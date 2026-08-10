@@ -102,3 +102,28 @@ for (const file of htmlFiles) {
   }
 }
 console.log(`purge-inline: ${done} pages inlined`);
+
+// Pre-compress every text asset with brotli (served via .br sidecar files).
+// The server prefers these when the client accepts br — ~15-20% smaller than gzip.
+{
+  const { brotliCompressSync, constants } = await import("node:zlib");
+  const TEXT = /\.(html|css|js|mjs|svg|xml|txt|json|webmanifest)$/;
+  const stack = [dist];
+  let n = 0, saved = 0;
+  while (stack.length) {
+    const dir = stack.pop();
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const f = path.join(dir, e.name);
+      if (e.isDirectory()) { stack.push(f); continue; }
+      if (!TEXT.test(e.name)) continue;
+      const buf = fs.readFileSync(f);
+      if (buf.length < 1024) continue;
+      const br = brotliCompressSync(buf, {
+        params: { [constants.BROTLI_PARAM_QUALITY]: 11 },
+      });
+      fs.writeFileSync(f + ".br", br);
+      n++; saved += buf.length - br.length;
+    }
+  }
+  console.log(`brotli: ${n} files pre-compressed, saved ${(saved / 1024).toFixed(0)}KB raw`);
+}
