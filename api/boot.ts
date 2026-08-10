@@ -68,45 +68,6 @@ if (env.isProduction) {
     await next();
   });
 
-  // Serve pre-compressed .br sidecars (built by purge-inline.mjs) when the
-  // client accepts brotli — skips on-the-fly gzip for text assets entirely.
-  {
-    const { existsSync } = await import("node:fs");
-    const { readFile } = await import("node:fs/promises");
-    const mime: Record<string, string> = {
-      ".html": "text/html; charset=utf-8",
-      ".css": "text/css; charset=utf-8",
-      ".js": "text/javascript; charset=utf-8",
-      ".mjs": "text/javascript; charset=utf-8",
-      ".svg": "image/svg+xml",
-      ".xml": "application/xml; charset=utf-8",
-      ".txt": "text/plain; charset=utf-8",
-      ".json": "application/json",
-      ".webmanifest": "application/manifest+json",
-    };
-    const root = "./dist/public";
-    app.use("*", async (c, next) => {
-      if (!(c.req.header("accept-encoding") ?? "").includes("br")) return next();
-      let p = decodeURIComponent(c.req.path);
-      if (p.endsWith("/")) p += "index.html";
-      else if (!/\.[a-z0-9]+$/i.test(p)) p += "/index.html";
-      const ext = p.match(/\.[a-z0-9]+$/i)?.[0]?.toLowerCase() ?? "";
-      // Brotli only for HTML: it transfers ~25% smaller (FCP win) and decodes
-      // fast. JS/CSS stay gzip — brotli decode cost on slow mobile CPUs
-      // measurably delays LCP paint under Lighthouse's 4x CPU emulation.
-      if (ext !== ".html") return next();
-      const type = mime[ext];
-      if (!type) return next();
-      const file = `${root}${p}`;
-      if (!existsSync(`${file}.br`)) return next();
-      const body = await readFile(`${file}.br`);
-      c.header("Content-Type", type);
-      c.header("Content-Encoding", "br");
-      c.header("Vary", "Accept-Encoding");
-      return c.body(body);
-    });
-  }
-
   serveStaticFiles(app);
 
   const port = parseInt(process.env.PORT || "3000");  serve({ fetch: app.fetch, port, hostname: "0.0.0.0" }, () => {
