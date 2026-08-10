@@ -351,7 +351,7 @@ export default function Home() {
                 ].map(([what, us, them]) => (
                   <tr key={what}>
                     <th className="px-5 py-3.5 font-semibold">{what}</th>
-                    <td className="px-5 py-3.5 font-medium text-emerald-600">✓ {us}</td>
+                    <td className="px-5 py-3.5 font-medium text-emerald-800">✓ {us}</td>
                     <td className="px-5 py-3.5 text-foreground/70">✗ {them}</td>
                   </tr>
                 ))}

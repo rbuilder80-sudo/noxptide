@@ -41,7 +41,7 @@ if (env.isProduction) {
       c.res.headers.set("Cache-Control", "public, max-age=31536000, immutable");
     } else if (/\.(webp|avif|png|jpe?g|svg|mp4)$/.test(p)) {
       // Images, fonts, media — cache a week, revalidate in background
-      c.res.headers.set("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400");
+      c.res.headers.set("Cache-Control", "public, max-age=2592000, stale-while-revalidate=604800");
     } else if (p === "/sitemap.xml" || p === "/robots.txt" || p === "/llms.txt") {
       c.res.headers.set("Cache-Control", "public, max-age=3600");
     } else {
