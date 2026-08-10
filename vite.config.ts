@@ -38,31 +38,17 @@ export default defineConfig({
             env: { ...process.env, PRERENDER_BUNDLE: path.resolve(bundle) },
           })
 
-          // Purge unused CSS against prerendered HTML + client JS, then inline
-          const purgedPath = path.join(dir, "assets", "purged.css")
-          execSync(
-            `npx -y purgecss --css "${cssPath}" --config purgecss.config.cjs --output "${purgedPath}"`,
-            { stdio: "inherit" },
-          )
-          const purged = fs.readFileSync(purgedPath, "utf8")
-          const linkRe = /<link[^>]*rel="stylesheet"[^>]*>/
-          const walk = (d: string) => {
-            for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-              const p = path.join(d, e.name)
-              if (e.isDirectory()) walk(p)
-              else if (e.name === "index.html") {
-                const h = fs.readFileSync(p, "utf8")
-                if (linkRe.test(h)) fs.writeFileSync(p, h.replace(linkRe, `<style data-inlined>${purged}</style>`))
-              }
-            }
-          }
-          walk(dir)
-          fs.unlinkSync(purgedPath)
+          // Per-route CSS purge + inline (each page gets only the CSS it uses)
+          if (!process.env.SKIP_PURGE) execSync(`node scripts/purge-inline.mjs`, { stdio: "inherit" })
         } catch (e) {
-          console.warn("prerender skipped:", e)
+          console.warn("prerender skipped:", e?.stderr?.toString?.() || e?.message || e)
           // Fallback: inline the full stylesheet into the root page
-          const css = fs.readFileSync(cssPath, "utf8")
-          fs.writeFileSync(htmlPath, html.replace(m[0], `<style data-inlined>${css}</style>`))
+          try {
+            const css = fs.readFileSync(cssPath, "utf8")
+            const cur = fs.readFileSync(htmlPath, "utf8")
+            const lm = cur.match(/<link[^>]*rel="stylesheet"[^>]*>/)
+            if (lm) fs.writeFileSync(htmlPath, cur.replace(lm[0], `<style data-inlined>${css}</style>`))
+          } catch {}
         }
       },
     }],
