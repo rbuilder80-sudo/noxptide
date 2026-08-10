@@ -94,13 +94,6 @@ for (const file of htmlFiles) {
       `<link rel="preload" as="image" href="/images/hero-vials.webp" media="(min-width: 1024px)">\n</head>`,
     );
   }
-  if (file === path.join(dist, "shop", "index.html")) {
-    // LCP on /shop is the first product card image — preload it with matching srcset/sizes
-    out = out.replace(
-      "</head>",
-      `<link rel="preload" as="image" href="/images/products/bpc-157-5mg-400.webp" imagesrcset="/images/products/bpc-157-5mg-400.webp 400w, /images/products/bpc-157-5mg.webp 800w" imagesizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px" fetchpriority="high">\n</head>`,
-    );
-  }
   fs.writeFileSync(file, out);
   done++;
   globalThis.gc?.();
