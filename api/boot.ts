@@ -36,7 +36,10 @@ if (env.isProduction) {
     if (p.startsWith("/assets/")) {
       // Vite content-hashed bundles — safe to cache forever
       c.res.headers.set("Cache-Control", "public, max-age=31536000, immutable");
-    } else if (/\.(webp|avif|png|jpe?g|svg|woff2?|mp4)$/.test(p)) {
+    } else if (/\.woff2?$/.test(p)) {
+      // Self-hosted font files are stable — cache for a year
+      c.res.headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (/\.(webp|avif|png|jpe?g|svg|mp4)$/.test(p)) {
       // Images, fonts, media — cache a week, revalidate in background
       c.res.headers.set("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400");
     } else if (p === "/sitemap.xml" || p === "/robots.txt" || p === "/llms.txt") {
