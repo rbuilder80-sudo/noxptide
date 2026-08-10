@@ -11,18 +11,21 @@ export function serveStaticFiles(app: App) {
 
   app.use("*", serveStatic({ root: "./dist/public" }));
 
-  // Admin is a client-rendered SPA area and must never index: serve the
-  // prerender-free shell with a noindex,nofollow header (audit §8).
-  const adminShellPath = path.resolve(distPath, "admin-shell.html");
-  const adminHandler = (c: Context) => {
-    c.header("X-Robots-Tag", "noindex, nofollow");
-    if (fs.existsSync(adminShellPath)) {
-      return c.html(fs.readFileSync(adminShellPath, "utf-8"));
-    }
-    return c.html(fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8"));
+  // Admin + checkout are client-rendered SPA areas that must never index:
+  // serve the prerender-free shells with robots headers (audit §8).
+  const shellHandler = (file: string, robots: string) => {
+    const shellPath = path.resolve(distPath, file);
+    return (c: Context) => {
+      c.header("X-Robots-Tag", robots);
+      if (fs.existsSync(shellPath)) {
+        return c.html(fs.readFileSync(shellPath, "utf-8"));
+      }
+      return c.html(fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8"));
+    };
   };
-  app.get("/admin", adminHandler);
-  app.get("/admin/*", adminHandler);
+  app.get("/admin", shellHandler("admin-shell.html", "noindex, nofollow"));
+  app.get("/admin/*", shellHandler("admin-shell.html", "noindex, nofollow"));
+  app.get("/checkout", shellHandler("checkout-shell.html", "noindex, follow"));
 
   // Unknown/deleted URLs must return a genuine 404 with a useful HTML page —
   // never the SPA homepage with a 200 (audit: required HTTP contract).

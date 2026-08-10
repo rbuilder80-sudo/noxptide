@@ -79,11 +79,13 @@ function applySeo(html, seo) {
 }
 
 // Every route the SPA serves publicly. /category/* is intentionally absent:
-// legacy category URLs 301 to /shop at the server (audit §8).
+// legacy category URLs 301 to /shop at the server (audit §8). /checkout is
+// served as a noindex shell by the server — with an empty SSR cart it only
+// redirects to /cart, so there is no useful content to prerender.
 const staticRoutes = [
   "/", "/shop", "/quality", "/faq", "/about", "/shipping", "/legal",
   "/terms", "/privacy", "/data-retention", "/contact", "/cart",
-  "/guides",
+  "/guides", "/login",
 ];
 const routes = [
   ...staticRoutes,
@@ -125,16 +127,14 @@ try {
 
 // Admin shell: no prerendered storefront markup (clean client hydration) and
 // a noindex,nofollow robots directive in the initial HTML (audit §8).
-{
-  const shell = template
-    .replace(/<title>.*?<\/title>/s, "<title>Admin | Noxptide</title>")
-    .replace(
-      /<meta name="robots" content="[^"]*" \/>/,
-      '<meta name="robots" content="noindex, nofollow" />',
-    );
-  fs.writeFileSync(path.join(dist, "admin-shell.html"), shell);
-  console.log("prerender: admin-shell.html written");
-}
+// Checkout gets the same treatment with noindex,follow.
+const makeShell = (title, robots) =>
+  template
+    .replace(/<title>.*?<\/title>/s, `<title>${esc(title)}</title>`)
+    .replace(/<meta name="robots" content="[^"]*" \/>/, `<meta name="robots" content="${robots}" />`);
+fs.writeFileSync(path.join(dist, "admin-shell.html"), makeShell("Admin | Noxptide", "noindex, nofollow"));
+fs.writeFileSync(path.join(dist, "checkout-shell.html"), makeShell("Secure Checkout | Noxptide", "noindex, follow"));
+console.log("prerender: admin-shell.html + checkout-shell.html written");
 
 // Sitemap: only canonical, indexable www URLs (audit P0-2, launch checklist).
 const lastmod = new Date().toISOString().slice(0, 10);
