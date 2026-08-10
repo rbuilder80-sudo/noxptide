@@ -1,14 +1,15 @@
 export { products, categories } from "../src/data/products";
 export { guides } from "../src/data/guides";
 export { seoForPath, INDEXABLE_PATHS, notFoundSeo } from "../src/data/seo";
-import { renderToString } from "react-dom/server";
+import { prerender } from "react-dom/static";
 import { MemoryRouter } from "react-router";
 import App from "../src/App";
 
-export function render(url: string): string {
-  return renderToString(
+export async function render(url: string): Promise<string> {
+  const { prelude } = await prerender(
     <MemoryRouter initialEntries={[url]}>
       <App />
     </MemoryRouter>,
   );
+  return await new Response(prelude).text();
 }

@@ -116,7 +116,7 @@ console.log(`prerender: ${ok}/${routes.length} routes rendered`);
 
 // True-404 template: rendered NotFound page with noindex, served with HTTP 404.
 try {
-  const appHtml = render("/this-page-does-not-exist");
+  const appHtml = await render("/this-page-does-not-exist");
   const html = applySeo(template.replace(ROOT, `<div id="root">${appHtml}</div>`), notFoundSeo);
   fs.writeFileSync(path.join(dist, "404.html"), html);
   console.log("prerender: 404.html written");
