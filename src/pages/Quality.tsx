@@ -37,7 +37,7 @@ export default function Quality() {
 
       <div className="mt-6 max-w-3xl">
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Quality You Can Verify, Not Just Believe
+          Peptide Quality Testing You Can Verify
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
           The research peptide market has a documentation problem. Suppliers claim 99% purity; few

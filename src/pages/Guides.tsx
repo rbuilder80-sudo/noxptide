@@ -15,7 +15,7 @@ export default function Guides() {
 
       <div className="mt-6 max-w-3xl">
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Research Guides & Resources
+          Research Peptide Guides &amp; Laboratory Resources
         </h1>
         <p className="mt-4 leading-relaxed text-muted-foreground">
           Written for laboratories, not search engines — though both will find what they need.

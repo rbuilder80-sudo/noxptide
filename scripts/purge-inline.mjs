@@ -25,7 +25,7 @@ const walk = (d) => {
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
     const p = path.join(d, e.name);
     if (e.isDirectory()) walk(p);
-    else if (e.name === "index.html") htmlFiles.push(p);
+    else if (e.name === "index.html" || e.name === "404.html") htmlFiles.push(p);
   }
 };
 walk(dist);

@@ -42,58 +42,7 @@ export default function Product() {
 
   useSeo({
     pageKey: `product:${product?.slug ?? ""}`,
-    title: product
-      ? `${product.name} UK | Buy ${product.name} ${product.purity} — Noxptide`
-      : 'Product Not Found | Noxptide',
-    description: product ? product.short : 'This product could not be found.',
-    jsonLd: product
-      ? [
-          {
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: product.name,
-            description: product.short,
-            url: `https://noxptide.co.uk/product/${product.slug}`,
-            image: `https://noxptide.co.uk/images/products/${product.slug}-${product.sizes[0].label.replace(/ /g, '').toLowerCase()}.webp`,
-            brand: { '@type': 'Brand', name: 'Noxptide' },
-            sku: product.slug.toUpperCase(),
-            aggregateRating: {
-              '@type': 'AggregateRating',
-              ratingValue: product.rating.toFixed(1),
-              reviewCount: product.reviews,
-              bestRating: '5',
-              worstRating: '1',
-            },
-            offers: product.sizes.map((s) => ({
-              '@type': 'Offer',
-              url: `https://noxptide.co.uk/product/${product.slug}`,
-              priceCurrency: 'GBP',
-              price: s.price.toFixed(2),
-              name: `${product.name} ${s.label}`,
-              availability: 'https://schema.org/InStock',
-              itemCondition: 'https://schema.org/NewCondition',
-            })),
-          },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: product.faqs.map((f) => ({
-              '@type': 'Question',
-              name: f.q,
-              acceptedAnswer: { '@type': 'Answer', text: f.a },
-            })),
-          },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://noxptide.co.uk/' },
-              { '@type': 'ListItem', position: 2, name: 'Peptides', item: 'https://noxptide.co.uk/shop' },
-              { '@type': 'ListItem', position: 3, name: product.name },
-            ],
-          },
-        ]
-      : undefined,
+    ...(product ? productSeo(product) : notFoundSeo),
   })
 
   if (!product) return <Navigate to="/shop" replace />

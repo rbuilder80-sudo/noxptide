@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { useSeo } from '../hooks/useSeo'
+import { notFoundSeo } from '../data/seo'
 
 export default function NotFound() {
   useSeo({ ...notFoundSeo })

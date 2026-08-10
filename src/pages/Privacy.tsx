@@ -1,16 +1,13 @@
 import { Link } from 'react-router'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 
 const H = ({ id, children }: { id: string; children: React.ReactNode }) => (
   <h2 id={id} className="text-xl font-bold text-foreground">{children}</h2>
 )
 
 export default function Privacy() {
-  useSeo({
-    title: 'Privacy Policy | Noxptide UK',
-    description:
-      'How Noxptide collects, uses and protects your personal data — UK GDPR compliant privacy policy covering orders, cookies, analytics and your data rights.',
-  })
+  useSeo({ ...coreSeo['/privacy'] })
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">

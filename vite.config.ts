@@ -70,9 +70,10 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-react": ["react", "react-dom", "react-router"],
-          "vendor-data": ["@tanstack/react-query", "@trpc/client", "@trpc/server", "superjson"],
+        manualChunks(id: string) {
+          if (!id.includes("node_modules")) return
+          if (/[\/]node_modules[\/](react|react-dom|react-router|scheduler)([\/]|$)/.test(id)) return "vendor-react"
+          if (/[\/]node_modules[\/](@trpc|@tanstack|superjson)([\/]|$)/.test(id)) return "vendor-data"
         },
       },
     },

@@ -35,7 +35,7 @@ export default function Shop() {
       <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
         <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-foreground">Peptides</span>
       </nav>
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Peptides</h1>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Research Peptides UK</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
         Every product below is synthesised to ≥99% purity, independently verified by HPLC and mass
         spectrometry, and shipped with a batch-specific Certificate of Analysis.

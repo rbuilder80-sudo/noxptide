@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSeo } from "../hooks/useSeo";
+import { coreSeo } from "../data/seo";
 
 function getOAuthUrl() {
   const kimiAuthUrl = import.meta.env.VITE_KIMI_AUTH_URL;
@@ -18,6 +20,7 @@ function getOAuthUrl() {
 }
 
 export default function Login() {
+  useSeo({ ...coreSeo['/login'] });
   return (
     <div className="min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-sm">

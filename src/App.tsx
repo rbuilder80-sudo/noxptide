@@ -17,13 +17,15 @@ import Privacy from './pages/Privacy'
 import DataRetention from './pages/DataRetention'
 import Contact from './pages/Contact'
 import Cart from './pages/Cart'
-import Checkout from './pages/Checkout'
 import NotFound from './pages/NotFound'
 import Guides from './pages/Guides'
 import GuideArticle from './pages/GuideArticle'
-import Login from './pages/Login'
 import { CmsProvider } from './hooks/useCms'
 
+// Pages that need the tRPC/react-query stack load it lazily via TrpcShell
+const Checkout = lazy(() => import('./pages/Checkout'))
+const Login = lazy(() => import('./pages/Login'))
+const TrpcShell = lazy(() => import('./providers/TrpcShell'))
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'))
@@ -75,7 +77,16 @@ export default function App() {
             </Route>
             <Route path="*" element={<NotFound />} />
           </Route>
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login"
+            element={
+              <Suspense fallback={adminFallback}>
+                <TrpcShell>
+                  <Login />
+                </TrpcShell>
+              </Suspense>
+            }
+          />
         </Routes>
       </CmsProvider>
     </CartProvider>

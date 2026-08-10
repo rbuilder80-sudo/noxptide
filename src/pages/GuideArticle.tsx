@@ -32,41 +32,7 @@ export default function GuideArticle() {
 
   useSeo({
     pageKey: `guide:${guide?.slug ?? ""}`,
-    title: guide ? `${guide.title} | Noxptide Research Guides` : 'Guide Not Found | Noxptide',
-    description: guide ? guide.description : 'This guide could not be found.',
-    jsonLd: guide
-      ? [
-          {
-            '@context': 'https://schema.org',
-            '@type': 'Article',
-            headline: guide.title,
-            description: guide.description,
-            datePublished: guide.published,
-            dateModified: guide.updated,
-            author: { '@type': 'Organization', name: 'Noxptide Research Team' },
-            publisher: { '@type': 'Organization', name: 'Noxptide' },
-            mainEntityOfPage: `https://noxptide.co.uk/guides/${guide.slug}`,
-          },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: guide.faqs.map((f) => ({
-              '@type': 'Question',
-              name: f.q,
-              acceptedAnswer: { '@type': 'Answer', text: f.a },
-            })),
-          },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://noxptide.co.uk/' },
-              { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://noxptide.co.uk/guides' },
-              { '@type': 'ListItem', position: 3, name: guide.title },
-            ],
-          },
-        ]
-      : undefined,
+    ...(guide ? guideSeo(guide) : notFoundSeo),
   })
 
   if (!guide) return <Navigate to="/guides" replace />

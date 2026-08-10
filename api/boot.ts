@@ -51,10 +51,26 @@ if (env.isProduction) {
     }
   });
 
+  // Canonical host + legacy route redirects (audit P0-2, §8):
+  // apex -> www in one permanent, path-preserving hop; legacy category
+  // URLs permanently redirect to the catalogue hub.
+  app.use("*", async (c, next) => {
+    const host = (c.req.header("host") ?? "").split(":")[0];
+    if (host === "noxptide.co.uk") {
+      const url = new URL(c.req.url);
+      c.header("Cache-Control", "public, max-age=86400");
+      return c.redirect(`https://www.noxptide.co.uk${url.pathname}${url.search}`, 301);
+    }
+    if (c.req.path.startsWith("/category/")) {
+      c.header("Cache-Control", "public, max-age=86400");
+      return c.redirect("/shop", 301);
+    }
+    await next();
+  });
+
   serveStaticFiles(app);
 
-  const port = parseInt(process.env.PORT || "3000");
-  serve({ fetch: app.fetch, port, hostname: "0.0.0.0" }, () => {
+  const port = parseInt(process.env.PORT || "3000");  serve({ fetch: app.fetch, port, hostname: "0.0.0.0" }, () => {
     console.log(`Server running on http://localhost:${port}/`);
   });
 

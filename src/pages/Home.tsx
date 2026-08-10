@@ -71,8 +71,8 @@ export default function Home() {
               </Enter>
               <Enter>
               <h1 className="mt-6 font-display text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-                Research peptides{' '}
-                <em className="italic text-accent">your lab can trust</em>
+                UK research peptides with{' '}
+                <em className="italic text-accent">verifiable ≥99% purity</em>
               </h1>
               </Enter>
               <Enter>

@@ -338,6 +338,7 @@ export const coreSeo: Record<string, RouteSeo> = {
           '/faq',
           'Answers about research peptide purity, COAs, storage, UK delivery, ordering and research-use compliance.',
         ),
+        faqPageLd(allFaqs),
         breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'FAQ' }]),
       ],
     },
