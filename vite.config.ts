@@ -14,7 +14,7 @@ export default defineConfig({
     {
       name: "inline-css",
       apply: "build",
-      closeBundle() {
+      async closeBundle() {
         const dir = path.resolve(__dirname, "dist/public")
         const htmlPath = path.join(dir, "index.html")
         if (!fs.existsSync(htmlPath)) return
@@ -26,6 +26,23 @@ export default defineConfig({
         const css = fs.readFileSync(cssPath, "utf8")
         html = html.replace(m[0], `<style data-inlined>${css}</style>`)
         fs.writeFileSync(htmlPath, html)
+
+        // Prerender public routes to static HTML for instant first paint
+        try {
+          const { execSync } = await import("child_process")
+          const bundle = "node_modules/.cache/prerender.mjs"
+          fs.mkdirSync(path.dirname(bundle), { recursive: true })
+          execSync(
+            `npx esbuild scripts/prerender.tsx --bundle --platform=node --format=esm --outfile=${bundle} --alias:@=./src --jsx=automatic --banner:js="import { createRequire } from 'module';const require = createRequire(import.meta.url);" --define:process.env.NODE_ENV='"'"'production'"'"'`,
+            { stdio: "inherit" },
+          )
+          execSync(`node scripts/prerender-run.mjs`, {
+            stdio: "inherit",
+            env: { ...process.env, PRERENDER_BUNDLE: path.resolve(bundle) },
+          })
+        } catch (e) {
+          console.warn("prerender skipped:", e)
+        }
       },
     }],
   server: {
