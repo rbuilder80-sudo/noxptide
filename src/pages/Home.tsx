@@ -246,10 +246,15 @@ export default function Home() {
           </Link>
         </div>
         <RevealGroup className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {products.map((p) => (
+          {products.slice(0, 8).map((p) => (
             <RevealItem key={p.slug}><ProductCard product={p} /></RevealItem>
           ))}
         </RevealGroup>
+        <div className="mt-8 text-center sm:hidden">
+          <Link to="/shop" className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+            View all peptides <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </div>
       </section>
 
       {/* Best sellers */}
