@@ -190,11 +190,36 @@ const GUIDE_TITLE_OVERRIDES: Record<string, string> = {
   'epitalon-research-guide': 'Epitalon Research Guide: The Telomerase-Pathway Tetrapeptide',
 }
 
+/** Meta descriptions per audit (≤160 chars; the on-page card copy stays longer). */
+const GUIDE_DESCRIPTION_OVERRIDES: Record<string, string> = {
+  'bpc-157-research-guide':
+    'The complete laboratory guide to BPC-157: what it is, what the published research covers, how to store and reconstitute it, and how to verify purity.',
+  'tb-500-research-guide':
+    'A laboratory guide to TB-500: mechanism coverage in the literature, correct storage and reconstitution, purity verification, and how it differs from BPC-157.',
+  'bpc-157-vs-tb-500':
+    'BPC-157 and TB-500 compared for research design: mechanisms, literature coverage, handling differences, purity verification, and when to choose each.',
+  'ipamorelin-vs-cjc-1295':
+    'Ipamorelin vs CJC-1295 (No DAC) compared for endocrine research: receptor mechanisms, selectivity, literature coverage, handling, and why labs pair them.',
+  'semax-research-guide':
+    'A laboratory guide to Semax: its origin as an ACTH(4-10) analogue, neurotrophin literature, light-sensitive handling, and purity verification.',
+  'ghk-cu-research-guide':
+    'A laboratory guide to GHK-Cu (Copper Tripeptide-1): four decades of skin and matrix research, what the blue colour tells you about quality, and correct storage.',
+  'peptide-reconstitution-storage-guide':
+    'Step-by-step laboratory guidance on reconstituting lyophilised peptides with bacteriostatic water, storage temperatures, shelf life and freeze-thaw limits.',
+  'how-to-read-peptide-coa':
+    'What every section of a peptide COA actually means: HPLC purity traces, mass spectrometry identity, batch numbers, appearance testing, and red flags.',
+  'melanotan-2-vs-pt-141':
+    'Melanotan II vs PT-141 (Bremelanotide) compared for melanocortin research: the one-atom structural difference, receptor profiles, literature and handling.',
+  'epitalon-research-guide':
+    'A laboratory guide to Epitalon (Epithalon): the Ala-Glu-Asp-Gly tetrapeptide, telomerase and pineal research literature, handling, and analytical verification.',
+}
+
 export function guideSeo(guide: Guide): RouteSeo {
   const path = `/guides/${guide.slug}`
+  const description = GUIDE_DESCRIPTION_OVERRIDES[guide.slug] ?? guide.description
   return {
     title: GUIDE_TITLE_OVERRIDES[guide.slug] ?? `${guide.title} | Noxptide Research Guides`,
-    description: guide.description,
+    description,
     robots: INDEX_ROBOTS,
     canonical: `${SITE_URL}${path}`,
     ogType: 'article',
@@ -204,7 +229,7 @@ export function guideSeo(guide: Guide): RouteSeo {
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: guide.title,
-        description: guide.description,
+        description,
         image: DEFAULT_OG_IMAGE,
         datePublished: guide.published,
         dateModified: guide.updated,
