@@ -76,7 +76,7 @@ export default function Shop() {
       <h2 className="sr-only">Product list</h2>
       <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filtered.map((p, i) => (
-          <ProductCard key={p.slug} product={p} eager={i < 4} />
+          <ProductCard key={p.slug} product={p} eager={i < 2} />
         ))}
       </div>
 
