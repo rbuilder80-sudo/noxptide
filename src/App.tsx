@@ -4,9 +4,6 @@ import { CartProvider } from './context/CartContext'
 import ScrollToTop from './components/ScrollToTop'
 import Layout from './components/Layout'
 import Home from './pages/Home'
-import Shop from './pages/Shop'
-import Category from './pages/Category'
-import Product from './pages/Product'
 import Quality from './pages/Quality'
 import Faq from './pages/Faq'
 import About from './pages/About'
@@ -18,10 +15,15 @@ import DataRetention from './pages/DataRetention'
 import Contact from './pages/Contact'
 import Cart from './pages/Cart'
 import NotFound from './pages/NotFound'
-import Guides from './pages/Guides'
-import GuideArticle from './pages/GuideArticle'
 import { CmsProvider } from './hooks/useCms'
 
+// Heavy storefront pages code-split per route; react-dom/static prerender
+// resolves them fully during SSG, hydration re-suspends until chunk loads.
+const Shop = lazy(() => import('./pages/Shop'))
+const Category = lazy(() => import('./pages/Category'))
+const Product = lazy(() => import('./pages/Product'))
+const Guides = lazy(() => import('./pages/Guides'))
+const GuideArticle = lazy(() => import('./pages/GuideArticle'))
 // Pages that need the tRPC/react-query stack load it lazily via TrpcShell
 const Checkout = lazy(() => import('./pages/Checkout'))
 const Login = lazy(() => import('./pages/Login'))
@@ -42,6 +44,7 @@ export default function App() {
     <CartProvider>
       <CmsProvider>
         <ScrollToTop />
+        <Suspense fallback={null}>
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
@@ -88,6 +91,7 @@ export default function App() {
             }
           />
         </Routes>
+        </Suspense>
       </CmsProvider>
     </CartProvider>
   )
