@@ -2,26 +2,12 @@ import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Search } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 import { products } from '../data/products'
 import ProductCard from '../components/ProductCard'
 
 export default function Shop() {
-  useSeo({
-    pageKey: 'shop',
-    title: 'Shop All Research Peptides | Noxptide — UK Supplier, ≥99% Purity',
-    description:
-      'Browse the full Noxptide catalogue: BPC-157, TB-500, GHK-Cu, Ipamorelin, CJC-1295, Semax, Selank and more. Every batch HPLC & MS verified with COA. Tracked UK delivery.',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      itemListElement: products.map((p, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        url: `https://noxptide.co.uk/product/${p.slug}`,
-        name: p.name,
-      })),
-    },
-  })
+  useSeo({ pageKey: 'shop', ...coreSeo['/shop'] })
 
   const [params] = useSearchParams()
   const [q, setQ] = useState(params.get('q') ?? '')

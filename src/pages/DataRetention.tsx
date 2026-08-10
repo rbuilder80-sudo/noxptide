@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 
 const rows: [string, string, string][] = [
   ['Order and transaction records', '6 years from the end of the financial year of the order', 'Required by UK tax and accounting law; needed to handle any legal claim'],
@@ -12,11 +13,7 @@ const rows: [string, string, string][] = [
 ]
 
 export default function DataRetention() {
-  useSeo({
-    title: 'Data Retention Policy | Noxptide UK',
-    description:
-      'Exactly how long Noxptide keeps each kind of personal data and why — order records, accounts, emails, marketing, analytics and backups.',
-  })
+  useSeo({ ...coreSeo['/data-retention'] })
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">

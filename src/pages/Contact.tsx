@@ -2,14 +2,10 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { Mail, Clock, CheckCircle2 } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 
 export default function Contact() {
-  useSeo({
-    pageKey: 'contact',
-    title: 'Contact Noxptide | COA Requests & Research Support',
-    description:
-      'Contact Noxptide for batch COA requests (answered within one working hour), order support and research enquiries. UK-based team, support@noxptide.co.uk.',
-  })
+  useSeo({ pageKey: 'contact', ...coreSeo['/contact'] })
 
   const [sent, setSent] = useState(false)
 
@@ -19,7 +15,7 @@ export default function Contact() {
         <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-foreground">Contact</span>
       </nav>
 
-      <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Contact Us</h1>
+      <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Contact Noxptide</h1>
       <p className="mt-3 text-muted-foreground">
         COA requests, order support and research enquiries — handled by people who understand
         laboratory work.

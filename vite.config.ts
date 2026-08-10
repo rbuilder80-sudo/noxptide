@@ -39,7 +39,7 @@ export default defineConfig({
           })
 
           // Per-route CSS purge + inline (each page gets only the CSS it uses)
-          if (!process.env.SKIP_PURGE) execSync(`node scripts/purge-inline.mjs`, { stdio: "inherit" })
+          if (!process.env.SKIP_PURGE) execSync(`node --expose-gc scripts/purge-inline.mjs`, { stdio: "inherit" })
         } catch (e) {
           console.warn("prerender skipped:", e?.stderr?.toString?.() || e?.message || e)
           // Fallback: inline the full stylesheet into the root page

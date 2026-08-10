@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { ShieldCheck, FlaskConical, FileCheck, Microscope, ArrowRight } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 
 const pillars = [
   {
@@ -26,12 +27,7 @@ const pillars = [
 ]
 
 export default function Quality() {
-  useSeo({
-    pageKey: 'quality',
-    title: 'Quality & Certificates of Analysis | Noxptide UK',
-    description:
-      'How Noxptide guarantees ≥99% peptide purity: SPPS synthesis, preparative HPLC purification, independent HPLC & MS verification, and a batch-specific COA with every order.',
-  })
+  useSeo({ pageKey: 'quality', ...coreSeo['/quality'] })
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:py-14">

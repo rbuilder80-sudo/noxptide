@@ -4,6 +4,7 @@ import {
   ShieldCheck, Truck, FileCheck, FlaskConical, ChevronDown, ShoppingCart, Check,
 } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { notFoundSeo, productSeo } from '../data/seo'
 import { useCart } from '../context/CartContext'
 import { formatGBP, getProduct, productsByCategory } from '../data/products'
 import ProductCard, { ProductImage } from '../components/ProductCard'
@@ -138,7 +139,7 @@ export default function Product() {
             Peptides
           </Link>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            {product.name}
+            {product.name} Research Peptide
           </h1>
           <p className="mt-1 text-muted-foreground">{product.subtitle}</p>
           <div className="mt-3">

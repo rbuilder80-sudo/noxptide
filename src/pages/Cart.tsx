@@ -1,12 +1,13 @@
 import { Link } from 'react-router'
 import { Minus, Plus, Trash2, ArrowRight, ShieldCheck } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 import { useCart, unitPrice } from '../context/CartContext'
 import { formatGBP, getProduct } from '../data/products'
 import { ProductImage } from '../components/ProductCard'
 
 export default function Cart() {
-  useSeo({ title: 'Your Cart | Noxptide', description: 'Review your research peptide order.' })
+  useSeo({ ...coreSeo['/cart'] })
   const { items, setQty, removeItem, subtotal, discountRate, discountAmount, discountedSubtotal } = useCart()
   const shipping = subtotal >= 25 || subtotal === 0 ? 0 : 4.99
 

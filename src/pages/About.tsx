@@ -1,20 +1,10 @@
 import { Link } from 'react-router'
 import { ArrowRight, Target, Eye, ShieldCheck } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 
 export default function About() {
-  useSeo({
-    pageKey: 'about',
-    title: 'About Noxptide | The UK Quality-First Research Peptide Supplier',
-    description:
-      'Noxptide was founded to end the guesswork in UK research peptide supply — independent verification, batch COAs and honest documentation on every product.',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'AboutPage',
-      name: 'About Noxptide',
-      url: 'https://noxptide.co.uk/about',
-    },
-  })
+  useSeo({ pageKey: 'about', ...coreSeo['/about'] })
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
@@ -23,7 +13,7 @@ export default function About() {
       </nav>
 
       <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Built by Researchers, for Researchers
+        About Noxptide
       </h1>
 
       <div className="mt-6 space-y-5 leading-relaxed text-muted-foreground">

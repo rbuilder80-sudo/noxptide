@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, Navigate } from 'react-router'
 import { CheckCircle2, Lock, ShieldCheck, Truck } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 import { useCart, unitPrice } from '../context/CartContext'
 import { formatGBP, getProduct } from '../data/products'
 import { trpc } from '../providers/trpc'
@@ -10,7 +11,7 @@ const inputCls =
   'mt-1.5 w-full rounded-lg border border-input px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
 
 export default function Checkout() {
-  useSeo({ title: 'Secure Checkout | Noxptide', description: 'Complete your research peptide order securely.' })
+  useSeo({ ...coreSeo['/checkout'] })
   const { items, subtotal, discountRate, discountAmount, discountedSubtotal, clear } = useCart()
   const [orderNumber, setOrderNumber] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)

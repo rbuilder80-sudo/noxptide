@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { ArrowRight, ShieldCheck, FlaskConical, Truck, FileCheck, Star, Quote } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 import { products } from '../data/products'
 import ProductCard from '../components/ProductCard'
 import { Enter, Reveal, RevealGroup, RevealItem } from '../components/motion'
@@ -47,40 +48,7 @@ const testimonials = [
 ]
 
 export default function Home() {
-  const homeFaqs = [
-    {
-      q: 'What are research peptides?',
-      a: 'Research peptides are short chains of amino acids synthesised for laboratory study. They are used by universities, contract research organisations and private laboratories to investigate biological pathways in controlled, in-vitro settings. Noxptide supplies research peptides strictly for laboratory use — never for human or veterinary administration.',
-    },
-    {
-      q: 'Where can I buy high-purity research peptides in the UK?',
-      a: 'Noxptide supplies UK laboratories with ≥99% purity research peptides, independently verified by HPLC and mass spectrometry. Every order includes a batch-specific Certificate of Analysis, ships from within the UK with tracked delivery (free over £25), and is dispatched the same day when ordered before 4pm Monday–Friday.',
-    },
-    {
-      q: 'How do I verify a peptide supplier is legitimate?',
-      a: 'Ask three questions: Is purity verified by an independent laboratory rather than in-house? Can you see the batch-specific Certificate of Analysis before ordering? Does the supplier operate clear research-use-only compliance? Noxptide answers yes to all three — and will send any current batch COA within one working hour of your request.',
-    },
-    {
-      q: 'Which research peptides do UK laboratories order most?',
-      a: 'The most-ordered compounds at Noxptide are BPC-157 and TB-500 for tissue-repair research, Ipamorelin and CJC-1295 for endocrine research, and Semax and Selank for neuroscience research. All are stocked in the UK at ≥99% purity with full analytical documentation.',
-    },
-  ]
-
-  useSeo({
-    pageKey: 'home',
-    title: 'Noxptide | Buy UK Research Peptides — ≥99% Purity, COA With Every Batch',
-    description:
-      "The UK's quality-first research peptide supplier. BPC-157, TB-500, Ipamorelin and more — independently HPLC & MS verified to ≥99% purity, batch COAs, tracked UK delivery. Research use only.",
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: homeFaqs.map((f) => ({
-        '@type': 'Question',
-        name: f.q,
-        acceptedAnswer: { '@type': 'Answer', text: f.a },
-      })),
-    },
-  })
+  useSeo({ pageKey: 'home', ...coreSeo['/'] })
 
   const featured = products.filter((p) => ['bpc-157', 'tb-500', 'ipamorelin', 'ghk-cu'].includes(p.slug))
 

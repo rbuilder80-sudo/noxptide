@@ -16,14 +16,8 @@ const cssPath = path.join(dist, m[1]);
 
 const extractor = (content) => content.match(/[^\s"'`=<>\\]+(?<!:)/g) || [];
 const safelist = {
-  standard: [
-    "in-view", "dark", "html", "body",
-    /^sm:/, /^md:/, /^lg:/, /^xl:/, /^hover:/, /^focus:/, /^focus-visible:/,
-    /^active:/, /^disabled:/, /^group-hover:/, /^peer-/, /^aria-/, /^data-/,
-    /^first:/, /^last:/, /^odd:/, /^even:/, /^visited:/, /^checked:/,
-    /^placeholder:/, /^before:/, /^after:/, /^backdrop-/, /^motion-/, /^print:/,
-  ],
-  greedy: [/reveal/, /^animate-/, /^glass/, /^sr-only/],
+  standard: ["in-view", "dark", "html", "body"],
+  greedy: [/reveal/, /^animate-/, /^glass/, /^sr-only/, /^data-/, /^aria-/],
 };
 
 const htmlFiles = [];
@@ -53,28 +47,45 @@ const jsFiles = listFiles(path.join(dist, "assets"), /\.js$/);
 const srcFiles = ["src/pages", "src/components", "src/hooks", "src/context", "src/providers"]
   .flatMap((d) => listFiles(path.resolve(import.meta.dirname, "../", d), /\.(tsx?|jsx?)$/));
 
-const content = [
-  ...htmlFiles.map((f) => ({ raw: fs.readFileSync(f, "utf8"), extension: "html" })),
-  ...jsFiles,
-  ...srcFiles,
-];
-
-const [result] = await new PurgeCSS().purge({
-  content,
-  css: [cssPath],
-  defaultExtractor: extractor,
-  safelist,
-  fontFace: true,
-  keyframes: true,
-  variables: true,
-});
-console.log(`purge-inline: purged css ${(result.css.length / 1024).toFixed(1)}KB`);
+// Precompute class tokens from client JS + sources once (small memory footprint).
+// Admin chunks/classes only go into the root page (SPA fallback that also renders
+// /admin); prerendered storefront pages only need storefront tokens.
+const isAdmin = (f) => /Admin/i.test(path.basename(f)) || /pages[\/]admin/i.test(f);
+const storefrontTokens = new Set();
+const adminTokens = new Set();
+for (const f of [...jsFiles, ...srcFiles]) {
+  // Only shared components contribute dynamic classes on prerendered pages
+  // (each page's own markup is fully present in its prerendered HTML).
+  if (!/src[\/](hooks|context|providers)[\/]/.test(f) && !/src[\/]components[\/][^\/]+$/.test(f) && !/useAuth/.test(f)) continue;
+  const target = isAdmin(f) ? adminTokens : storefrontTokens;
+  for (const t of extractor(fs.readFileSync(f, "utf8"))) target.add(t);
+}
+for (const f of jsFiles) {
+  // Admin lazy chunks only matter for the SPA fallback (root)
+  if (!/Admin/i.test(path.basename(f))) continue;
+  for (const t of extractor(fs.readFileSync(f, "utf8"))) adminTokens.add(t);
+}
+const storefrontRaw = [...storefrontTokens].join(" ");
+const allRaw = [...storefrontTokens, ...adminTokens].join(" ");
 
 let done = 0;
 for (const file of htmlFiles) {
   const html = fs.readFileSync(file, "utf8");
   const link = html.match(/<link[^>]*rel="stylesheet"[^>]*>/);
   if (!link) continue;
+  const isRoot = file === path.join(dist, "index.html");
+  const [result] = await new PurgeCSS().purge({
+    content: [
+      { raw: html, extension: "html" },
+      { raw: isRoot ? allRaw : storefrontRaw, extension: "html" },
+    ],
+    css: [cssPath],
+    defaultExtractor: extractor,
+    safelist,
+    fontFace: true,
+    keyframes: true,
+    variables: true,
+  });
   let out = html.replace(link[0], `<style data-inlined>${result.css}</style>`);
   if (file === path.join(dist, "index.html")) {
     // Hero image is a CSS background (desktop-only column) — preload on large screens only
@@ -85,5 +96,9 @@ for (const file of htmlFiles) {
   }
   fs.writeFileSync(file, out);
   done++;
+  globalThis.gc?.();
+  if (isRoot) {
+    console.log(`purge-inline: home css ${(result.css.length / 1024).toFixed(1)}KB`);
+  }
 }
 console.log(`purge-inline: ${done} pages inlined`);
