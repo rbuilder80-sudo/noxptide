@@ -373,7 +373,7 @@ export default function Home() {
                 <Quote className="h-6 w-6 opacity-60" aria-hidden="true" />
                 <blockquote className="mt-4 leading-relaxed">{t.quote}</blockquote>
                 <figcaption className="mt-4 text-sm opacity-80">{t.author}</figcaption>
-                <div className="mt-3 flex gap-1" aria-label="5 out of 5 stars">
+                <div className="mt-3 flex gap-1" role="img" aria-label="5 out of 5 stars">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" aria-hidden="true" />
                   ))}
