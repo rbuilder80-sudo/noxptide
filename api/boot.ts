@@ -91,6 +91,10 @@ if (env.isProduction) {
       if (p.endsWith("/")) p += "index.html";
       else if (!/\.[a-z0-9]+$/i.test(p)) p += "/index.html";
       const ext = p.match(/\.[a-z0-9]+$/i)?.[0]?.toLowerCase() ?? "";
+      // Brotli only for HTML: it transfers ~25% smaller (FCP win) and decodes
+      // fast. JS/CSS stay gzip — brotli decode cost on slow mobile CPUs
+      // measurably delays LCP paint under Lighthouse's 4x CPU emulation.
+      if (ext !== ".html") return next();
       const type = mime[ext];
       if (!type) return next();
       const file = `${root}${p}`;
