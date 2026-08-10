@@ -14,7 +14,15 @@ const app = (
 
 const rootEl = document.getElementById('root')!
 if (rootEl.hasChildNodes()) {
-  hydrateRoot(rootEl, app)
+  // Page is fully prerendered — hydrate during idle time so the main thread
+  // stays free for first paint, fonts and images (real anchor links work
+  // immediately; interactivity attaches moments later).
+  const hydrate = () => hydrateRoot(rootEl, app)
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(hydrate, { timeout: 3000 })
+  } else {
+    setTimeout(hydrate, 200)
+  }
 } else {
   createRoot(rootEl).render(app)
 }
