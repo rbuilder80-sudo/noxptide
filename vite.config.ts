@@ -23,9 +23,6 @@ export default defineConfig({
         if (!m) return
         const cssPath = path.join(dir, m[1])
         if (!fs.existsSync(cssPath)) return
-        const css = fs.readFileSync(cssPath, "utf8")
-        html = html.replace(m[0], `<style data-inlined>${css}</style>`)
-        fs.writeFileSync(htmlPath, html)
 
         // Prerender public routes to static HTML for instant first paint
         try {
@@ -40,8 +37,32 @@ export default defineConfig({
             stdio: "inherit",
             env: { ...process.env, PRERENDER_BUNDLE: path.resolve(bundle) },
           })
+
+          // Purge unused CSS against prerendered HTML + client JS, then inline
+          const purgedPath = path.join(dir, "assets", "purged.css")
+          execSync(
+            `npx -y purgecss --css "${cssPath}" --config purgecss.config.cjs --output "${purgedPath}"`,
+            { stdio: "inherit" },
+          )
+          const purged = fs.readFileSync(purgedPath, "utf8")
+          const linkRe = /<link[^>]*rel="stylesheet"[^>]*>/
+          const walk = (d: string) => {
+            for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+              const p = path.join(d, e.name)
+              if (e.isDirectory()) walk(p)
+              else if (e.name === "index.html") {
+                const h = fs.readFileSync(p, "utf8")
+                if (linkRe.test(h)) fs.writeFileSync(p, h.replace(linkRe, `<style data-inlined>${purged}</style>`))
+              }
+            }
+          }
+          walk(dir)
+          fs.unlinkSync(purgedPath)
         } catch (e) {
           console.warn("prerender skipped:", e)
+          // Fallback: inline the full stylesheet into the root page
+          const css = fs.readFileSync(cssPath, "utf8")
+          fs.writeFileSync(htmlPath, html.replace(m[0], `<style data-inlined>${css}</style>`))
         }
       },
     }],
