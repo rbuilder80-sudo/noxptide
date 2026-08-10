@@ -73,9 +73,10 @@ export default function Shop() {
         Showing {filtered.length} of {products.length} peptides
       </p>
 
+      <h2 className="sr-only">Product list</h2>
       <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filtered.map((p) => (
-          <ProductCard key={p.slug} product={p} />
+        {filtered.map((p, i) => (
+          <ProductCard key={p.slug} product={p} eager={i < 4} />
         ))}
       </div>
 

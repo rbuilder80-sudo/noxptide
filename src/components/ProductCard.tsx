@@ -47,11 +47,11 @@ export function ProductImage({
   )
 }
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, eager = false }: { product: Product; eager?: boolean }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
-      <Link to={`/product/${product.slug}`} className="relative block" aria-label={`View ${product.name}`}>
-        <ProductImage product={product} className="aspect-[4/3] w-full" />
+      <Link to={`/product/${product.slug}`} className="relative block">
+        <ProductImage product={product} className="aspect-[4/3] w-full" eager={eager} />
         {product.badge && (
           <span className="absolute left-3 top-3 z-10 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-slate-900">
             {product.badge}
