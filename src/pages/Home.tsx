@@ -3,7 +3,7 @@ import { ArrowRight, ShieldCheck, FlaskConical, Truck, FileCheck, Star, Quote } 
 import { useSeo } from '../hooks/useSeo'
 import { products } from '../data/products'
 import ProductCard from '../components/ProductCard'
-import { Reveal, RevealGroup, RevealItem } from '../components/motion'
+import { Enter, Reveal, RevealGroup, RevealItem } from '../components/motion'
 
 const steps = [
   {
@@ -95,25 +95,25 @@ export default function Home() {
         <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 pb-16 pt-32 sm:pb-24">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <Reveal>
+              <Enter>
               <p className="inline-flex items-center gap-2 rounded-full border border-[#1B133C]/10 bg-white/70 px-4 py-1.5 text-xs font-semibold text-foreground backdrop-blur-sm">
                 <ShieldCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
                 Every batch independently verified to ≥99% purity
               </p>
-              </Reveal>
-              <Reveal>
+              </Enter>
+              <Enter>
               <h1 className="mt-6 font-display text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                 Research peptides{' '}
                 <em className="italic text-accent">your lab can trust</em>
               </h1>
-              </Reveal>
-              <Reveal>
+              </Enter>
+              <Enter>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
                 The UK's quality-first research peptide supplier — synthesis-grade compounds,
                 batch-specific Certificates of Analysis, and same-day dispatch from UK stock.
               </p>
-              </Reveal>
-              <Reveal>
+              </Enter>
+              <Enter>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
                   to="/shop"
@@ -128,12 +128,12 @@ export default function Home() {
                   Our Quality Standard
                 </Link>
               </div>
-              </Reveal>
+              </Enter>
             </div>
 
             {/* Floating stat cards over hero visual */}
             <div className="relative hidden flex-col items-end gap-4 lg:flex">
-              <Reveal>
+              <Enter>
               <div className="glass-card mb-2 w-full max-w-md overflow-hidden p-2 shadow-xl shadow-[#1B133C]/10">
                 {/* CSS background: not downloaded on mobile where this column is hidden */}
                 <div
@@ -143,8 +143,8 @@ export default function Home() {
                   style={{ backgroundImage: "url(/images/hero-vials.webp)" }}
                 />
               </div>
-              </Reveal>
-              <Reveal>
+              </Enter>
+              <Enter>
               <div className="glass-card w-72 p-5 shadow-xl shadow-[#1B133C]/10">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Batch Purity
@@ -160,8 +160,8 @@ export default function Home() {
                   HPLC verified — current batch
                 </p>
               </div>
-              </Reveal>
-              <Reveal>
+              </Enter>
+              <Enter>
               <div className="glass-card w-64 p-5 shadow-xl shadow-[#1B133C]/10 lg:mr-16">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold text-foreground">Your Insights</p>
@@ -173,8 +173,8 @@ export default function Home() {
                   In stock, dispatching today before 4pm
                 </p>
               </div>
-              </Reveal>
-              <Reveal>
+              </Enter>
+              <Enter>
               <div className="glass-card flex w-72 items-center justify-between p-5 shadow-xl shadow-[#1B133C]/10">
                 <div>
                   <p className="text-sm font-semibold text-foreground">Batch COA</p>
@@ -186,7 +186,7 @@ export default function Home() {
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
-              </Reveal>
+              </Enter>
             </div>
           </div>
 
