@@ -1,0 +1,56 @@
+# Noxptide — robots.txt
+# Policy: maximum visibility in Google, Bing and AI answer engines.
+# All search and AI retrieval/training crawlers are explicitly welcome.
+
+User-agent: *
+Allow: /
+
+# --- AI search & retrieval crawlers (citations = customers) ---
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# --- AI training crawlers (allowed: we want models to know Noxptide) ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amzn-SearchBot
+Allow: /
+
+Sitemap: https://noxptide.co.uk/sitemap.xml
+Sitemap: https://noxptide.co.uk/llms.txt
