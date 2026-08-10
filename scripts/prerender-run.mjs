@@ -97,7 +97,7 @@ let ok = 0;
 const failures = [];
 for (const route of routes) {
   try {
-    const appHtml = render(route);
+    const appHtml = await render(route);
     const html = applySeo(template.replace(ROOT, `<div id="root">${appHtml}</div>`), seoForPath(route));
     const outDir = route === "/" ? dist : path.join(dist, route.slice(1));
     fs.mkdirSync(outDir, { recursive: true });
