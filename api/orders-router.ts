@@ -55,7 +55,7 @@ const orderStatuses = [
 
 const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID?.trim() || "148385007";
 
-function hubSpotRecordUrl(objectTypeId: "0-1" | "0-3", recordId?: string | null) {
+function hubSpotRecordUrl(objectTypeId: "0-1" | "0-2" | "0-3", recordId?: string | null) {
   if (!recordId) return null;
   const params = new URLSearchParams({
     utm_source: "noxptide_admin",
@@ -65,12 +65,13 @@ function hubSpotRecordUrl(objectTypeId: "0-1" | "0-3", recordId?: string | null)
   return `https://app.hubspot.com/contacts/${HUBSPOT_PORTAL_ID}/record/${objectTypeId}/${recordId}?${params}`;
 }
 
-function withHubSpotLinks<T extends { hubspotContactId?: string | null; hubspotDealId?: string | null }>(
+function withHubSpotLinks<T extends { hubspotContactId?: string | null; hubspotCompanyId?: string | null; hubspotDealId?: string | null }>(
   order: T,
 ) {
   return {
     ...order,
     hubspotContactUrl: hubSpotRecordUrl("0-1", order.hubspotContactId),
+    hubspotCompanyUrl: hubSpotRecordUrl("0-2", order.hubspotCompanyId),
     hubspotDealUrl: hubSpotRecordUrl("0-3", order.hubspotDealId),
   };
 }
@@ -155,6 +156,7 @@ async function syncOrder(order: Order) {
         result.status === "synced"
           ? {
               hubspotContactId: result.contactId,
+              hubspotCompanyId: result.companyId,
               hubspotDealId: result.dealId,
               hubspotSyncedAt: new Date(),
               hubspotSyncError: null,
@@ -184,6 +186,7 @@ async function syncOrderOrThrow(order: Order) {
       result.status === "synced"
         ? {
             hubspotContactId: result.contactId,
+            hubspotCompanyId: result.companyId,
             hubspotDealId: result.dealId,
             hubspotSyncedAt: new Date(),
             hubspotSyncError: null,

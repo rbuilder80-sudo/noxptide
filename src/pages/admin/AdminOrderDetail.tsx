@@ -33,7 +33,7 @@ export default function AdminOrderDetail() {
         setSyncMessage('HubSpot sync is disabled because HUBSPOT_ACCESS_TOKEN is missing in Railway.')
         return
       }
-      setSyncMessage(`Synced to HubSpot: contact ${result.contactId}, deal ${result.dealId}.`)
+      setSyncMessage(`Synced to HubSpot: contact ${result.contactId}, company ${result.companyId ?? '—'}, deal ${result.dealId}.`)
     },
     onError: (error) => {
       setSyncMessage(`HubSpot sync failed: ${error.message}`)
@@ -176,6 +176,23 @@ export default function AdminOrderDetail() {
                 </a>
               ) : (
                 order.hubspotDealId ?? '—'
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Company ID</dt>
+            <dd className="font-semibold">
+              {order.hubspotCompanyUrl ? (
+                <a
+                  href={order.hubspotCompanyUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Open company {order.hubspotCompanyId}
+                </a>
+              ) : (
+                order.hubspotCompanyId ?? '—'
               )}
             </dd>
           </div>

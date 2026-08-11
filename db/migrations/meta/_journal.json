@@ -29,6 +29,13 @@
       "when": 1786470300000,
       "tag": "0003_hubspot_order_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1786473900000,
+      "tag": "0004_hubspot_company_audit",
+      "breakpoints": true
     }
   ]
 }

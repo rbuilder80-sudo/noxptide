@@ -50,6 +50,7 @@ export const orders = mysqlTable("orders", {
   paymentStatus: varchar("paymentStatus", { length: 32 }).default("NEW").notNull(),
   paymentReturnToken: varchar("paymentReturnToken", { length: 64 }).unique(),
   hubspotContactId: varchar("hubspotContactId", { length: 64 }),
+  hubspotCompanyId: varchar("hubspotCompanyId", { length: 64 }),
   hubspotDealId: varchar("hubspotDealId", { length: 64 }),
   hubspotSyncedAt: timestamp("hubspotSyncedAt"),
   hubspotSyncError: text("hubspotSyncError"),
