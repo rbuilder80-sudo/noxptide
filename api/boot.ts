@@ -82,6 +82,36 @@ if (env.isProduction) {
       const { getDb } = await import("./queries/connection");
       await migrate(getDb(), { migrationsFolder: "./db/migrations" });
       console.log("[db] schema synced");
+
+      // First-run seed: populate stock/pricing rows from the static catalogue
+      // so the admin panel opens with the full inventory editable. Existing
+      // rows (admin edits) are never touched.
+      const { productVariants } = await import("@db/schema");
+      const { products } = await import("../src/data/products");
+      const db = getDb();
+      const existing = await db
+        .select({ id: productVariants.id })
+        .from(productVariants)
+        .limit(1);
+      if (existing.length === 0) {
+        let count = 0;
+        for (const p of products) {
+          for (const s of p.sizes) {
+            await db
+              .insert(productVariants)
+              .values({
+                productSlug: p.slug,
+                sizeLabel: s.label,
+                pricePence: Math.round(s.price * 100),
+                stock: 100,
+                updatedBy: "seed",
+              })
+              .onDuplicateKeyUpdate({ set: { productSlug: p.slug } });
+            count++;
+          }
+        }
+        console.log(`[db] seeded ${count} product variants`);
+      }
     } catch (err) {
       console.warn("[db] schema sync skipped:", (err as Error).message);
     }
