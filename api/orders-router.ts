@@ -131,6 +131,12 @@ async function syncOrder(order: Order) {
   }
 }
 
+async function syncOrderOrThrow(order: Order) {
+  const db = getDb();
+  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
+  return syncOrderToHubSpot(order, items);
+}
+
 export async function applyWallidStatus(event: {
   api_payment_id: string;
   order_id: string;
@@ -331,5 +337,17 @@ export const ordersRouter = createRouter({
       const [order] = await db.select().from(orders).where(eq(orders.id, input.id));
       if (order) await syncOrder(order);
       return { success: true };
+    }),
+
+  /** Staff: manually push an existing order into HubSpot after credentials are added/fixed. */
+  syncHubSpot: staffQuery
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input }) => {
+      const db = getDb();
+      const [order] = await db.select().from(orders).where(eq(orders.id, input.id));
+      if (!order) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Order not found." });
+      }
+      return syncOrderOrThrow(order);
     }),
 });

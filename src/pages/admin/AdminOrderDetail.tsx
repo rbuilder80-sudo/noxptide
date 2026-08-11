@@ -15,6 +15,7 @@ export default function AdminOrderDetail() {
   const utils = trpc.useUtils()
   const { data: order, isLoading } = trpc.orders.get.useQuery({ id: orderId }, { enabled: Number.isFinite(orderId) })
   const [notes, setNotes] = useState('')
+  const [syncMessage, setSyncMessage] = useState<string | null>(null)
   useEffect(() => {
     if (order?.notes) setNotes(order.notes)
   }, [order?.notes])
@@ -22,6 +23,18 @@ export default function AdminOrderDetail() {
     onSuccess: () => {
       utils.orders.get.invalidate({ id: orderId })
       utils.orders.list.invalidate()
+    },
+  })
+  const syncHubSpot = trpc.orders.syncHubSpot.useMutation({
+    onSuccess: (result) => {
+      if (result.status === 'disabled') {
+        setSyncMessage('HubSpot sync is disabled because HUBSPOT_ACCESS_TOKEN is missing in Railway.')
+        return
+      }
+      setSyncMessage(`Synced to HubSpot: contact ${result.contactId}, deal ${result.dealId}.`)
+    },
+    onError: (error) => {
+      setSyncMessage(`HubSpot sync failed: ${error.message}`)
     },
   })
 
@@ -39,6 +52,16 @@ export default function AdminOrderDetail() {
           <p className="mt-1 text-sm text-muted-foreground">Placed {new Date(order.createdAt).toLocaleString('en-GB')}</p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <button
+            disabled={syncHubSpot.isPending}
+            onClick={() => {
+              setSyncMessage(null)
+              syncHubSpot.mutate({ id: order.id })
+            }}
+            className="rounded-lg border border-primary bg-card px-3.5 py-2 text-xs font-bold text-primary transition hover:bg-secondary disabled:opacity-60"
+          >
+            {syncHubSpot.isPending ? 'Syncing HubSpot…' : 'Sync HubSpot'}
+          </button>
           {STATUSES.map((s) => (
             <button
               key={s}
@@ -55,6 +78,11 @@ export default function AdminOrderDetail() {
           ))}
         </div>
       </div>
+      {syncMessage && (
+        <p className="mt-4 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground">
+          {syncMessage}
+        </p>
+      )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
