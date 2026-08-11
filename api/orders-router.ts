@@ -125,8 +125,28 @@ async function syncOrder(order: Order) {
   const db = getDb();
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
   try {
-    await syncOrderToHubSpot(order, items);
+    const result = await syncOrderToHubSpot(order, items);
+    await db
+      .update(orders)
+      .set(
+        result.status === "synced"
+          ? {
+              hubspotContactId: result.contactId,
+              hubspotDealId: result.dealId,
+              hubspotSyncedAt: new Date(),
+              hubspotSyncError: null,
+            }
+          : {
+              hubspotSyncError: "HUBSPOT_ACCESS_TOKEN is not configured",
+            },
+      )
+      .where(eq(orders.id, order.id));
   } catch (error) {
+    const message = error instanceof Error ? error.message : "HubSpot sync failed";
+    await db
+      .update(orders)
+      .set({ hubspotSyncError: message.slice(0, 2000) })
+      .where(eq(orders.id, order.id));
     console.error(`[hubspot] order ${order.orderNumber} sync failed:`, error);
   }
 }
@@ -134,7 +154,23 @@ async function syncOrder(order: Order) {
 async function syncOrderOrThrow(order: Order) {
   const db = getDb();
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
-  return syncOrderToHubSpot(order, items);
+  const result = await syncOrderToHubSpot(order, items);
+  await db
+    .update(orders)
+    .set(
+      result.status === "synced"
+        ? {
+            hubspotContactId: result.contactId,
+            hubspotDealId: result.dealId,
+            hubspotSyncedAt: new Date(),
+            hubspotSyncError: null,
+          }
+        : {
+            hubspotSyncError: "HUBSPOT_ACCESS_TOKEN is not configured",
+          },
+    )
+    .where(eq(orders.id, order.id));
+  return result;
 }
 
 export async function applyWallidStatus(event: {

@@ -49,6 +49,10 @@ export const orders = mysqlTable("orders", {
   paymentId: varchar("paymentId", { length: 64 }).unique(),
   paymentStatus: varchar("paymentStatus", { length: 32 }).default("NEW").notNull(),
   paymentReturnToken: varchar("paymentReturnToken", { length: 64 }).unique(),
+  hubspotContactId: varchar("hubspotContactId", { length: 64 }),
+  hubspotDealId: varchar("hubspotDealId", { length: 64 }),
+  hubspotSyncedAt: timestamp("hubspotSyncedAt"),
+  hubspotSyncError: text("hubspotSyncError"),
   status: mysqlEnum("status", [
     "pending",
     "paid",

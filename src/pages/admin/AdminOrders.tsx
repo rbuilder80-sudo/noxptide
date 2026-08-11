@@ -64,6 +64,7 @@ export default function AdminOrders() {
                 <th className="px-5 py-3">Email</th>
                 <th className="px-5 py-3">Total</th>
                 <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3">HubSpot</th>
                 <th className="px-5 py-3">Placed</th>
                 <th className="px-5 py-3"></th>
               </tr>
@@ -95,6 +96,21 @@ export default function AdminOrders() {
                       ))}
                     </select>
                   </td>
+                  <td className="px-5 py-3">
+                    {o.hubspotSyncedAt ? (
+                      <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800">
+                        Synced
+                      </span>
+                    ) : o.hubspotSyncError ? (
+                      <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">
+                        Needs sync
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">
+                        Pending
+                      </span>
+                    )}
+                  </td>
                   <td className="px-5 py-3 text-muted-foreground">{new Date(o.createdAt).toLocaleString('en-GB')}</td>
                   <td className="px-5 py-3">
                     {o.status !== 'completed' && o.status !== 'cancelled' && (
@@ -110,7 +126,7 @@ export default function AdminOrders() {
               ))}
               {shown.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-muted-foreground">
+                  <td colSpan={8} className="px-5 py-10 text-center text-muted-foreground">
                     No orders in this view.
                   </td>
                 </tr>

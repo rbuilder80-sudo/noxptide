@@ -27,6 +27,8 @@ export default function AdminOrderDetail() {
   })
   const syncHubSpot = trpc.orders.syncHubSpot.useMutation({
     onSuccess: (result) => {
+      utils.orders.get.invalidate({ id: orderId })
+      utils.orders.list.invalidate()
       if (result.status === 'disabled') {
         setSyncMessage('HubSpot sync is disabled because HUBSPOT_ACCESS_TOKEN is missing in Railway.')
         return
@@ -139,6 +141,30 @@ export default function AdminOrderDetail() {
           </dl>
         </section>
       </div>
+
+      <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <h2 className="font-bold">HubSpot sync</h2>
+        <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <dt className="text-muted-foreground">Contact ID</dt>
+            <dd className="font-semibold">{order.hubspotContactId ?? '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Deal ID</dt>
+            <dd className="font-semibold">{order.hubspotDealId ?? '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Last synced</dt>
+            <dd className="font-semibold">
+              {order.hubspotSyncedAt ? new Date(order.hubspotSyncedAt).toLocaleString('en-GB') : 'Not synced yet'}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Last error</dt>
+            <dd className="font-semibold text-amber-700">{order.hubspotSyncError ?? '—'}</dd>
+          </div>
+        </dl>
+      </section>
     </div>
   )
 }
