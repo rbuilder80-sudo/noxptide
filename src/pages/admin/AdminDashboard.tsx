@@ -11,6 +11,9 @@ export default function AdminDashboard() {
   const syncCatalog = trpc.products.syncHubSpotCatalog.useMutation({
     onSuccess: () => utils.integrations.status.invalidate(),
   })
+  const testHubSpotSync = trpc.integrations.testHubSpotSync.useMutation({
+    onSuccess: () => utils.integrations.status.invalidate(),
+  })
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>
 
@@ -166,6 +169,38 @@ export default function AdminDashboard() {
           {syncCatalog.error && (
             <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
               {syncCatalog.error.message}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-5 rounded-xl border border-border bg-background p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-bold">HubSpot end-to-end test</h3>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                After HUBSPOT_ACCESS_TOKEN is added, run one labelled test sync to prove Contact,
+                Company, Deal, Product and Line Item creation before taking real orders.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => testHubSpotSync.mutate()}
+              disabled={testHubSpotSync.isPending}
+              className="rounded-lg border border-primary bg-card px-4 py-2 text-xs font-bold text-primary hover:bg-secondary disabled:opacity-60"
+            >
+              {testHubSpotSync.isPending ? 'Testing HubSpot…' : 'Run HubSpot test sync'}
+            </button>
+          </div>
+          {testHubSpotSync.data && (
+            <p className="mt-3 rounded-lg bg-secondary px-3 py-2 text-xs font-semibold">
+              {testHubSpotSync.data.status === 'synced'
+                ? `Test synced: contact ${testHubSpotSync.data.contactId}, company ${testHubSpotSync.data.companyId ?? '—'}, deal ${testHubSpotSync.data.dealId}.`
+                : 'HubSpot token is not configured yet. Add HUBSPOT_ACCESS_TOKEN in Railway, then run this test again.'}
+            </p>
+          )}
+          {testHubSpotSync.error && (
+            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+              {testHubSpotSync.error.message}
             </p>
           )}
         </div>

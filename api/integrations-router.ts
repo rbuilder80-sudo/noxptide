@@ -1,5 +1,5 @@
 import { createRouter, staffQuery } from "./middleware";
-import { checkHubSpotReadiness } from "./lib/hubspot";
+import { checkHubSpotReadiness, syncOrderToHubSpot, type EcommerceOrder, type EcommerceOrderItem } from "./lib/hubspot";
 import { checkWallidReadiness } from "./lib/wallid";
 
 const requiredLiveVariables = [
@@ -48,5 +48,38 @@ export const integrationsRouter = createRouter({
       },
       missingVariables: missing,
     };
+  }),
+
+  /** Staff: create/update a clearly labelled HubSpot test ecommerce sync. */
+  testHubSpotSync: staffQuery.mutation(async () => {
+    const order: EcommerceOrder = {
+      orderNumber: "NOX-HUBSPOT-TEST",
+      customerName: "Noxptide HubSpot Test",
+      email: "hubspot-test@noxptide.co.uk",
+      phone: "+44 0000 000000",
+      addressLine1: "Noxptide integration test",
+      addressLine2: "Do not fulfil",
+      city: "London",
+      postcode: "TEST 1AA",
+      country: "United Kingdom",
+      status: "paid",
+      totalPence: 3499,
+      notes: [
+        "Organisation: Noxptide Integration Test",
+        "Delivery: standard",
+        "This is a safe labelled test record created from the Noxptide admin dashboard to verify HubSpot ecommerce sync.",
+        "Do not fulfil. Do not contact.",
+      ].join("\n"),
+    };
+    const items: EcommerceOrderItem[] = [
+      {
+        productSlug: "bpc-157",
+        productName: "BPC-157",
+        sizeLabel: "5 mg",
+        unitPricePence: 3499,
+        qty: 1,
+      },
+    ];
+    return syncOrderToHubSpot(order, items);
   }),
 });
