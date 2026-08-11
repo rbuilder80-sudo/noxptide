@@ -1,10 +1,12 @@
 import { Link } from 'react-router'
+import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { trpc } from '../../providers/trpc'
 import { products } from '../../data/products'
 
 export default function AdminDashboard() {
   const { data: overrides, isLoading } = trpc.products.overrides.useQuery()
   const { data: cmsRows } = trpc.cms.all.useQuery()
+  const { data: integrationStatus } = trpc.integrations.status.useQuery()
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>
 
@@ -48,6 +50,56 @@ export default function AdminDashboard() {
         ))}
       </div>
 
+      <section className="mt-8 rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-lg font-bold">Ecommerce integrations</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Live checkout needs Wallid payment keys and HubSpot needs a private app token before
+              orders can sync into CRM.
+            </p>
+          </div>
+          {integrationStatus?.ecommerceReady ? (
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-700">
+              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+              Ready
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-sm font-bold text-amber-700">
+              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+              Needs setup
+            </span>
+          )}
+        </div>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <IntegrationTile
+            label="HubSpot CRM"
+            ready={integrationStatus?.hubspot.ready}
+            detail="Contacts, deals, line items and product catalogue sync"
+          />
+          <IntegrationTile
+            label="Wallid Pay-by-Bank"
+            ready={integrationStatus?.wallid.ready}
+            detail="Checkout payment session and webhook secrets"
+          />
+          <IntegrationTile
+            label="Public site URL"
+            ready={integrationStatus?.site.publicSiteUrlConfigured}
+            detail={integrationStatus?.site.publicSiteUrl ?? 'https://www.noxptide.co.uk'}
+          />
+        </div>
+
+        {integrationStatus && integrationStatus.missingVariables.length > 0 && (
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <p className="font-bold">Missing Railway variables:</p>
+            <p className="mt-1 font-mono text-xs">
+              {integrationStatus.missingVariables.join(', ')}
+            </p>
+          </div>
+        )}
+      </section>
+
       <h2 className="mt-10 text-lg font-bold">Recent SEO edits</h2>
       <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
         <table className="w-full min-w-[560px] text-left text-sm">
@@ -86,6 +138,30 @@ export default function AdminDashboard() {
           </tbody>
         </table>
       </div>
+    </div>
+  )
+}
+
+function IntegrationTile({
+  label,
+  ready,
+  detail,
+}: {
+  label: string
+  ready?: boolean
+  detail: string
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-background p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="font-bold">{label}</p>
+        {ready ? (
+          <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+        ) : (
+          <AlertTriangle className="h-5 w-5 text-amber-600" aria-hidden="true" />
+        )}
+      </div>
+      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{detail}</p>
     </div>
   )
 }
