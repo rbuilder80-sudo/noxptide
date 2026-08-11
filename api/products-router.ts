@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { and, asc, eq } from "drizzle-orm";
 import { productStatuses, productVariants } from "@db/schema";
+import { products as storefrontProducts } from "@/data/products";
 import { getDb } from "./queries/connection";
 import { createRouter, publicQuery, editorQuery } from "./middleware";
+import { syncProductCatalogToHubSpot, type EcommerceOrderItem } from "./lib/hubspot";
 
 /**
  * Catalogue control: stock & pricing overrides, managed from the admin panel.
@@ -105,4 +107,37 @@ export const productsRouter = createRouter({
         .onDuplicateKeyUpdate({ set: { status: input.status, updatedBy: by } });
       return { success: true };
     }),
+
+  /** Editor+: push the active storefront catalogue into HubSpot Products. */
+  syncHubSpotCatalog: editorQuery.mutation(async () => {
+    const db = getDb();
+    const [variants, statuses] = await Promise.all([
+      db.select().from(productVariants),
+      db.select().from(productStatuses),
+    ]);
+    const variantPrice = new Map(
+      variants.map((variant) => [`${variant.productSlug}:${variant.sizeLabel}`, variant.pricePence]),
+    );
+    const status = new Map(statuses.map((row) => [row.productSlug, row.status]));
+    const hidden = storefrontProducts.filter((product) => status.get(product.slug) === "hidden").length;
+    const items: EcommerceOrderItem[] = storefrontProducts
+      .filter((product) => status.get(product.slug) !== "hidden")
+      .flatMap((product) =>
+        product.sizes.map((size) => ({
+          productSlug: product.slug,
+          productName: product.name,
+          sizeLabel: size.label,
+          unitPricePence:
+            variantPrice.get(`${product.slug}:${size.label}`) ?? Math.round(size.price * 100),
+          qty: 1,
+        })),
+      );
+
+    const result = await syncProductCatalogToHubSpot(items);
+    return {
+      ...result,
+      checked: items.length,
+      skippedHiddenProducts: hidden,
+    };
+  }),
 });

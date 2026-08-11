@@ -322,6 +322,18 @@ export async function syncOrderToHubSpot(
   };
 }
 
+export async function syncProductCatalogToHubSpot(items: EcommerceOrderItem[]) {
+  if (!hubSpotToken()) return { status: "disabled" as const, synced: 0 };
+
+  let synced = 0;
+  for (const item of items) {
+    await upsertProduct(item);
+    synced++;
+  }
+
+  return { status: "synced" as const, synced };
+}
+
 export async function checkHubSpotReadiness() {
   if (!hubSpotToken()) {
     return {

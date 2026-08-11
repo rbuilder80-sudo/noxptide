@@ -4,9 +4,13 @@ import { trpc } from '../../providers/trpc'
 import { products } from '../../data/products'
 
 export default function AdminDashboard() {
+  const utils = trpc.useUtils()
   const { data: overrides, isLoading } = trpc.products.overrides.useQuery()
   const { data: cmsRows } = trpc.cms.all.useQuery()
   const { data: integrationStatus } = trpc.integrations.status.useQuery()
+  const syncCatalog = trpc.products.syncHubSpotCatalog.useMutation({
+    onSuccess: () => utils.integrations.status.invalidate(),
+  })
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>
 
@@ -132,6 +136,38 @@ export default function AdminDashboard() {
               {integrationStatus?.wallid.webhookUrl ?? 'https://www.noxptide.co.uk/api/wallid/webhook'}
             </p>
           </div>
+        </div>
+
+        <div className="mt-5 rounded-xl border border-border bg-background p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-bold">HubSpot product catalogue</h3>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Push active Noxptide product sizes and live admin prices into HubSpot Products.
+                Hidden products are skipped.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => syncCatalog.mutate()}
+              disabled={syncCatalog.isPending}
+              className="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            >
+              {syncCatalog.isPending ? 'Syncing catalogue…' : 'Sync catalogue to HubSpot'}
+            </button>
+          </div>
+          {syncCatalog.data && (
+            <p className="mt-3 rounded-lg bg-secondary px-3 py-2 text-xs font-semibold">
+              {syncCatalog.data.status === 'synced'
+                ? `Synced ${syncCatalog.data.synced} HubSpot products. ${syncCatalog.data.skippedHiddenProducts} hidden products skipped.`
+                : `HubSpot token is not configured yet. ${syncCatalog.data.checked} catalogue variants are ready to sync once the Railway token is added.`}
+            </p>
+          )}
+          {syncCatalog.error && (
+            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+              {syncCatalog.error.message}
+            </p>
+          )}
         </div>
       </section>
 

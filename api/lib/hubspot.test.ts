@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   checkHubSpotReadiness,
+  syncProductCatalogToHubSpot,
   syncOrderToHubSpot,
   type EcommerceOrder,
   type EcommerceOrderItem,
@@ -121,6 +122,41 @@ describe("syncOrderToHubSpot", () => {
     expect(fetchMock.mock.calls[9][0]).toBe(
       "https://api.hubapi.com/crm/v4/objects/deals/deal-1/associations/default/line_items/line-1",
     );
+  });
+});
+
+describe("syncProductCatalogToHubSpot", () => {
+  afterEach(() => {
+    delete process.env.HUBSPOT_ACCESS_TOKEN;
+    vi.unstubAllGlobals();
+  });
+
+  it("does not write products when the private app token is missing", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(syncProductCatalogToHubSpot(items)).resolves.toEqual({ status: "disabled", synced: 0 });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("upserts each catalogue product variant", async () => {
+    process.env.HUBSPOT_ACCESS_TOKEN = "private-token";
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ results: [] }))
+      .mockResolvedValueOnce(json({ id: "product-1" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(syncProductCatalogToHubSpot(items)).resolves.toEqual({ status: "synced", synced: 1 });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const productCreate = fetchMock.mock.calls[1] as [string, RequestInit];
+    expect(productCreate[0]).toBe("https://api.hubapi.com/crm/v3/objects/products");
+    expect(JSON.parse(String(productCreate[1].body)).properties).toMatchObject({
+      name: "BPC-157 5mg",
+      hs_sku: "noxptide:bpc-157:5mg",
+      price: "34.99",
+      hs_url: "https://www.noxptide.co.uk/product/bpc-157",
+    });
   });
 });
 
