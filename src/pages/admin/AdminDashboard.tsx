@@ -3,6 +3,19 @@ import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { trpc } from '../../providers/trpc'
 import { products } from '../../data/products'
 
+const hubspotRequiredScopes = [
+  'crm.objects.contacts.read',
+  'crm.objects.contacts.write',
+  'crm.objects.companies.read',
+  'crm.objects.companies.write',
+  'crm.objects.deals.read',
+  'crm.objects.deals.write',
+  'crm.objects.line_items.read',
+  'crm.objects.line_items.write',
+  'crm.objects.products.read',
+  'crm.objects.products.write',
+] as const
+
 export default function AdminDashboard() {
   const utils = trpc.useUtils()
   const { data: overrides, isLoading } = trpc.products.overrides.useQuery()
@@ -138,6 +151,17 @@ export default function AdminDashboard() {
             <p className="mt-1 break-all font-mono">
               {integrationStatus?.wallid.webhookUrl ?? 'https://www.noxptide.co.uk/api/wallid/webhook'}
             </p>
+          </div>
+          <div className="mt-4 rounded-lg bg-secondary p-3 text-xs">
+            <p className="font-bold">HubSpot Private App scopes needed</p>
+            <p className="mt-1 text-muted-foreground">
+              Add these scopes before copying the Private App token into Railway:
+            </p>
+            <ul className="mt-2 grid gap-1 font-mono sm:grid-cols-2">
+              {hubspotRequiredScopes.map((scope) => (
+                <li key={scope}>{scope}</li>
+              ))}
+            </ul>
           </div>
         </div>
 
