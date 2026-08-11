@@ -108,6 +108,31 @@ export default function AdminDashboard() {
             </p>
           </div>
         )}
+
+        <div className="mt-5 rounded-xl border border-border bg-background p-4">
+          <h3 className="text-sm font-bold">Railway / Wallid setup checklist</h3>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            Add these in Railway under the Noxptide app service Variables tab. Do not paste secret
+            values into chat or support messages.
+          </p>
+          <ul className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+            <SetupItem label="HUBSPOT_ACCESS_TOKEN" value="HubSpot Private App token" />
+            <SetupItem label="HUBSPOT_PORTAL_ID" value="148385007" />
+            <SetupItem label="WALLID_API_KEY_ID" value="Wallid key ID" />
+            <SetupItem label="WALLID_API_KEY_SECRET" value="Wallid key secret" />
+            <SetupItem label="WALLID_WEBHOOK_SECRET" value="Wallid webhook signing secret" />
+            <SetupItem
+              label="PUBLIC_SITE_URL"
+              value={integrationStatus?.site.publicSiteUrl ?? 'https://www.noxptide.co.uk'}
+            />
+          </ul>
+          <div className="mt-4 rounded-lg bg-secondary p-3 text-xs">
+            <p className="font-bold">Wallid webhook URL</p>
+            <p className="mt-1 break-all font-mono">
+              {integrationStatus?.wallid.webhookUrl ?? 'https://www.noxptide.co.uk/api/wallid/webhook'}
+            </p>
+          </div>
+        </div>
       </section>
 
       <h2 className="mt-10 text-lg font-bold">Recent SEO edits</h2>
@@ -149,6 +174,15 @@ export default function AdminDashboard() {
         </table>
       </div>
     </div>
+  )
+}
+
+function SetupItem({ label, value }: { label: string; value: string }) {
+  return (
+    <li className="rounded-lg border border-border bg-card p-3">
+      <p className="font-mono font-bold">{label}</p>
+      <p className="mt-1 text-muted-foreground">{value}</p>
+    </li>
   )
 }
 
