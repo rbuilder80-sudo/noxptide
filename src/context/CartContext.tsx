@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { getProduct, products } from '../data/products'
+import { livePrice, useProductOverrides } from '../hooks/useProductOverrides'
 
 export interface CartItem {
   slug: string
@@ -20,6 +21,8 @@ interface CartContextValue {
   discountedSubtotal: number
   isOpen: boolean
   setOpen: (open: boolean) => void
+  /** Live (admin-controlled) unit price in pounds, falling back to catalogue default. */
+  priceOf: (slug: string, sizeLabel: string) => number
 }
 
 /** Volume pricing: 20% off over £150, 30% off over £500 — applied automatically. */
@@ -40,6 +43,10 @@ export function unitPrice(slug: string, sizeLabel: string): number {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [isOpen, setOpen] = useState(false)
+  const overrides = useProductOverrides()
+
+  const priceOf = (slug: string, sizeLabel: string): number =>
+    livePrice(overrides, slug, sizeLabel) ?? unitPrice(slug, sizeLabel)
 
   const addItem = (slug: string, sizeLabel: string, qty = 1) => {
     setItems((prev) => {
@@ -89,7 +96,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, setQty, clear, count, subtotal, discountRate, discountAmount, discountedSubtotal, isOpen, setOpen }}
+      value={{ items, addItem, removeItem, setQty, clear, count, subtotal, discountRate, discountAmount, discountedSubtotal, isOpen, setOpen, priceOf }}
     >
       {children}
     </CartContext.Provider>

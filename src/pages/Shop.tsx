@@ -5,6 +5,7 @@ import { useSeo } from '../hooks/useSeo'
 import { coreSeo } from '../data/seo'
 import { products } from '../data/products'
 import ProductCard from '../components/ProductCard'
+import { isProductHidden, livePrice, useProductOverrides } from '../hooks/useProductOverrides'
 
 export default function Shop() {
   useSeo({ pageKey: 'shop', ...coreSeo['/shop'] })
@@ -12,9 +13,12 @@ export default function Shop() {
   const [params] = useSearchParams()
   const [q, setQ] = useState(params.get('q') ?? '')
   const [sort, setSort] = useState<'featured' | 'price-asc' | 'price-desc' | 'name'>('featured')
+  const overrides = useProductOverrides()
 
   const filtered = useMemo(() => {
-    let list = [...products]
+    let list = products.filter((p) => !isProductHidden(overrides, p.slug))
+    const fromPrice = (p: (typeof products)[number]) =>
+      livePrice(overrides, p.slug, p.sizes[0].label) ?? p.sizes[0].price
     if (q.trim()) {
       const needle = q.toLowerCase()
       list = list.filter(
@@ -24,11 +28,11 @@ export default function Shop() {
           p.cas.includes(needle),
       )
     }
-    if (sort === 'price-asc') list.sort((a, b) => a.sizes[0].price - b.sizes[0].price)
-    if (sort === 'price-desc') list.sort((a, b) => b.sizes[0].price - a.sizes[0].price)
-    if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name))
+    if (sort === 'price-asc') list = [...list].sort((a, b) => fromPrice(a) - fromPrice(b))
+    if (sort === 'price-desc') list = [...list].sort((a, b) => fromPrice(b) - fromPrice(a))
+    if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name))
     return list
-  }, [q, sort])
+  }, [q, sort, overrides])
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:py-14">

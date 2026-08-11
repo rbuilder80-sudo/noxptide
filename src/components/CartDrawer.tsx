@@ -1,10 +1,10 @@
 import { Link } from 'react-router'
 import { X, Minus, Plus, Trash2, ShieldCheck } from 'lucide-react'
-import { useCart, unitPrice } from '../context/CartContext'
+import { useCart } from '../context/CartContext'
 import { formatGBP, getProduct } from '../data/products'
 
 export default function CartDrawer() {
-  const { items, isOpen, setOpen, setQty, removeItem, subtotal, discountRate, discountAmount, discountedSubtotal } = useCart()
+  const { items, isOpen, setOpen, setQty, removeItem, subtotal, discountRate, discountAmount, discountedSubtotal, priceOf } = useCart()
   const freeShipThreshold = 25
 
   if (!isOpen) return null
@@ -40,7 +40,7 @@ export default function CartDrawer() {
               {items.map((it) => {
                 const p = getProduct(it.slug)
                 if (!p) return null
-                const price = unitPrice(it.slug, it.sizeLabel)
+                const price = priceOf(it.slug, it.sizeLabel)
                 return (
                   <li key={`${it.slug}-${it.sizeLabel}`} className="flex gap-4 py-4">
                     <div

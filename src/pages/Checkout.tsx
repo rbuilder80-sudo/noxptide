@@ -3,7 +3,7 @@ import { Link, Navigate } from 'react-router'
 import { CheckCircle2, Lock, ShieldCheck, Truck } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
 import { coreSeo } from '../data/seo'
-import { useCart, unitPrice } from '../context/CartContext'
+import { useCart } from '../context/CartContext'
 import { formatGBP, getProduct } from '../data/products'
 import { trpc } from '../providers/trpc'
 
@@ -12,7 +12,7 @@ const inputCls =
 
 export default function Checkout() {
   useSeo({ ...coreSeo['/checkout'] })
-  const { items, subtotal, discountRate, discountAmount, discountedSubtotal, clear } = useCart()
+  const { items, subtotal, discountRate, discountAmount, discountedSubtotal, clear, priceOf } = useCart()
   const [orderNumber, setOrderNumber] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const createOrder = trpc.orders.create.useMutation()
@@ -44,7 +44,7 @@ export default function Checkout() {
             productSlug: it.slug,
             productName: p?.name ?? it.slug,
             sizeLabel: it.sizeLabel,
-            unitPricePence: Math.round(unitPrice(it.slug, it.sizeLabel) * 100),
+            unitPricePence: Math.round(priceOf(it.slug, it.sizeLabel) * 100),
             qty: it.qty,
           }
         }),
@@ -211,7 +211,7 @@ export default function Checkout() {
                   <span className="text-muted-foreground">
                     {p.name} {it.sizeLabel} × {it.qty}
                   </span>
-                  <span className="font-semibold">{formatGBP(unitPrice(it.slug, it.sizeLabel) * it.qty)}</span>
+                  <span className="font-semibold">{formatGBP(priceOf(it.slug, it.sizeLabel) * it.qty)}</span>
                 </li>
               )
             })}
