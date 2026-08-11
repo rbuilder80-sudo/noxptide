@@ -11,15 +11,11 @@ import { users as kimiUsers } from "./platform";
 import { findUserByUnionId, upsertUser } from "../queries/users";
 import type { TokenResponse } from "./types";
 
-async function exchangeAuthCode(
-  code: string,
-  redirectUri: string,
-): Promise<TokenResponse> {
+async function exchangeAuthCode(code: string): Promise<TokenResponse> {
   const body = new URLSearchParams({
     grant_type: "authorization_code",
     code,
     client_id: env.appId,
-    redirect_uri: redirectUri,
     client_secret: env.appSecret,
   });
 
@@ -119,8 +115,7 @@ export function createOAuthCallbackHandler() {
     }
 
     try {
-      const redirectUri = atob(state);
-      const tokenResp = await exchangeAuthCode(code, redirectUri);
+      const tokenResp = await exchangeAuthCode(code);
       const { userId } = await verifyAccessToken(tokenResp.access_token);
       const userProfile = await kimiUsers.getProfile(tokenResp.access_token);
       if (!userProfile) {
