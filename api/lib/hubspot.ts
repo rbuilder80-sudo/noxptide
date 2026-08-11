@@ -31,7 +31,7 @@ export type EcommerceOrderItem = {
 
 type HubSpotRecord = { id: string; properties?: Record<string, string> };
 type HubSpotSearch = { results: HubSpotRecord[] };
-type HubSpotReadinessObject = "contacts" | "deals" | "line_items" | "products";
+type HubSpotReadinessObject = "contacts" | "companies" | "deals" | "line_items" | "products";
 type HubSpotProperty = {
   name: string;
   options?: Array<{ label: string; value: string }>;
@@ -124,6 +124,14 @@ function organisation(notes?: string | null) {
   return value || undefined;
 }
 
+function companyDomain(email: string) {
+  const domain = email.split("@")[1]?.trim().toLowerCase();
+  if (!domain || ["gmail.com", "googlemail.com", "hotmail.com", "outlook.com", "live.com", "icloud.com", "yahoo.com"].includes(domain)) {
+    return undefined;
+  }
+  return domain;
+}
+
 function compact(properties: Record<string, string | undefined>) {
   return Object.fromEntries(
     Object.entries(properties).filter((entry): entry is [string, string] => Boolean(entry[1])),
@@ -199,6 +207,43 @@ function dealProperties(order: EcommerceOrder) {
     ]
       .filter(Boolean)
       .join("\n"),
+  });
+}
+
+async function upsertCompany(order: EcommerceOrder) {
+  const name = organisation(order.notes);
+  if (!name) return undefined;
+
+  const domain = companyDomain(order.email);
+  const filters = domain
+    ? [{ propertyName: "domain", operator: "EQ", value: domain }]
+    : [{ propertyName: "name", operator: "EQ", value: name }];
+  const found = await hubSpotRequest<HubSpotSearch>("/crm/v3/objects/companies/search", {
+    method: "POST",
+    body: JSON.stringify({
+      filterGroups: [{ filters }],
+      properties: ["name", "domain"],
+      limit: 1,
+    }),
+  });
+  const properties = compact({
+    name,
+    domain,
+    city: order.city,
+    zip: order.postcode,
+    country: order.country,
+    description: `Noxptide ecommerce customer organisation from order ${order.orderNumber}`,
+  });
+
+  if (found.results[0]) {
+    return hubSpotRequest<HubSpotRecord>(`/crm/v3/objects/companies/${found.results[0].id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ properties }),
+    });
+  }
+  return hubSpotRequest<HubSpotRecord>("/crm/v3/objects/companies", {
+    method: "POST",
+    body: JSON.stringify({ properties }),
   });
 }
 
@@ -300,11 +345,24 @@ export async function syncOrderToHubSpot(
   if (!hubSpotToken()) return { status: "disabled" as const };
 
   const contact = await upsertContact(order);
+  const company = await upsertCompany(order);
   const deal = await upsertDeal(order);
   await hubSpotRequest<void>(
     `/crm/v4/objects/deals/${deal.id}/associations/default/contacts/${contact.id}`,
     { method: "PUT" },
   );
+  if (company) {
+    await Promise.all([
+      hubSpotRequest<void>(
+        `/crm/v4/objects/contacts/${contact.id}/associations/default/companies/${company.id}`,
+        { method: "PUT" },
+      ),
+      hubSpotRequest<void>(
+        `/crm/v4/objects/deals/${deal.id}/associations/default/companies/${company.id}`,
+        { method: "PUT" },
+      ),
+    ]);
+  }
 
   for (const item of items) {
     await upsertProduct(item);
@@ -319,6 +377,7 @@ export async function syncOrderToHubSpot(
     status: "synced" as const,
     contactId: contact.id,
     dealId: deal.id,
+    companyId: company?.id,
   };
 }
 
@@ -347,7 +406,7 @@ export async function checkHubSpotReadiness() {
     };
   }
 
-  const requiredObjects: HubSpotReadinessObject[] = ["contacts", "deals", "line_items", "products"];
+  const requiredObjects: HubSpotReadinessObject[] = ["contacts", "companies", "deals", "line_items", "products"];
   const checkedObjects: HubSpotReadinessObject[] = [];
   const requiredProperties: Array<[HubSpotReadinessObject, string]> = [
     ["contacts", "email"],
@@ -355,6 +414,12 @@ export async function checkHubSpotReadiness() {
     ["contacts", "lastname"],
     ["contacts", "phone"],
     ["contacts", "company"],
+    ["companies", "name"],
+    ["companies", "domain"],
+    ["companies", "city"],
+    ["companies", "zip"],
+    ["companies", "country"],
+    ["companies", "description"],
     ["deals", "dealname"],
     ["deals", "amount"],
     ["deals", "pipeline"],
