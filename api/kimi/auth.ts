@@ -11,12 +11,16 @@ import { users as kimiUsers } from "./platform";
 import { findUserByUnionId, upsertUser } from "../queries/users";
 import type { TokenResponse } from "./types";
 
-async function exchangeAuthCode(code: string): Promise<TokenResponse> {
+async function exchangeAuthCode(
+  code: string,
+  redirectUri: string,
+): Promise<TokenResponse> {
   const body = new URLSearchParams({
     grant_type: "authorization_code",
     code,
     client_id: env.appId,
     client_secret: env.appSecret,
+    redirect_uri: redirectUri,
   });
 
   const resp = await fetch(`${env.kimiAuthUrl}/api/oauth/token`, {
@@ -47,9 +51,24 @@ function getPublicOrigin(c: Context) {
   return `${proto}://${host}`;
 }
 
+function getOAuthRedirectUri(c: Context) {
+  return env.kimiRedirectUri || `${getPublicOrigin(c)}${Paths.oauthCallback}`;
+}
+
+function decodeRedirectState(state: string) {
+  const redirectUri = Buffer.from(state, "base64").toString("utf8");
+  const parsed = new URL(redirectUri);
+
+  if (parsed.protocol !== "https:" && parsed.hostname !== "localhost") {
+    throw new Error("Invalid OAuth redirect state");
+  }
+
+  return redirectUri;
+}
+
 export function createOAuthLoginHandler() {
   return (c: Context) => {
-    const redirectUri = `${getPublicOrigin(c)}${Paths.oauthCallback}`;
+    const redirectUri = getOAuthRedirectUri(c);
     const state = Buffer.from(redirectUri, "utf8").toString("base64");
     const url = new URL(`${env.kimiAuthUrl}/api/oauth/authorize`);
 
@@ -115,7 +134,8 @@ export function createOAuthCallbackHandler() {
     }
 
     try {
-      const tokenResp = await exchangeAuthCode(code);
+      const redirectUri = decodeRedirectState(state);
+      const tokenResp = await exchangeAuthCode(code, redirectUri);
       const { userId } = await verifyAccessToken(tokenResp.access_token);
       const userProfile = await kimiUsers.getProfile(tokenResp.access_token);
       if (!userProfile) {
