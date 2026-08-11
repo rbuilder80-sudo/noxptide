@@ -41,10 +41,19 @@ const jwks = jose.createRemoteJWKSet(
   new URL(`${env.kimiAuthUrl}/api/.well-known/jwks.json`),
 );
 
+function getPublicOrigin(c: Context) {
+  const requestUrl = new URL(c.req.url);
+  const forwardedHost = c.req.header("x-forwarded-host");
+  const forwardedProto = c.req.header("x-forwarded-proto");
+  const host = forwardedHost ?? c.req.header("host") ?? requestUrl.host;
+  const proto = forwardedProto ?? requestUrl.protocol.replace(":", "");
+
+  return `${proto}://${host}`;
+}
+
 export function createOAuthLoginHandler() {
   return (c: Context) => {
-    const requestUrl = new URL(c.req.url);
-    const redirectUri = `${requestUrl.origin}${Paths.oauthCallback}`;
+    const redirectUri = `${getPublicOrigin(c)}${Paths.oauthCallback}`;
     const state = Buffer.from(redirectUri, "utf8").toString("base64");
     const url = new URL(`${env.kimiAuthUrl}/api/oauth/authorize`);
 
