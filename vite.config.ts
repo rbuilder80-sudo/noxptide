@@ -18,7 +18,7 @@ export default defineConfig({
         const dir = path.resolve(__dirname, "dist/public")
         const htmlPath = path.join(dir, "index.html")
         if (!fs.existsSync(htmlPath)) return
-        let html = fs.readFileSync(htmlPath, "utf8")
+        const html = fs.readFileSync(htmlPath, "utf8")
         const m = html.match(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/)
         if (!m) return
         const cssPath = path.join(dir, m[1])
@@ -26,29 +26,44 @@ export default defineConfig({
 
         // Prerender public routes to static HTML for instant first paint
         try {
-          const { execSync } = await import("child_process")
+          const { execFileSync, execSync } = await import("child_process")
+          const { build } = await import("esbuild")
+          const { pathToFileURL } = await import("url")
           const bundle = "node_modules/.cache/prerender.mjs"
           fs.mkdirSync(path.dirname(bundle), { recursive: true })
-          execSync(
-            `npx esbuild scripts/prerender.tsx --bundle --platform=node --format=esm --outfile=${bundle} --alias:@=./src --jsx=automatic --banner:js="import { createRequire } from 'module';const require = createRequire(import.meta.url);" --define:process.env.NODE_ENV='"'"'production'"'"'`,
-            { stdio: "inherit" },
-          )
-          execSync(`node scripts/prerender-run.mjs`, {
+          await build({
+            absWorkingDir: __dirname,
+            entryPoints: ["scripts/prerender.tsx"],
+            bundle: true,
+            platform: "node",
+            format: "esm",
+            outfile: bundle,
+            alias: { "@": "./src" },
+            jsx: "automatic",
+            banner: {
+              js: "import { createRequire } from 'module';const require = createRequire(import.meta.url);",
+            },
+            define: { "process.env.NODE_ENV": JSON.stringify("production") },
+          })
+          execFileSync(process.execPath, ["scripts/prerender-run.mjs"], {
             stdio: "inherit",
-            env: { ...process.env, PRERENDER_BUNDLE: path.resolve(bundle) },
+            env: { ...process.env, PRERENDER_BUNDLE: pathToFileURL(path.resolve(bundle)).href },
           })
 
           // Per-route CSS purge + inline (each page gets only the CSS it uses)
           if (!process.env.SKIP_PURGE) execSync(`node scripts/purge-inline.mjs`, { stdio: "inherit" })
         } catch (e) {
-          console.warn("prerender skipped:", e?.stderr?.toString?.() || e?.message || e)
+          const error = e as { stderr?: { toString(): string }; message?: string }
+          console.warn("prerender skipped:", error.stderr?.toString() || error.message || e)
           // Fallback: inline the full stylesheet into the root page
           try {
             const css = fs.readFileSync(cssPath, "utf8")
             const cur = fs.readFileSync(htmlPath, "utf8")
             const lm = cur.match(/<link[^>]*rel="stylesheet"[^>]*>/)
             if (lm) fs.writeFileSync(htmlPath, cur.replace(lm[0], `<style data-inlined>${css}</style>`))
-          } catch {}
+          } catch (fallbackError) {
+            console.warn("CSS fallback skipped:", fallbackError)
+          }
         }
       },
     }],

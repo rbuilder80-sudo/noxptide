@@ -44,6 +44,10 @@ export const orders = mysqlTable("orders", {
   discountPence: int("discountPence").default(0).notNull(),
   shippingPence: int("shippingPence").default(0).notNull(),
   totalPence: int("totalPence").notNull(),
+  paymentProvider: varchar("paymentProvider", { length: 32 }).default("wallid").notNull(),
+  paymentId: varchar("paymentId", { length: 64 }).unique(),
+  paymentStatus: varchar("paymentStatus", { length: 32 }).default("NEW").notNull(),
+  paymentReturnToken: varchar("paymentReturnToken", { length: 64 }).unique(),
   status: mysqlEnum("status", [
     "pending",
     "paid",
