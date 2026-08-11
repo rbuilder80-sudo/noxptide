@@ -1,6 +1,8 @@
+import { sql } from "drizzle-orm";
 import { createRouter, staffQuery } from "./middleware";
 import { checkHubSpotReadiness, syncOrderToHubSpot, type EcommerceOrder, type EcommerceOrderItem } from "./lib/hubspot";
 import { checkWallidReadiness } from "./lib/wallid";
+import { getDb } from "./queries/connection";
 
 const requiredLiveVariables = [
   "HUBSPOT_ACCESS_TOKEN",
@@ -26,15 +28,65 @@ function hubSpotRecordUrl(objectTypeId: "0-1" | "0-2" | "0-3", recordId?: string
   return `https://app.hubspot.com/contacts/${HUBSPOT_PORTAL_ID}/record/${objectTypeId}/${recordId}?${params}`;
 }
 
+const requiredOrderAuditColumns = [
+  "hubspotContactId",
+  "hubspotCompanyId",
+  "hubspotDealId",
+  "hubspotSyncedAt",
+  "hubspotSyncError",
+] as const;
+
+async function checkOrderAuditSchema() {
+  try {
+    const result = await getDb().execute(sql`
+      SELECT COLUMN_NAME AS columnName
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'orders'
+        AND COLUMN_NAME IN (
+          'hubspotContactId',
+          'hubspotCompanyId',
+          'hubspotDealId',
+          'hubspotSyncedAt',
+          'hubspotSyncError'
+        )
+    `);
+    const rows = Array.isArray(result) ? result : [];
+    const found = new Set(
+      rows
+        .map((row) => (row as { columnName?: unknown; COLUMN_NAME?: unknown }).columnName ?? (row as { COLUMN_NAME?: unknown }).COLUMN_NAME)
+        .filter((value): value is string => typeof value === "string"),
+    );
+    const checkedColumns = requiredOrderAuditColumns.filter((column) => found.has(column));
+    const missingColumns = requiredOrderAuditColumns.filter((column) => !found.has(column));
+    return {
+      ready: missingColumns.length === 0,
+      checkedColumns,
+      missingColumns,
+      error: undefined as string | undefined,
+    };
+  } catch (error) {
+    return {
+      ready: false,
+      checkedColumns: [] as string[],
+      missingColumns: [...requiredOrderAuditColumns],
+      error: error instanceof Error ? error.message.slice(0, 240) : "Database schema check failed",
+    };
+  }
+}
+
 export const integrationsRouter = createRouter({
   /** Staff: safe readiness status for external ecommerce integrations. */
   status: staffQuery.query(async () => {
     const missing = requiredLiveVariables.filter((name) => !configured(name));
-    const hubspot = await checkHubSpotReadiness();
+    const [hubspot, database] = await Promise.all([
+      checkHubSpotReadiness(),
+      checkOrderAuditSchema(),
+    ]);
     const wallid = checkWallidReadiness();
 
     return {
-      ecommerceReady: hubspot.ready && wallid.ready && configured("PUBLIC_SITE_URL"),
+      ecommerceReady: hubspot.ready && wallid.ready && database.ready && configured("PUBLIC_SITE_URL"),
       hubspot: {
         ready: hubspot.ready,
         tokenConfigured: hubspot.tokenConfigured,
@@ -58,6 +110,7 @@ export const integrationsRouter = createRouter({
         publicSiteUrlConfigured: configured("PUBLIC_SITE_URL"),
         publicSiteUrl: process.env.PUBLIC_SITE_URL?.trim() || "https://www.noxptide.co.uk",
       },
+      database,
       missingVariables: missing,
     };
   }),

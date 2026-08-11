@@ -92,7 +92,7 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-4">
           <IntegrationTile
             label="HubSpot CRM"
             ready={integrationStatus?.hubspot.ready}
@@ -117,6 +117,19 @@ export default function AdminDashboard() {
             label="Public site URL"
             ready={integrationStatus?.site.publicSiteUrlConfigured}
             detail={integrationStatus?.site.publicSiteUrl ?? 'https://www.noxptide.co.uk'}
+          />
+          <IntegrationTile
+            label="Order audit database"
+            ready={integrationStatus?.database.ready}
+            detail={
+              integrationStatus?.database.ready
+                ? `Verified: ${integrationStatus.database.checkedColumns.join(', ')}`
+                : integrationStatus?.database.error
+                  ? `Schema check failed: ${integrationStatus.database.error}`
+                  : integrationStatus?.database.missingColumns.length
+                    ? `Missing: ${integrationStatus.database.missingColumns.join(', ')}`
+                    : 'HubSpot order tracking columns'
+            }
           />
         </div>
 
