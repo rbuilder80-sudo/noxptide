@@ -78,7 +78,7 @@ export default function AdminDashboard() {
             ready={integrationStatus?.hubspot.ready}
             detail={
               integrationStatus?.hubspot.verified
-                ? `Verified: ${integrationStatus.hubspot.checkedObjects.join(', ')}`
+                ? `Verified: ${integrationStatus.hubspot.checkedObjects.join(', ')} · pipeline ${integrationStatus.hubspot.dealMapping?.pipelineId} · ${integrationStatus.hubspot.checkedProperties.length} properties`
                 : integrationStatus?.hubspot.error
                   ? `Token found, but verification failed: ${integrationStatus.hubspot.error}`
                   : 'Contacts, deals, line items and product catalogue sync'

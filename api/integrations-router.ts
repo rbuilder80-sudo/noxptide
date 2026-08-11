@@ -30,6 +30,8 @@ export const integrationsRouter = createRouter({
         tokenConfigured: hubspot.tokenConfigured,
         verified: hubspot.verified,
         checkedObjects: hubspot.checkedObjects,
+        checkedProperties: hubspot.checkedProperties,
+        dealMapping: hubspot.dealMapping,
         error: hubspot.error,
         syncs: ["contacts", "deals", "line_items", "products"],
       },

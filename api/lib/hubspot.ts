@@ -32,6 +32,10 @@ export type EcommerceOrderItem = {
 type HubSpotRecord = { id: string; properties?: Record<string, string> };
 type HubSpotSearch = { results: HubSpotRecord[] };
 type HubSpotReadinessObject = "contacts" | "deals" | "line_items" | "products";
+type HubSpotProperty = {
+  name: string;
+  options?: Array<{ label: string; value: string }>;
+};
 
 const DEAL_PIPELINE_ID = process.env.HUBSPOT_DEAL_PIPELINE_ID?.trim() || "default";
 const statusDealStage: Record<OrderStatus, string> = {
@@ -75,6 +79,36 @@ async function verifyReadableObject(objectType: HubSpotReadinessObject) {
     method: "POST",
     body: JSON.stringify({ properties: [], limit: 1 }),
   });
+}
+
+async function verifyProperty(objectType: HubSpotReadinessObject, propertyName: string) {
+  await hubSpotRequest<HubSpotProperty>(
+    `/crm/v3/properties/${objectType}/${encodeURIComponent(propertyName)}`,
+  );
+  return `${objectType}.${propertyName}`;
+}
+
+async function verifyDealMappings() {
+  const [pipelineProperty, stageProperty] = await Promise.all([
+    hubSpotRequest<HubSpotProperty>("/crm/v3/properties/deals/pipeline"),
+    hubSpotRequest<HubSpotProperty>("/crm/v3/properties/deals/dealstage"),
+  ]);
+
+  if (!pipelineProperty.options?.some((option) => option.value === DEAL_PIPELINE_ID)) {
+    throw new Error(`HubSpot deal pipeline '${DEAL_PIPELINE_ID}' was not found`);
+  }
+
+  const requiredStages = [...new Set(Object.values(statusDealStage))];
+  const stageOptions = new Set(stageProperty.options?.map((option) => option.value) ?? []);
+  const missingStages = requiredStages.filter((stage) => !stageOptions.has(stage));
+  if (missingStages.length > 0) {
+    throw new Error(`HubSpot deal stages missing: ${missingStages.join(", ")}`);
+  }
+
+  return {
+    pipelineId: DEAL_PIPELINE_ID,
+    dealStages: requiredStages,
+  };
 }
 
 function splitName(fullName: string) {
@@ -295,23 +329,55 @@ export async function checkHubSpotReadiness() {
       tokenConfigured: false,
       verified: false,
       checkedObjects: [] as HubSpotReadinessObject[],
+      checkedProperties: [] as string[],
+      dealMapping: undefined as { pipelineId: string; dealStages: string[] } | undefined,
       error: undefined as string | undefined,
     };
   }
 
   const requiredObjects: HubSpotReadinessObject[] = ["contacts", "deals", "line_items", "products"];
   const checkedObjects: HubSpotReadinessObject[] = [];
+  const requiredProperties: Array<[HubSpotReadinessObject, string]> = [
+    ["contacts", "email"],
+    ["contacts", "firstname"],
+    ["contacts", "lastname"],
+    ["contacts", "phone"],
+    ["contacts", "company"],
+    ["deals", "dealname"],
+    ["deals", "amount"],
+    ["deals", "pipeline"],
+    ["deals", "dealstage"],
+    ["deals", "closedate"],
+    ["deals", "description"],
+    ["line_items", "name"],
+    ["line_items", "hs_sku"],
+    ["line_items", "quantity"],
+    ["line_items", "price"],
+    ["products", "name"],
+    ["products", "hs_sku"],
+    ["products", "price"],
+    ["products", "description"],
+    ["products", "hs_url"],
+    ["products", "hs_images"],
+  ];
+  const checkedProperties: string[] = [];
 
   try {
     for (const objectType of requiredObjects) {
       await verifyReadableObject(objectType);
       checkedObjects.push(objectType);
     }
+    const dealMapping = await verifyDealMappings();
+    for (const [objectType, propertyName] of requiredProperties) {
+      checkedProperties.push(await verifyProperty(objectType, propertyName));
+    }
     return {
       ready: true,
       tokenConfigured: true,
       verified: true,
       checkedObjects,
+      checkedProperties,
+      dealMapping,
       error: undefined as string | undefined,
     };
   } catch (error) {
@@ -320,6 +386,8 @@ export async function checkHubSpotReadiness() {
       tokenConfigured: true,
       verified: false,
       checkedObjects,
+      checkedProperties,
+      dealMapping: undefined as { pipelineId: string; dealStages: string[] } | undefined,
       error: error instanceof Error ? error.message.slice(0, 240) : "HubSpot verification failed",
     };
   }

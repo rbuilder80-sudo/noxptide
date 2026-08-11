@@ -139,6 +139,8 @@ describe("checkHubSpotReadiness", () => {
       tokenConfigured: false,
       verified: false,
       checkedObjects: [],
+      checkedProperties: [],
+      dealMapping: undefined,
       error: undefined,
     });
     expect(fetchMock).not.toHaveBeenCalled();
@@ -146,19 +148,51 @@ describe("checkHubSpotReadiness", () => {
 
   it("verifies required ecommerce CRM objects without writing data", async () => {
     process.env.HUBSPOT_ACCESS_TOKEN = "private-token";
-    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(json({ results: [] })));
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.endsWith("/crm/v3/properties/deals/pipeline")) {
+        return Promise.resolve(json({ name: "pipeline", options: [{ value: "default", label: "Default" }] }));
+      }
+      if (url.endsWith("/crm/v3/properties/deals/dealstage")) {
+        return Promise.resolve(
+          json({
+            name: "dealstage",
+            options: [
+              { value: "appointmentscheduled", label: "New Enquiry" },
+              { value: "closedwon", label: "Won" },
+              { value: "closedlost", label: "Lost" },
+            ],
+          }),
+        );
+      }
+      if (url.includes("/crm/v3/properties/")) {
+        return Promise.resolve(json({ name: url.split("/").pop() }));
+      }
+      return Promise.resolve(json({ results: [] }));
+    });
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(checkHubSpotReadiness()).resolves.toEqual({
+    const result = await checkHubSpotReadiness();
+    expect(result).toEqual({
       ready: true,
       tokenConfigured: true,
       verified: true,
       checkedObjects: ["contacts", "deals", "line_items", "products"],
+      checkedProperties: expect.arrayContaining([
+        "contacts.email",
+        "deals.pipeline",
+        "deals.dealstage",
+        "line_items.hs_sku",
+        "products.hs_images",
+      ]),
+      dealMapping: {
+        pipelineId: "default",
+        dealStages: ["appointmentscheduled", "closedwon", "closedlost"],
+      },
       error: undefined,
     });
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(result.checkedProperties).toHaveLength(21);
+    expect(fetchMock).toHaveBeenCalledTimes(27);
     for (const [, init] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
-      expect(init.method).toBe("POST");
       expect(new Headers(init.headers).get("Authorization")).toBe("Bearer private-token");
     }
   });
