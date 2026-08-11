@@ -214,9 +214,15 @@ export default function Home() {
           </Link>
         </div>
         <RevealGroup className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {products.slice(0, 8).map((p) => (
-            <RevealItem key={p.slug}><ProductCard product={p} /></RevealItem>
-          ))}
+          {products.slice(0, 8).map((p, i) =>
+            i < 4 ? (
+              // First row: visible immediately (no JS-gated reveal) so Speed Index
+              // doesn't wait for idle hydration; first two images load eager.
+              <ProductCard key={p.slug} product={p} eager={i < 2} />
+            ) : (
+              <RevealItem key={p.slug}><ProductCard product={p} /></RevealItem>
+            ),
+          )}
         </RevealGroup>
         <div className="mt-8 text-center sm:hidden">
           <Link to="/shop" className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
