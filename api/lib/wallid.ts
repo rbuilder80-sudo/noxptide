@@ -60,6 +60,10 @@ function credentials() {
   return { keyId, secret };
 }
 
+function publicSiteUrl() {
+  return (process.env.PUBLIC_SITE_URL?.trim() || "https://www.noxptide.co.uk").replace(/\/$/, "");
+}
+
 async function wallidRequest<T>(path: string, init: RequestInit): Promise<T> {
   const { keyId, secret } = credentials();
   const response = await fetch(`${WALLID_API_URL}${path}`, {
@@ -126,4 +130,34 @@ export function parseWallidWebhook(rawBody: string): WallidWebhookEvent[] {
       : null;
   if (!Array.isArray(events)) throw new Error("Invalid Wallid webhook body");
   return events as WallidWebhookEvent[];
+}
+
+export function checkWallidReadiness() {
+  const apiKeyIdConfigured = Boolean(process.env.WALLID_API_KEY_ID?.trim());
+  const apiKeySecretConfigured = Boolean(process.env.WALLID_API_KEY_SECRET?.trim());
+  const webhookSecretConfigured = Boolean(process.env.WALLID_WEBHOOK_SECRET?.trim());
+  const webhookUrl = `${publicSiteUrl()}/api/wallid/webhook`;
+
+  let webhookVerified = false;
+  if (webhookSecretConfigured) {
+    const timestamp = String(Math.floor(Date.now() / 1000));
+    const rawBody = JSON.stringify({ events: [] });
+    const signature = `sha256=${createHmac("sha256", process.env.WALLID_WEBHOOK_SECRET!.trim())
+      .update(`${timestamp}.${rawBody}`)
+      .digest("hex")}`;
+    webhookVerified = verifyWallidWebhook(rawBody, timestamp, signature);
+  }
+
+  return {
+    ready: apiKeyIdConfigured && apiKeySecretConfigured && webhookVerified,
+    apiKeyIdConfigured,
+    apiKeySecretConfigured,
+    webhookSecretConfigured,
+    webhookVerified,
+    webhookUrl,
+    error:
+      apiKeyIdConfigured && apiKeySecretConfigured && webhookSecretConfigured
+        ? undefined
+        : "Wallid API key ID, API key secret and webhook secret must be configured in Railway",
+  };
 }

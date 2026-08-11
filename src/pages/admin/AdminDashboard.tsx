@@ -87,7 +87,11 @@ export default function AdminDashboard() {
           <IntegrationTile
             label="Wallid Pay-by-Bank"
             ready={integrationStatus?.wallid.ready}
-            detail="Checkout payment session and webhook secrets"
+            detail={
+              integrationStatus?.wallid.webhookVerified
+                ? `Webhook verified locally · ${integrationStatus.wallid.webhookUrl}`
+                : integrationStatus?.wallid.error ?? 'Checkout payment session and webhook secrets'
+            }
           />
           <IntegrationTile
             label="Public site URL"

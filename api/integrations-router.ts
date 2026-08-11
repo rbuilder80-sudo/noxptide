@@ -1,5 +1,6 @@
 import { createRouter, staffQuery } from "./middleware";
 import { checkHubSpotReadiness } from "./lib/hubspot";
+import { checkWallidReadiness } from "./lib/wallid";
 
 const requiredLiveVariables = [
   "HUBSPOT_ACCESS_TOKEN",
@@ -18,13 +19,10 @@ export const integrationsRouter = createRouter({
   status: staffQuery.query(async () => {
     const missing = requiredLiveVariables.filter((name) => !configured(name));
     const hubspot = await checkHubSpotReadiness();
-    const wallidReady =
-      configured("WALLID_API_KEY_ID") &&
-      configured("WALLID_API_KEY_SECRET") &&
-      configured("WALLID_WEBHOOK_SECRET");
+    const wallid = checkWallidReadiness();
 
     return {
-      ecommerceReady: hubspot.ready && wallidReady && configured("PUBLIC_SITE_URL"),
+      ecommerceReady: hubspot.ready && wallid.ready && configured("PUBLIC_SITE_URL"),
       hubspot: {
         ready: hubspot.ready,
         tokenConfigured: hubspot.tokenConfigured,
@@ -36,10 +34,13 @@ export const integrationsRouter = createRouter({
         syncs: ["contacts", "deals", "line_items", "products"],
       },
       wallid: {
-        ready: wallidReady,
-        apiKeyIdConfigured: configured("WALLID_API_KEY_ID"),
-        apiKeySecretConfigured: configured("WALLID_API_KEY_SECRET"),
-        webhookSecretConfigured: configured("WALLID_WEBHOOK_SECRET"),
+        ready: wallid.ready,
+        apiKeyIdConfigured: wallid.apiKeyIdConfigured,
+        apiKeySecretConfigured: wallid.apiKeySecretConfigured,
+        webhookSecretConfigured: wallid.webhookSecretConfigured,
+        webhookVerified: wallid.webhookVerified,
+        webhookUrl: wallid.webhookUrl,
+        error: wallid.error,
       },
       site: {
         publicSiteUrlConfigured: configured("PUBLIC_SITE_URL"),

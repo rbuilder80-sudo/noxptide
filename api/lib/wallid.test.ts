@@ -1,6 +1,7 @@
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  checkWallidReadiness,
   createWallidPayment,
   parseWallidWebhook,
   verifyWallidWebhook,
@@ -10,6 +11,7 @@ afterEach(() => {
   delete process.env.WALLID_API_KEY_ID;
   delete process.env.WALLID_API_KEY_SECRET;
   delete process.env.WALLID_WEBHOOK_SECRET;
+  delete process.env.PUBLIC_SITE_URL;
   vi.unstubAllGlobals();
 });
 
@@ -82,5 +84,33 @@ describe("Wallid Pay-by-Bank", () => {
     };
     expect(parseWallidWebhook(JSON.stringify({ events: [event] }))).toEqual([event]);
     expect(parseWallidWebhook(JSON.stringify([event]))).toEqual([event]);
+  });
+
+  it("reports readiness without exposing Wallid secrets", () => {
+    process.env.WALLID_API_KEY_ID = "key-id";
+    process.env.WALLID_API_KEY_SECRET = "key-secret";
+    process.env.WALLID_WEBHOOK_SECRET = "webhook-secret";
+    process.env.PUBLIC_SITE_URL = "https://www.noxptide.co.uk/";
+
+    expect(checkWallidReadiness()).toEqual({
+      ready: true,
+      apiKeyIdConfigured: true,
+      apiKeySecretConfigured: true,
+      webhookSecretConfigured: true,
+      webhookVerified: true,
+      webhookUrl: "https://www.noxptide.co.uk/api/wallid/webhook",
+      error: undefined,
+    });
+  });
+
+  it("reports missing Wallid credentials", () => {
+    expect(checkWallidReadiness()).toMatchObject({
+      ready: false,
+      apiKeyIdConfigured: false,
+      apiKeySecretConfigured: false,
+      webhookSecretConfigured: false,
+      webhookVerified: false,
+      webhookUrl: "https://www.noxptide.co.uk/api/wallid/webhook",
+    });
   });
 });
