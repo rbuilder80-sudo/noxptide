@@ -57,6 +57,8 @@ describe("syncOrderToHubSpot", () => {
       .mockResolvedValueOnce(json({ id: "deal-1" }))
       .mockResolvedValueOnce(new Response(null, { status: 204 }))
       .mockResolvedValueOnce(json({ results: [] }))
+      .mockResolvedValueOnce(json({ id: "product-1" }))
+      .mockResolvedValueOnce(json({ results: [] }))
       .mockResolvedValueOnce(json({ id: "line-1" }))
       .mockResolvedValueOnce(new Response(null, { status: 204 }));
     vi.stubGlobal("fetch", fetchMock);
@@ -66,7 +68,7 @@ describe("syncOrderToHubSpot", () => {
       contactId: "contact-1",
       dealId: "deal-1",
     });
-    expect(fetchMock).toHaveBeenCalledTimes(8);
+    expect(fetchMock).toHaveBeenCalledTimes(10);
 
     for (const [, init] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
       expect(new Headers(init.headers).get("Authorization")).toBe("Bearer private-token");
@@ -95,14 +97,23 @@ describe("syncOrderToHubSpot", () => {
       "https://api.hubapi.com/crm/v4/objects/deals/deal-1/associations/default/contacts/contact-1",
     );
 
-    const lineItemCreate = fetchMock.mock.calls[6] as [string, RequestInit];
+    const productCreate = fetchMock.mock.calls[6] as [string, RequestInit];
+    expect(productCreate[0]).toBe("https://api.hubapi.com/crm/v3/objects/products");
+    expect(JSON.parse(String(productCreate[1].body)).properties).toMatchObject({
+      name: "BPC-157 5mg",
+      hs_sku: "noxptide:bpc-157:5mg",
+      price: "34.99",
+      hs_url: "https://www.noxptide.co.uk/product/bpc-157",
+    });
+
+    const lineItemCreate = fetchMock.mock.calls[8] as [string, RequestInit];
     expect(JSON.parse(String(lineItemCreate[1].body)).properties).toEqual({
       name: "BPC-157 5mg",
       hs_sku: "NOX-TEST-1001:bpc-157:5mg",
       quantity: "2",
       price: "34.99",
     });
-    expect(fetchMock.mock.calls[7][0]).toBe(
+    expect(fetchMock.mock.calls[9][0]).toBe(
       "https://api.hubapi.com/crm/v4/objects/deals/deal-1/associations/default/line_items/line-1",
     );
   });

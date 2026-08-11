@@ -180,6 +180,49 @@ function itemSku(orderNumber: string, item: EcommerceOrderItem) {
   return `${orderNumber}:${item.productSlug}:${item.sizeLabel}`;
 }
 
+function productSku(item: EcommerceOrderItem) {
+  return `noxptide:${item.productSlug}:${item.sizeLabel}`;
+}
+
+function publicSiteUrl() {
+  return (process.env.PUBLIC_SITE_URL?.trim() || "https://www.noxptide.co.uk").replace(/\/$/, "");
+}
+
+function productImageUrl(item: EcommerceOrderItem) {
+  const size = item.sizeLabel.replace(/\s+/g, "").toLowerCase();
+  return `${publicSiteUrl()}/images/products/${item.productSlug}-${size}.webp`;
+}
+
+async function upsertProduct(item: EcommerceOrderItem) {
+  const sku = productSku(item);
+  const found = await hubSpotRequest<HubSpotSearch>("/crm/v3/objects/products/search", {
+    method: "POST",
+    body: JSON.stringify({
+      filterGroups: [{ filters: [{ propertyName: "hs_sku", operator: "EQ", value: sku }] }],
+      properties: ["hs_sku"],
+      limit: 1,
+    }),
+  });
+  const properties = {
+    name: `${item.productName} ${item.sizeLabel}`,
+    hs_sku: sku,
+    price: (item.unitPricePence / 100).toFixed(2),
+    description: `${item.productName} ${item.sizeLabel} research peptide sold by Noxptide.`,
+    hs_url: `${publicSiteUrl()}/product/${item.productSlug}`,
+    hs_images: productImageUrl(item),
+  };
+  if (found.results[0]) {
+    return hubSpotRequest<HubSpotRecord>(`/crm/v3/objects/products/${found.results[0].id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ properties }),
+    });
+  }
+  return hubSpotRequest<HubSpotRecord>("/crm/v3/objects/products", {
+    method: "POST",
+    body: JSON.stringify({ properties }),
+  });
+}
+
 async function upsertLineItem(orderNumber: string, item: EcommerceOrderItem) {
   const sku = itemSku(orderNumber, item);
   const found = await hubSpotRequest<HubSpotSearch>("/crm/v3/objects/line_items/search", {
@@ -222,6 +265,7 @@ export async function syncOrderToHubSpot(
   );
 
   for (const item of items) {
+    await upsertProduct(item);
     const lineItem = await upsertLineItem(order.orderNumber, item);
     await hubSpotRequest<void>(
       `/crm/v4/objects/deals/${deal.id}/associations/default/line_items/${lineItem.id}`,
