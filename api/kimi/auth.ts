@@ -15,22 +15,37 @@ async function exchangeAuthCode(
   code: string,
   redirectUri: string,
 ): Promise<TokenResponse> {
-  const body = new URLSearchParams({
-    grant_type: "authorization_code",
-    code,
-    client_id: env.appId,
-    client_secret: env.appSecret,
-    redirect_uri: redirectUri,
-  });
+  const requestToken = (includeRedirectUri: boolean) => {
+    const body = new URLSearchParams({
+      grant_type: "authorization_code",
+      code,
+      client_id: env.appId,
+      client_secret: env.appSecret,
+    });
 
-  const resp = await fetch(`${env.kimiAuthUrl}/api/oauth/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
-  });
+    if (includeRedirectUri) {
+      body.set("redirect_uri", redirectUri);
+    }
+
+    return fetch(`${env.kimiAuthUrl}/api/oauth/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
+    });
+  };
+
+  let resp = await requestToken(true);
 
   if (!resp.ok) {
     const text = await resp.text();
+    if (/invalid[_ ]redirect_uri|Invalid redirect_uri/i.test(text)) {
+      resp = await requestToken(false);
+      if (resp.ok) {
+        return resp.json() as Promise<TokenResponse>;
+      }
+      const retryText = await resp.text();
+      throw new Error(`Token exchange failed (${resp.status}): ${retryText}`);
+    }
     throw new Error(`Token exchange failed (${resp.status}): ${text}`);
   }
 
