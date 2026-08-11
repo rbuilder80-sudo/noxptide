@@ -59,9 +59,9 @@ export default function DataRetention() {
         <section aria-labelledby="dr-never">
           <h2 id="dr-never" className="text-xl font-bold text-foreground">What we never keep</h2>
           <p className="mt-3">
-            Card numbers and bank logins. All payments are processed directly on our payment
-            providers' platforms. Your payment credentials never reach our servers, so there is
-            nothing for us to retain.
+            Card numbers and bank logins. Pay-by-Bank authentication happens with Wallid and your
+            bank. Your payment credentials never reach our servers, so there is nothing for us to
+            retain.
           </p>
         </section>
 

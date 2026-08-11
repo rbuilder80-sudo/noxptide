@@ -7,6 +7,8 @@ import { appRouter } from "./router";
 import { createContext } from "./context";
 import { env } from "./lib/env";
 import { createOAuthCallbackHandler } from "./kimi/auth";
+import { processWallidWebhookEvents } from "./orders-router";
+import { parseWallidWebhook, verifyWallidWebhook } from "./lib/wallid";
 import { Paths } from "@contracts/constants";
 
 const app = new Hono<{ Bindings: HttpBindings }>();
@@ -14,6 +16,24 @@ const app = new Hono<{ Bindings: HttpBindings }>();
 app.use(compress());
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
 app.get(Paths.oauthCallback, createOAuthCallbackHandler());
+app.post("/api/wallid/webhook", async (c) => {
+  const rawBody = await c.req.text();
+  const valid = verifyWallidWebhook(
+    rawBody,
+    c.req.header("X-Webhook-Timestamp"),
+    c.req.header("X-Webhook-Signature"),
+  );
+  if (!valid) return c.json({ error: "Invalid webhook signature" }, 400);
+
+  try {
+    const events = parseWallidWebhook(rawBody);
+    const processed = await processWallidWebhookEvents(events);
+    return c.json({ received: events.length, processed });
+  } catch (error) {
+    console.error("[wallid] webhook processing failed:", error);
+    return c.json({ error: "Webhook processing failed" }, 500);
+  }
+});
 app.use("/api/trpc/*", async (c) => {
   return fetchRequestHandler({
     endpoint: "/api/trpc",

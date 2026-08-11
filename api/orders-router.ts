@@ -1,34 +1,46 @@
+import { randomBytes } from "node:crypto";
 import { z } from "zod";
-import { desc, eq } from "drizzle-orm";
-import { orders, orderItems } from "@db/schema";
+import { and, desc, eq } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import { orders, orderItems, type Order } from "@db/schema";
+import { categories, getProduct } from "@/data/products";
 import { getDb } from "./queries/connection";
 import { createRouter, publicQuery, staffQuery } from "./middleware";
+import { syncOrderToHubSpot } from "./lib/hubspot";
+import {
+  createWallidPayment,
+  getWallidPaymentStatus,
+  type WallidItem,
+  type WallidPaymentStatus,
+  type WallidWebhookEvent,
+} from "./lib/wallid";
 
 const orderInput = z.object({
   customerName: z.string().min(2).max(255),
   email: z.string().email().max(320),
   phone: z.string().max(64).optional(),
+  organisation: z.string().min(2).max(255),
   addressLine1: z.string().min(3).max(255),
   addressLine2: z.string().max(255).optional(),
   city: z.string().min(2).max(128),
   postcode: z.string().min(3).max(16),
-  country: z.string().max(64).default("United Kingdom"),
-  subtotalPence: z.number().int().nonnegative(),
-  discountPence: z.number().int().nonnegative(),
-  shippingPence: z.number().int().nonnegative(),
-  totalPence: z.number().int().positive(),
-  notes: z.string().max(2000).optional(),
+  country: z.literal("United Kingdom").default("United Kingdom"),
+  shippingMethod: z.enum(["standard", "next-day"]),
   items: z
     .array(
       z.object({
         productSlug: z.string().max(128),
-        productName: z.string().max(255),
         sizeLabel: z.string().max(32),
-        unitPricePence: z.number().int().nonnegative(),
-        qty: z.number().int().positive(),
+        qty: z.number().int().min(1).max(50),
       }),
     )
-    .min(1),
+    .min(1)
+    .max(50),
+});
+
+const paymentLookupInput = z.object({
+  orderNumber: z.string().min(6).max(32),
+  token: z.string().length(48),
 });
 
 const orderStatuses = [
@@ -40,18 +52,248 @@ const orderStatuses = [
   "cancelled",
 ] as const;
 
+function calculateOrder(input: z.infer<typeof orderInput>) {
+  const items = input.items.map((item) => {
+    const product = getProduct(item.productSlug);
+    const size = product?.sizes.find((candidate) => candidate.label === item.sizeLabel);
+    if (!product || !size) {
+      throw new TRPCError({ code: "BAD_REQUEST", message: "A product in your basket is unavailable." });
+    }
+    return {
+      productSlug: product.slug,
+      productName: product.name,
+      sizeLabel: size.label,
+      unitPricePence: Math.round(size.price * 100),
+      qty: item.qty,
+      category: categories.find((category) => category.slug === product.category)?.name ?? "Research Peptides",
+    };
+  });
+  const subtotalPence = items.reduce((sum, item) => sum + item.unitPricePence * item.qty, 0);
+  const discountRate = subtotalPence >= 50_000 ? 0.3 : subtotalPence >= 15_000 ? 0.2 : 0;
+  const discountPence = Math.round(subtotalPence * discountRate);
+  const shippingPence = input.shippingMethod === "next-day" ? 899 : subtotalPence >= 2_500 ? 0 : 499;
+  const totalPence = subtotalPence - discountPence + shippingPence;
+  return { items, subtotalPence, discountPence, shippingPence, totalPence };
+}
+
+function productImageUrl(origin: string, slug: string, sizeLabel: string) {
+  const size = sizeLabel.replace(/\s+/g, "").toLowerCase();
+  return `${origin}/images/products/${slug}-${size}.webp`;
+}
+
+function toWallidItems(
+  origin: string,
+  calculated: ReturnType<typeof calculateOrder>,
+): WallidItem[] {
+  let allocatedDiscount = 0;
+  const result = calculated.items.map((item, index) => {
+    const lineTotal = item.unitPricePence * item.qty;
+    const lineDiscount =
+      index === calculated.items.length - 1
+        ? calculated.discountPence - allocatedDiscount
+        : Math.round((calculated.discountPence * lineTotal) / calculated.subtotalPence);
+    allocatedDiscount += lineDiscount;
+    return {
+      name: `${item.productName} ${item.sizeLabel} × ${item.qty}`,
+      category: item.category,
+      price_minor: lineTotal - lineDiscount,
+      image_url: productImageUrl(origin, item.productSlug, item.sizeLabel),
+      product_url: `${origin}/product/${item.productSlug}`,
+    };
+  });
+
+  if (calculated.shippingPence > 0) {
+    const first = calculated.items[0];
+    result.push({
+      name: "Tracked UK delivery",
+      category: "Delivery",
+      price_minor: calculated.shippingPence,
+      image_url: productImageUrl(origin, first.productSlug, first.sizeLabel),
+      product_url: `${origin}/shipping`,
+    });
+  }
+  return result;
+}
+
+function publicOrigin(request: Request) {
+  if (process.env.PUBLIC_SITE_URL) return process.env.PUBLIC_SITE_URL.replace(/\/$/, "");
+  if (process.env.NODE_ENV === "production") return "https://www.noxptide.co.uk";
+  return new URL(request.url).origin;
+}
+
+async function syncOrder(order: Order) {
+  const db = getDb();
+  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
+  try {
+    await syncOrderToHubSpot(order, items);
+  } catch (error) {
+    console.error(`[hubspot] order ${order.orderNumber} sync failed:`, error);
+  }
+}
+
+export async function applyWallidStatus(event: {
+  api_payment_id: string;
+  order_id: string;
+  status: WallidPaymentStatus;
+  amount: number;
+  currency: string;
+}) {
+  const db = getDb();
+  const [order] = await db
+    .select()
+    .from(orders)
+    .where(and(eq(orders.orderNumber, event.order_id), eq(orders.paymentId, event.api_payment_id)));
+  if (!order || event.amount !== order.totalPence || event.currency !== "GBP") return false;
+
+  let status = order.status;
+  if (event.status === "SUCCESS") status = "paid";
+  if ((event.status === "FAILED" || event.status === "EXPIRED") && order.status === "pending") {
+    status = "cancelled";
+  }
+  await db
+    .update(orders)
+    .set({ paymentStatus: event.status, status })
+    .where(eq(orders.id, order.id));
+  await syncOrder({ ...order, paymentStatus: event.status, status });
+  return true;
+}
+
+export async function processWallidWebhookEvents(events: WallidWebhookEvent[]) {
+  let processed = 0;
+  for (const event of events) {
+    if (await applyWallidStatus(event)) processed += 1;
+  }
+  return processed;
+}
+
 export const ordersRouter = createRouter({
-  /** Public: place an order from checkout. */
-  create: publicQuery.input(orderInput).mutation(async ({ input }) => {
+  /** Public: create an order and a Wallid hosted Pay-by-Bank session. */
+  create: publicQuery.input(orderInput).mutation(async ({ input, ctx }) => {
     const db = getDb();
+    const calculated = calculateOrder(input);
     const orderNumber = `NOX-${Date.now().toString(36).toUpperCase()}${Math.floor(
       Math.random() * 900 + 100,
     )}`;
-    const { items, ...fields } = input;
-    const [result] = await db.insert(orders).values({ ...fields, orderNumber });
+    const paymentReturnToken = randomBytes(24).toString("hex");
+    const notes = `Organisation: ${input.organisation}\nDelivery: ${input.shippingMethod}`;
+    const [result] = await db.insert(orders).values({
+      orderNumber,
+      customerName: input.customerName,
+      email: input.email,
+      phone: input.phone,
+      addressLine1: input.addressLine1,
+      addressLine2: input.addressLine2,
+      city: input.city,
+      postcode: input.postcode,
+      country: input.country,
+      subtotalPence: calculated.subtotalPence,
+      discountPence: calculated.discountPence,
+      shippingPence: calculated.shippingPence,
+      totalPence: calculated.totalPence,
+      paymentReturnToken,
+      notes,
+    });
     const orderId = result.insertId;
-    await db.insert(orderItems).values(items.map((it) => ({ ...it, orderId })));
-    return { success: true, orderNumber, orderId };
+    await db.insert(orderItems).values(
+      calculated.items.map((item) => ({
+        orderId,
+        productSlug: item.productSlug,
+        productName: item.productName,
+        sizeLabel: item.sizeLabel,
+        unitPricePence: item.unitPricePence,
+        qty: item.qty,
+      })),
+    );
+
+    const origin = publicOrigin(ctx.req);
+    const successUrl = new URL("/checkout", origin);
+    successUrl.searchParams.set("payment", "success");
+    successUrl.searchParams.set("order", orderNumber);
+    successUrl.searchParams.set("token", paymentReturnToken);
+    const failUrl = new URL(successUrl);
+    failUrl.searchParams.set("payment", "failed");
+
+    try {
+      const payment = await createWallidPayment({
+        order_id: orderNumber,
+        amount: calculated.totalPence,
+        currency: "GBP",
+        success_url: successUrl.toString(),
+        fail_url: failUrl.toString(),
+        customer_email: input.email,
+        customer_id: String(orderId),
+        description: `Noxptide order ${orderNumber}`,
+        metadata: { local_order_id: String(orderId) },
+        locale: "en",
+        country: "GB",
+        items: toWallidItems(origin, calculated),
+      });
+      if (
+        payment.order_id !== orderNumber ||
+        payment.amount !== calculated.totalPence ||
+        payment.currency !== "GBP" ||
+        !payment.api_payment_id ||
+        !payment.payment_link
+      ) {
+        throw new Error("Wallid returned an invalid payment session");
+      }
+      await db
+        .update(orders)
+        .set({ paymentId: payment.api_payment_id, paymentStatus: payment.status })
+        .where(eq(orders.id, orderId));
+      const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
+      if (order) await syncOrder(order);
+      return { success: true, orderNumber, paymentLink: payment.payment_link };
+    } catch (error) {
+      await db
+        .update(orders)
+        .set({ paymentStatus: "FAILED", status: "cancelled" })
+        .where(eq(orders.id, orderId));
+      console.error(`[wallid] order ${orderNumber} payment session failed:`, error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Pay by Bank is temporarily unavailable. Please try again shortly.",
+      });
+    }
+  }),
+
+  /** Public: read only the payment state for a signed checkout return URL. */
+  paymentStatus: publicQuery.input(paymentLookupInput).query(async ({ input }) => {
+    const db = getDb();
+    const [order] = await db
+      .select({ orderNumber: orders.orderNumber, status: orders.status, paymentStatus: orders.paymentStatus })
+      .from(orders)
+      .where(
+        and(
+          eq(orders.orderNumber, input.orderNumber),
+          eq(orders.paymentReturnToken, input.token),
+        ),
+      );
+    return order ?? null;
+  }),
+
+  /** Public: confirm the bank result server-to-server if a webhook is delayed. */
+  confirmPayment: publicQuery.input(paymentLookupInput).mutation(async ({ input }) => {
+    const db = getDb();
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(
+        and(
+          eq(orders.orderNumber, input.orderNumber),
+          eq(orders.paymentReturnToken, input.token),
+        ),
+      );
+    if (!order?.paymentId) return { status: order?.status ?? null };
+    try {
+      const payment = await getWallidPaymentStatus(order.paymentId);
+      await applyWallidStatus(payment);
+      const [updated] = await db.select({ status: orders.status }).from(orders).where(eq(orders.id, order.id));
+      return { status: updated?.status ?? null };
+    } catch (error) {
+      console.error(`[wallid] order ${order.orderNumber} status check failed:`, error);
+      return { status: order.status };
+    }
   }),
 
   /** Staff: list all orders, newest first. */
@@ -67,10 +309,7 @@ export const ordersRouter = createRouter({
       const db = getDb();
       const [order] = await db.select().from(orders).where(eq(orders.id, input.id));
       if (!order) return null;
-      const items = await db
-        .select()
-        .from(orderItems)
-        .where(eq(orderItems.orderId, input.id));
+      const items = await db.select().from(orderItems).where(eq(orderItems.orderId, input.id));
       return { ...order, items };
     }),
 
@@ -89,6 +328,8 @@ export const ordersRouter = createRouter({
         .update(orders)
         .set({ status: input.status, ...(input.notes !== undefined ? { notes: input.notes } : {}) })
         .where(eq(orders.id, input.id));
+      const [order] = await db.select().from(orders).where(eq(orders.id, input.id));
+      if (order) await syncOrder(order);
       return { success: true };
     }),
 });

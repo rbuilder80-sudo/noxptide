@@ -19,7 +19,7 @@ export default function Privacy() {
       </nav>
 
       <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Privacy Policy</h1>
-      <p className="mt-3 text-sm text-muted-foreground">Last updated: 8 August 2026</p>
+      <p className="mt-3 text-sm text-muted-foreground">Last updated: 10 August 2026</p>
 
       <div className="prose-sm mt-8 space-y-8 leading-relaxed text-muted-foreground">
         <p>
@@ -110,9 +110,9 @@ export default function Privacy() {
           </p>
           <ul className="mt-2 list-disc space-y-2 pl-5">
             <li>
-              <strong className="text-foreground">Payment providers.</strong> Card acquiring and
-              open banking services, to take and refund payments. Your card details are entered
-              directly with the payment provider and never touch our servers.
+              <strong className="text-foreground">Payment provider.</strong> Wallid provides our
+              Pay-by-Bank checkout and Open Banking payment confirmation. Your bank login details
+              are entered only with your bank or Wallid and never reach our servers.
             </li>
             <li>
               <strong className="text-foreground">Delivery carriers.</strong> Royal Mail and courier
@@ -121,6 +121,11 @@ export default function Privacy() {
             <li>
               <strong className="text-foreground">Email providers.</strong> To send order
               confirmations, delivery updates, and (where subscribed) marketing emails.
+            </li>
+            <li>
+              <strong className="text-foreground">Customer and order management.</strong> HubSpot
+              stores customer contact details, order details, fulfilment status, and purchased line
+              items so our team can process orders and provide customer support.
             </li>
             <li>
               <strong className="text-foreground">Hosting, CDN, and security providers.</strong> To

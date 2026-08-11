@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Link, Navigate } from 'react-router'
-import { CheckCircle2, Lock, ShieldCheck, Truck } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Link, Navigate, useSearchParams } from 'react-router'
+import { CheckCircle2, Landmark, LoaderCircle, Lock, ShieldCheck, Truck } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
 import { useCart, unitPrice } from '../context/CartContext'
 import { formatGBP, getProduct } from '../data/products'
@@ -12,62 +12,112 @@ const inputCls =
 export default function Checkout() {
   useSeo({ title: 'Secure Checkout | Noxptide', description: 'Complete your research peptide order securely.' })
   const { items, subtotal, discountRate, discountAmount, discountedSubtotal, clear } = useCart()
-  const [orderNumber, setOrderNumber] = useState<string | null>(null)
+  const [searchParams] = useSearchParams()
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [shippingMethod, setShippingMethod] = useState<'standard' | 'next-day'>('standard')
   const createOrder = trpc.orders.create.useMutation()
-  const shipping = subtotal >= 25 ? 0 : 4.99
+  const confirmPayment = trpc.orders.confirmPayment.useMutation()
+  const paymentResult = searchParams.get('payment')
+  const returnedOrder = searchParams.get('order') ?? ''
+  const returnToken = searchParams.get('token') ?? ''
+  const validReturn = Boolean(paymentResult && returnedOrder && returnToken.length === 48)
+  const paymentQuery = trpc.orders.paymentStatus.useQuery(
+    { orderNumber: returnedOrder, token: returnToken },
+    {
+      enabled: validReturn,
+      refetchInterval: (query) => (query.state.data?.status === 'pending' ? 2000 : false),
+    },
+  )
+  const confirmationStarted = useRef(false)
+  const cartCleared = useRef(false)
+  const shipping = shippingMethod === 'next-day' ? 8.99 : subtotal >= 25 ? 0 : 4.99
+
+  useEffect(() => {
+    if (paymentResult !== 'success' || !validReturn || confirmationStarted.current) return
+    confirmationStarted.current = true
+    void confirmPayment
+      .mutateAsync({ orderNumber: returnedOrder, token: returnToken })
+      .catch(() => undefined)
+      .finally(() => paymentQuery.refetch())
+  }, [confirmPayment, paymentQuery, paymentResult, returnToken, returnedOrder, validReturn])
+
+  useEffect(() => {
+    if (paymentQuery.data?.status !== 'paid' || cartCleared.current) return
+    cartCleared.current = true
+    clear()
+  }, [clear, paymentQuery.data?.status])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSubmitError(null)
     const fd = new FormData(e.currentTarget)
-    const totalPence = Math.round((discountedSubtotal + shipping) * 100)
     try {
       const res = await createOrder.mutateAsync({
         customerName: String(fd.get('name') || ''),
         email: String(fd.get('email') || ''),
         phone: String(fd.get('phone') || ''),
+        organisation: String(fd.get('org') || ''),
         addressLine1: String(fd.get('address1') || ''),
         addressLine2: String(fd.get('address2') || ''),
         city: String(fd.get('city') || ''),
         postcode: String(fd.get('postcode') || ''),
         country: 'United Kingdom',
-        subtotalPence: Math.round(subtotal * 100),
-        discountPence: Math.round(discountAmount * 100),
-        shippingPence: Math.round(shipping * 100),
-        totalPence,
-        notes: `Organisation: ${String(fd.get('org') || '')}`,
-        items: items.map((it) => {
-          const p = getProduct(it.slug)
-          return {
-            productSlug: it.slug,
-            productName: p?.name ?? it.slug,
-            sizeLabel: it.sizeLabel,
-            unitPricePence: Math.round(unitPrice(it.slug, it.sizeLabel) * 100),
-            qty: it.qty,
-          }
-        }),
+        shippingMethod,
+        items: items.map((it) => ({
+          productSlug: it.slug,
+          sizeLabel: it.sizeLabel,
+          qty: it.qty,
+        })),
       })
-      setOrderNumber(res.orderNumber)
-      clear()
+      window.location.assign(res.paymentLink)
     } catch {
-      setSubmitError('We could not place your order just now. Please check your details and try again, or contact support@noxptide.co.uk.')
+      setSubmitError('Pay by Bank is temporarily unavailable. Please try again, or contact support@noxptide.co.uk.')
     }
   }
 
-  if (orderNumber) {
+  if (validReturn && paymentQuery.data?.status === 'paid') {
     return (
       <div className="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center">
         <CheckCircle2 className="h-16 w-16 text-primary" aria-hidden="true" />
-        <h1 className="mt-6 text-3xl font-extrabold tracking-tight">Order Confirmed</h1>
-        <p className="mt-4 text-lg font-semibold">Order reference: {orderNumber}</p>
+        <h1 className="mt-6 text-3xl font-extrabold tracking-tight">Payment received</h1>
+        <p className="mt-4 text-lg font-semibold">Order reference: {returnedOrder}</p>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Thank you for your order. A confirmation email with your tracking details and batch
-          Certificates of Analysis reference will follow shortly. Orders placed before 4pm are
-          dispatched the same working day.
+          Your bank confirmed the payment and your order is now being prepared. Tracking details
+          and batch Certificates of Analysis will follow by email.
         </p>
         <Link to="/shop" className="mt-8 rounded-xl bg-primary px-7 py-3.5 font-bold text-primary-foreground hover:opacity-90">
           Continue Shopping
+        </Link>
+      </div>
+    )
+  }
+
+  if (validReturn && paymentResult === 'success') {
+    return (
+      <div className="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center">
+        <LoaderCircle className="h-16 w-16 animate-spin text-primary" aria-hidden="true" />
+        <h1 className="mt-6 text-3xl font-extrabold tracking-tight">Confirming your bank payment</h1>
+        <p className="mt-4 text-lg font-semibold">Order reference: {returnedOrder}</p>
+        <p className="mt-4 leading-relaxed text-muted-foreground">
+          Please keep this page open while Wallid and your bank confirm the payment. This normally
+          takes only a few seconds.
+        </p>
+      </div>
+    )
+  }
+
+  if (validReturn && paymentResult === 'failed') {
+    return (
+      <div className="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center">
+        <Landmark className="h-16 w-16 text-primary" aria-hidden="true" />
+        <h1 className="mt-6 text-3xl font-extrabold tracking-tight">Payment not completed</h1>
+        <p className="mt-4 text-lg font-semibold">Order reference: {returnedOrder}</p>
+        <p className="mt-4 leading-relaxed text-muted-foreground">
+          No payment was taken. Your basket is still available, so you can return to checkout and
+          try another bank.
+        </p>
+        <Link to="/checkout" className="mt-8 rounded-xl bg-primary px-7 py-3.5 font-bold text-primary-foreground hover:opacity-90">
+          Try Pay by Bank again
         </Link>
       </div>
     )
@@ -134,14 +184,28 @@ export default function Checkout() {
               <div className="mt-2 space-y-2">
                 <label className="flex items-center justify-between rounded-lg border border-border px-4 py-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-secondary">
                   <span className="flex items-center gap-2">
-                    <input type="radio" name="ship" defaultChecked className="accent-primary" />
+                    <input
+                      type="radio"
+                      name="ship"
+                      value="standard"
+                      checked={shippingMethod === 'standard'}
+                      onChange={() => setShippingMethod('standard')}
+                      className="accent-primary"
+                    />
                     <span className="font-medium">Standard tracked (1–2 working days)</span>
                   </span>
                   <span className="font-semibold">{shipping === 0 ? 'Free' : formatGBP(4.99)}</span>
                 </label>
                 <label className="flex items-center justify-between rounded-lg border border-border px-4 py-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-secondary">
                   <span className="flex items-center gap-2">
-                    <input type="radio" name="ship" className="accent-primary" />
+                    <input
+                      type="radio"
+                      name="ship"
+                      value="next-day"
+                      checked={shippingMethod === 'next-day'}
+                      onChange={() => setShippingMethod('next-day')}
+                      className="accent-primary"
+                    />
                     <span className="font-medium">Next working day</span>
                   </span>
                   <span className="font-semibold">{formatGBP(8.99)}</span>
@@ -152,20 +216,16 @@ export default function Checkout() {
 
           {/* Payment */}
           <section className="rounded-2xl border border-border bg-card p-6 shadow-sm" aria-labelledby="co-pay">
-            <h2 id="co-pay" className="text-lg font-bold">3. Payment</h2>
-            <div className="mt-4 grid gap-5 sm:grid-cols-2">
-              <label className="block sm:col-span-2">
-                <span className="text-sm font-semibold">Card number</span>
-                <input required type="text" inputMode="numeric" placeholder="1234 5678 9012 3456" autoComplete="cc-number" className={inputCls} />
-              </label>
-              <label className="block">
-                <span className="text-sm font-semibold">Expiry (MM/YY)</span>
-                <input required type="text" placeholder="MM/YY" autoComplete="cc-exp" className={inputCls} />
-              </label>
-              <label className="block">
-                <span className="text-sm font-semibold">CVC</span>
-                <input required type="text" inputMode="numeric" placeholder="123" autoComplete="cc-csc" className={inputCls} />
-              </label>
+            <h2 id="co-pay" className="text-lg font-bold">3. Pay by Bank</h2>
+            <div className="mt-4 flex gap-4 rounded-xl border border-primary/25 bg-secondary p-4">
+              <Landmark className="mt-0.5 h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
+              <div>
+                <p className="font-bold">Secure bank payment with Wallid</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  Continue to Wallid, choose your bank, and approve the payment in your banking app.
+                  Noxptide never sees or stores your bank login details.
+                </p>
+              </div>
             </div>
             <div className="mt-5 space-y-3">
               <label className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -241,7 +301,7 @@ export default function Checkout() {
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90 disabled:opacity-60"
           >
             <Lock className="h-4 w-4" aria-hidden="true" />
-            {createOrder.isPending ? 'Placing Order…' : `Place Order — ${formatGBP(discountedSubtotal + shipping)}`}
+            {createOrder.isPending ? 'Opening Wallid…' : `Pay by Bank — ${formatGBP(discountedSubtotal + shipping)}`}
           </button>
           {submitError && (
             <p className="mt-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{submitError}</p>
@@ -249,7 +309,7 @@ export default function Checkout() {
           <ul className="mt-5 space-y-2 text-xs text-muted-foreground">
             <li className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5 text-primary" aria-hidden="true" /> Batch COA included with every vial</li>
             <li className="flex items-center gap-2"><Truck className="h-3.5 w-3.5 text-primary" aria-hidden="true" /> Same-day dispatch before 4pm</li>
-            <li className="flex items-center gap-2"><Lock className="h-3.5 w-3.5 text-primary" aria-hidden="true" /> Secure encrypted checkout</li>
+            <li className="flex items-center gap-2"><Landmark className="h-3.5 w-3.5 text-primary" aria-hidden="true" /> Secure Wallid Pay-by-Bank checkout</li>
           </ul>
         </aside>
       </form>

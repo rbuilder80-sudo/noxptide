@@ -61,7 +61,9 @@ const content = [
 
 const [result] = await new PurgeCSS().purge({
   content,
-  css: [cssPath],
+  // Raw CSS works consistently on both Windows and Linux; PurgeCSS v8 can
+  // return no result for an absolute Windows path.
+  css: [{ raw: fs.readFileSync(cssPath, "utf8") }],
   defaultExtractor: extractor,
   safelist,
   fontFace: true,
