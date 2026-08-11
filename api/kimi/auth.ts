@@ -4,7 +4,7 @@ import * as jose from "jose";
 import * as cookie from "cookie";
 import { env } from "../lib/env";
 import { getSessionCookieOptions } from "../lib/cookies";
-import { Session } from "@contracts/constants";
+import { Paths, Session } from "@contracts/constants";
 import { Errors } from "@contracts/errors";
 import { signSessionToken, verifySessionToken } from "./session";
 import { users as kimiUsers } from "./platform";
@@ -40,6 +40,23 @@ async function exchangeAuthCode(
 const jwks = jose.createRemoteJWKSet(
   new URL(`${env.kimiAuthUrl}/api/.well-known/jwks.json`),
 );
+
+export function createOAuthLoginHandler() {
+  return (c: Context) => {
+    const requestUrl = new URL(c.req.url);
+    const redirectUri = `${requestUrl.origin}${Paths.oauthCallback}`;
+    const state = Buffer.from(redirectUri, "utf8").toString("base64");
+    const url = new URL(`${env.kimiAuthUrl}/api/oauth/authorize`);
+
+    url.searchParams.set("client_id", env.appId);
+    url.searchParams.set("redirect_uri", redirectUri);
+    url.searchParams.set("response_type", "code");
+    url.searchParams.set("scope", "profile");
+    url.searchParams.set("state", state);
+
+    return c.redirect(url.toString(), 302);
+  };
+}
 
 async function verifyAccessToken(
   accessToken: string,
