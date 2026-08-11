@@ -147,11 +147,37 @@ export default function AdminOrderDetail() {
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-muted-foreground">Contact ID</dt>
-            <dd className="font-semibold">{order.hubspotContactId ?? '—'}</dd>
+            <dd className="font-semibold">
+              {order.hubspotContactUrl ? (
+                <a
+                  href={order.hubspotContactUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Open contact {order.hubspotContactId}
+                </a>
+              ) : (
+                order.hubspotContactId ?? '—'
+              )}
+            </dd>
           </div>
           <div>
             <dt className="text-muted-foreground">Deal ID</dt>
-            <dd className="font-semibold">{order.hubspotDealId ?? '—'}</dd>
+            <dd className="font-semibold">
+              {order.hubspotDealUrl ? (
+                <a
+                  href={order.hubspotDealUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Open deal {order.hubspotDealId}
+                </a>
+              ) : (
+                order.hubspotDealId ?? '—'
+              )}
+            </dd>
           </div>
           <div>
             <dt className="text-muted-foreground">Last synced</dt>

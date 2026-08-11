@@ -52,6 +52,28 @@ const orderStatuses = [
   "cancelled",
 ] as const;
 
+const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID?.trim() || "148385007";
+
+function hubSpotRecordUrl(objectTypeId: "0-1" | "0-3", recordId?: string | null) {
+  if (!recordId) return null;
+  const params = new URLSearchParams({
+    utm_source: "noxptide_admin",
+    utm_medium: "order_sync",
+    utm_campaign: "noxptide_ecommerce",
+  });
+  return `https://app.hubspot.com/contacts/${HUBSPOT_PORTAL_ID}/record/${objectTypeId}/${recordId}?${params}`;
+}
+
+function withHubSpotLinks<T extends { hubspotContactId?: string | null; hubspotDealId?: string | null }>(
+  order: T,
+) {
+  return {
+    ...order,
+    hubspotContactUrl: hubSpotRecordUrl("0-1", order.hubspotContactId),
+    hubspotDealUrl: hubSpotRecordUrl("0-3", order.hubspotDealId),
+  };
+}
+
 function calculateOrder(input: z.infer<typeof orderInput>) {
   const items = input.items.map((item) => {
     const product = getProduct(item.productSlug);
@@ -341,7 +363,8 @@ export const ordersRouter = createRouter({
   /** Staff: list all orders, newest first. */
   list: staffQuery.query(async () => {
     const db = getDb();
-    return db.select().from(orders).orderBy(desc(orders.createdAt)).limit(500);
+    const rows = await db.select().from(orders).orderBy(desc(orders.createdAt)).limit(500);
+    return rows.map(withHubSpotLinks);
   }),
 
   /** Staff: single order with its items. */
@@ -352,7 +375,7 @@ export const ordersRouter = createRouter({
       const [order] = await db.select().from(orders).where(eq(orders.id, input.id));
       if (!order) return null;
       const items = await db.select().from(orderItems).where(eq(orderItems.orderId, input.id));
-      return { ...order, items };
+      return { ...withHubSpotLinks(order), items };
     }),
 
   /** Staff: update status / internal notes (e.g. mark completed). */
