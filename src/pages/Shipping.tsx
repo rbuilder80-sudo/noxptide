@@ -1,14 +1,10 @@
 import { Link } from 'react-router'
 import { Truck, Package, Clock, Globe } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 
 export default function Shipping() {
-  useSeo({
-    pageKey: 'shipping',
-    title: 'Shipping & Delivery | Noxptide UK — Same-Day Dispatch Before 4pm',
-    description:
-      'UK peptide delivery from Noxptide: same-day dispatch before 4pm Mon–Fri, tracked Royal Mail & DHL options, free over £25, discreet tamper-evident packaging, European shipping available.',
-  })
+  useSeo({ pageKey: 'shipping', ...coreSeo['/shipping'] })
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
@@ -16,7 +12,7 @@ export default function Shipping() {
         <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-foreground">Shipping</span>
       </nav>
 
-      <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Shipping & Delivery</h1>
+      <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Research Peptide Shipping &amp; Delivery</h1>
       <p className="mt-3 text-muted-foreground">
         Fast, tracked and discreet — because research timelines do not wait.
       </p>

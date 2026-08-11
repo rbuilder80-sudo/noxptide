@@ -1,16 +1,13 @@
 import { Link } from 'react-router'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 
 const H = ({ id, children }: { id: string; children: React.ReactNode }) => (
   <h2 id={id} className="text-xl font-bold text-foreground">{children}</h2>
 )
 
 export default function Terms() {
-  useSeo({
-    title: 'Terms & Conditions | Noxptide UK',
-    description:
-      'Terms & Conditions governing use of noxptide.co.uk and every order placed with Noxptide — research use only, delivery, returns, liability and governing law.',
-  })
+  useSeo({ ...coreSeo['/terms'] })
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">

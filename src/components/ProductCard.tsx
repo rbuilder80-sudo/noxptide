@@ -3,6 +3,7 @@ import { FlaskConical } from 'lucide-react'
 import type { Product } from '../data/products'
 import { formatGBP } from '../data/products'
 import Rating from './Rating'
+import { livePrice, liveStock, useProductOverrides } from '../hooks/useProductOverrides'
 
 /** Noxptide-branded vial photography: /images/products/<slug>-<size>.webp per vial size.
  *  Pass sizeLabel to show the matching strength; falls back to a clean placeholder if missing. */
@@ -47,14 +48,24 @@ export function ProductImage({
   )
 }
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, eager = false }: { product: Product; eager?: boolean }) {
+  const overrides = useProductOverrides()
+  const fromPrice = livePrice(overrides, product.slug, product.sizes[0].label) ?? product.sizes[0].price
+  const allOut =
+    product.sizes.length > 0 &&
+    product.sizes.every((s) => liveStock(overrides, product.slug, s.label) === 0)
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
-      <Link to={`/product/${product.slug}`} className="relative block" aria-label={`View ${product.name}`}>
-        <ProductImage product={product} className="aspect-[4/3] w-full" />
+      <Link to={`/product/${product.slug}`} className="relative block">
+        <ProductImage product={product} className="aspect-[4/3] w-full" eager={eager} />
         {product.badge && (
           <span className="absolute left-3 top-3 z-10 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-slate-900">
             {product.badge}
+          </span>
+        )}
+        {allOut && (
+          <span className="absolute right-3 top-3 z-10 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
+            Out of stock
           </span>
         )}
       </Link>
@@ -72,7 +83,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
           <div>
             <span className="text-xs text-muted-foreground">from</span>
-            <p className="text-lg font-extrabold text-foreground">{formatGBP(product.sizes[0].price)}</p>
+            <p className="text-lg font-extrabold text-foreground">{formatGBP(fromPrice)}</p>
           </div>
           <Link
             to={`/product/${product.slug}`}

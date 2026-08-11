@@ -4,7 +4,9 @@ import {
   ShieldCheck, Truck, FileCheck, FlaskConical, ChevronDown, ShoppingCart, Check,
 } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { notFoundSeo, productSeo } from '../data/seo'
 import { useCart } from '../context/CartContext'
+import { isProductHidden, livePrice, liveStock, useProductOverrides } from '../hooks/useProductOverrides'
 import { formatGBP, getProduct, productsByCategory } from '../data/products'
 import ProductCard, { ProductImage } from '../components/ProductCard'
 import ProductDetailsAccordion, { TrustStrips } from '../components/ProductDetailsAccordion'
@@ -35,71 +37,28 @@ export default function Product() {
   const related = product ? productsByCategory(product.category).filter((p) => p.slug !== slug) : []
   const productGuides = guidesForProduct(slug).filter((g) => !g.slug.endsWith('storage-guide'))
   const { addItem } = useCart()
+  const overrides = useProductOverrides()
   const [sizeIdx, setSizeIdx] = useState(0)
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
 
   useSeo({
     pageKey: `product:${product?.slug ?? ""}`,
-    title: product
-      ? `${product.name} UK | Buy ${product.name} ${product.purity} — Noxptide`
-      : 'Product Not Found | Noxptide',
-    description: product ? product.short : 'This product could not be found.',
-    jsonLd: product
-      ? [
-          {
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: product.name,
-            description: product.short,
-            url: `https://noxptide.co.uk/product/${product.slug}`,
-            image: `https://noxptide.co.uk/images/products/${product.slug}-${product.sizes[0].label.replace(/ /g, '').toLowerCase()}.webp`,
-            brand: { '@type': 'Brand', name: 'Noxptide' },
-            sku: product.slug.toUpperCase(),
-            aggregateRating: {
-              '@type': 'AggregateRating',
-              ratingValue: product.rating.toFixed(1),
-              reviewCount: product.reviews,
-              bestRating: '5',
-              worstRating: '1',
-            },
-            offers: product.sizes.map((s) => ({
-              '@type': 'Offer',
-              url: `https://noxptide.co.uk/product/${product.slug}`,
-              priceCurrency: 'GBP',
-              price: s.price.toFixed(2),
-              name: `${product.name} ${s.label}`,
-              availability: 'https://schema.org/InStock',
-              itemCondition: 'https://schema.org/NewCondition',
-            })),
-          },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: product.faqs.map((f) => ({
-              '@type': 'Question',
-              name: f.q,
-              acceptedAnswer: { '@type': 'Answer', text: f.a },
-            })),
-          },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://noxptide.co.uk/' },
-              { '@type': 'ListItem', position: 2, name: 'Peptides', item: 'https://noxptide.co.uk/shop' },
-              { '@type': 'ListItem', position: 3, name: product.name },
-            ],
-          },
-        ]
-      : undefined,
+    ...(product ? productSeo(product) : notFoundSeo),
   })
 
-  if (!product) return <Navigate to="/shop" replace />
+  if (!product || isProductHidden(overrides, slug)) return <Navigate to="/shop" replace />
 
   const size = product.sizes[sizeIdx]
+  /** Admin-controlled live values (DB) fall back to catalogue defaults. */
+  const priceForSize = (s: { label: string; price: number }) =>
+    livePrice(overrides, product.slug, s.label) ?? s.price
+  const unitNow = priceForSize(size)
+  const stock = liveStock(overrides, product.slug, size.label)
+  const outOfStock = stock === 0
 
   const handleAdd = () => {
+    if (outOfStock) return
     addItem(product.slug, size.label, qty)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
@@ -138,7 +97,7 @@ export default function Product() {
             Peptides
           </Link>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            {product.name}
+            {product.name} Research Peptide
           </h1>
           <p className="mt-1 text-muted-foreground">{product.subtitle}</p>
           <div className="mt-3">
@@ -187,14 +146,30 @@ export default function Product() {
                 <span className="w-8 text-center font-bold" aria-live="polite">{qty}</span>
                 <button className="px-3 py-2.5 text-lg" onClick={() => setQty((q) => q + 1)} aria-label="Increase quantity">+</button>
               </div>
-              <p className="text-2xl font-extrabold">{formatGBP(size.price * qty)}</p>
+              <p className="text-2xl font-extrabold">{formatGBP(unitNow * qty)}</p>
             </div>
+
+            {stock !== null && (
+              <p
+                className={`mt-3 text-sm font-semibold ${outOfStock ? 'text-red-600' : stock <= 10 ? 'text-amber-600' : 'text-emerald-600'}`}
+                role="status"
+              >
+                {outOfStock
+                  ? 'Out of stock — check back soon'
+                  : stock <= 10
+                    ? `Low stock — only ${stock} left`
+                    : 'In stock, dispatching today before 4pm'}
+              </p>
+            )}
 
             <button
               onClick={handleAdd}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 transition hover:opacity-90"
+              disabled={outOfStock}
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {added ? (
+              {outOfStock ? (
+                'Out of Stock'
+              ) : added ? (
                 <>
                   <Check className="h-5 w-5" aria-hidden="true" /> Added to Cart
                 </>
@@ -366,14 +341,15 @@ export default function Product() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-bold leading-tight">{product.name} · {size.label}</p>
-            <p className="text-lg font-extrabold text-primary">{formatGBP(size.price * qty)}</p>
+            <p className="text-lg font-extrabold text-primary">{formatGBP(unitNow * qty)}</p>
           </div>
           <button
             onClick={handleAdd}
-            className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20"
+            disabled={outOfStock}
+            className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {added ? <Check className="h-4 w-4" aria-hidden="true" /> : <ShoppingCart className="h-4 w-4" aria-hidden="true" />}
-            {added ? 'Added' : 'Add to Cart'}
+            {outOfStock ? 'Out of Stock' : added ? 'Added' : 'Add to Cart'}
           </button>
         </div>
       </div>

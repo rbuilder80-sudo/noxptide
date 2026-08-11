@@ -51,10 +51,10 @@ export default defineConfig({
           })
 
           // Per-route CSS purge + inline (each page gets only the CSS it uses)
-          if (!process.env.SKIP_PURGE) execSync(`node scripts/purge-inline.mjs`, { stdio: "inherit" })
-        } catch (e) {
-          const error = e as { stderr?: { toString(): string }; message?: string }
-          console.warn("prerender skipped:", error.stderr?.toString() || error.message || e)
+          if (!process.env.SKIP_PURGE) execSync(`node --expose-gc scripts/purge-inline.mjs`, { stdio: "inherit" })
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error)
+          console.warn("prerender skipped:", message)
           // Fallback: inline the full stylesheet into the root page
           try {
             const css = fs.readFileSync(cssPath, "utf8")
@@ -85,9 +85,10 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-react": ["react", "react-dom", "react-router"],
-          "vendor-data": ["@tanstack/react-query", "@trpc/client", "@trpc/server", "superjson"],
+        manualChunks(id: string) {
+          if (!id.includes("node_modules")) return
+          if (/[\/]node_modules[\/](react|react-dom|react-router|scheduler)([\/]|$)/.test(id)) return "vendor-react"
+          if (/[\/]node_modules[\/](@trpc|@tanstack|superjson)([\/]|$)/.test(id)) return "vendor-data"
         },
       },
     },

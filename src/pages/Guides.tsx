@@ -1,30 +1,11 @@
 import { Link } from 'react-router'
 import { BookOpen, ArrowRight } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 import { guides } from '../data/guides'
 
 export default function Guides() {
-  useSeo({
-    pageKey: 'guides',
-    title: 'Research Peptide Guides & Resources | Noxptide UK',
-    description:
-      'In-depth research peptide guides: BPC-157 vs TB-500, Ipamorelin vs CJC-1295, reconstitution protocols, how to read a COA, and compound-specific laboratory guides from Noxptide.',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'CollectionPage',
-      name: 'Research Peptide Guides',
-      url: 'https://noxptide.co.uk/guides',
-      mainEntity: {
-        '@type': 'ItemList',
-        itemListElement: guides.map((g, i) => ({
-          '@type': 'ListItem',
-          position: i + 1,
-          url: `https://noxptide.co.uk/guides/${g.slug}`,
-          name: g.title,
-        })),
-      },
-    },
-  })
+  useSeo({ pageKey: 'guides', ...coreSeo['/guides'] })
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
@@ -34,7 +15,7 @@ export default function Guides() {
 
       <div className="mt-6 max-w-3xl">
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Research Guides & Resources
+          Research Peptide Guides &amp; Laboratory Resources
         </h1>
         <p className="mt-4 leading-relaxed text-muted-foreground">
           Written for laboratories, not search engines — though both will find what they need.

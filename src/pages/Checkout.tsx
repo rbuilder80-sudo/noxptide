@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router'
 import { CheckCircle2, Landmark, LoaderCircle, Lock, ShieldCheck, Truck } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
-import { useCart, unitPrice } from '../context/CartContext'
+import { coreSeo } from '../data/seo'
+import { useCart } from '../context/CartContext'
 import { formatGBP, getProduct } from '../data/products'
 import { trpc } from '../providers/trpc'
 
@@ -10,8 +11,8 @@ const inputCls =
   'mt-1.5 w-full rounded-lg border border-input px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
 
 export default function Checkout() {
-  useSeo({ title: 'Secure Checkout | Noxptide', description: 'Complete your research peptide order securely.' })
-  const { items, subtotal, discountRate, discountAmount, discountedSubtotal, clear } = useCart()
+  useSeo({ ...coreSeo['/checkout'] })
+  const { items, subtotal, discountRate, discountAmount, discountedSubtotal, clear, priceOf } = useCart()
   const [searchParams] = useSearchParams()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'next-day'>('standard')
@@ -270,7 +271,7 @@ export default function Checkout() {
                   <span className="text-muted-foreground">
                     {p.name} {it.sizeLabel} × {it.qty}
                   </span>
-                  <span className="font-semibold">{formatGBP(unitPrice(it.slug, it.sizeLabel) * it.qty)}</span>
+                  <span className="font-semibold">{formatGBP(priceOf(it.slug, it.sizeLabel) * it.qty)}</span>
                 </li>
               )
             })}

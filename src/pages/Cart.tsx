@@ -1,13 +1,14 @@
 import { Link } from 'react-router'
 import { Minus, Plus, Trash2, ArrowRight, ShieldCheck } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
-import { useCart, unitPrice } from '../context/CartContext'
+import { coreSeo } from '../data/seo'
+import { useCart } from '../context/CartContext'
 import { formatGBP, getProduct } from '../data/products'
 import { ProductImage } from '../components/ProductCard'
 
 export default function Cart() {
-  useSeo({ title: 'Your Cart | Noxptide', description: 'Review your research peptide order.' })
-  const { items, setQty, removeItem, subtotal, discountRate, discountAmount, discountedSubtotal } = useCart()
+  useSeo({ ...coreSeo['/cart'] })
+  const { items, setQty, removeItem, subtotal, discountRate, discountAmount, discountedSubtotal, priceOf } = useCart()
   const shipping = subtotal >= 25 || subtotal === 0 ? 0 : 4.99
 
   return (
@@ -30,7 +31,7 @@ export default function Cart() {
             {items.map((it) => {
               const p = getProduct(it.slug)
               if (!p) return null
-              const price = unitPrice(it.slug, it.sizeLabel)
+              const price = priceOf(it.slug, it.sizeLabel)
               return (
                 <li key={`${it.slug}-${it.sizeLabel}`} className="flex gap-4 p-5">
                   <ProductImage product={p} className="h-20 w-20 shrink-0 rounded-lg" />

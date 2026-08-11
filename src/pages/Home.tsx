@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { ArrowRight, ShieldCheck, FlaskConical, Truck, FileCheck, Star, Quote } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 import { products } from '../data/products'
 import ProductCard from '../components/ProductCard'
 import { Enter, Reveal, RevealGroup, RevealItem } from '../components/motion'
@@ -47,40 +48,7 @@ const testimonials = [
 ]
 
 export default function Home() {
-  const homeFaqs = [
-    {
-      q: 'What are research peptides?',
-      a: 'Research peptides are short chains of amino acids synthesised for laboratory study. They are used by universities, contract research organisations and private laboratories to investigate biological pathways in controlled, in-vitro settings. Noxptide supplies research peptides strictly for laboratory use — never for human or veterinary administration.',
-    },
-    {
-      q: 'Where can I buy high-purity research peptides in the UK?',
-      a: 'Noxptide supplies UK laboratories with ≥99% purity research peptides, independently verified by HPLC and mass spectrometry. Every order includes a batch-specific Certificate of Analysis, ships from within the UK with tracked delivery (free over £25), and is dispatched the same day when ordered before 4pm Monday–Friday.',
-    },
-    {
-      q: 'How do I verify a peptide supplier is legitimate?',
-      a: 'Ask three questions: Is purity verified by an independent laboratory rather than in-house? Can you see the batch-specific Certificate of Analysis before ordering? Does the supplier operate clear research-use-only compliance? Noxptide answers yes to all three — and will send any current batch COA within one working hour of your request.',
-    },
-    {
-      q: 'Which research peptides do UK laboratories order most?',
-      a: 'The most-ordered compounds at Noxptide are BPC-157 and TB-500 for tissue-repair research, Ipamorelin and CJC-1295 for endocrine research, and Semax and Selank for neuroscience research. All are stocked in the UK at ≥99% purity with full analytical documentation.',
-    },
-  ]
-
-  useSeo({
-    pageKey: 'home',
-    title: 'Noxptide | Buy UK Research Peptides — ≥99% Purity, COA With Every Batch',
-    description:
-      "The UK's quality-first research peptide supplier. BPC-157, TB-500, Ipamorelin and more — independently HPLC & MS verified to ≥99% purity, batch COAs, tracked UK delivery. Research use only.",
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: homeFaqs.map((f) => ({
-        '@type': 'Question',
-        name: f.q,
-        acceptedAnswer: { '@type': 'Answer', text: f.a },
-      })),
-    },
-  })
+  useSeo({ pageKey: 'home', ...coreSeo['/'] })
 
   const featured = products.filter((p) => ['bpc-157', 'tb-500', 'ipamorelin', 'ghk-cu'].includes(p.slug))
 
@@ -95,25 +63,18 @@ export default function Home() {
         <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 pb-16 pt-32 sm:pb-24">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <Enter>
               <p className="inline-flex items-center gap-2 rounded-full border border-[#1B133C]/10 bg-white/70 px-4 py-1.5 text-xs font-semibold text-foreground backdrop-blur-sm">
                 <ShieldCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
                 Every batch independently verified to ≥99% purity
               </p>
-              </Enter>
-              <Enter>
               <h1 className="mt-6 font-display text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-                Research peptides{' '}
-                <em className="italic text-accent">your lab can trust</em>
+                UK research peptides with{' '}
+                <em className="italic text-accent">verifiable ≥99% purity</em>
               </h1>
-              </Enter>
-              <Enter>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
                 The UK's quality-first research peptide supplier — synthesis-grade compounds,
                 batch-specific Certificates of Analysis, and same-day dispatch from UK stock.
               </p>
-              </Enter>
-              <Enter>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
                   to="/shop"
@@ -128,7 +89,6 @@ export default function Home() {
                   Our Quality Standard
                 </Link>
               </div>
-              </Enter>
             </div>
 
             {/* Floating stat cards over hero visual */}
@@ -246,9 +206,15 @@ export default function Home() {
           </Link>
         </div>
         <RevealGroup className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {products.slice(0, 8).map((p) => (
-            <RevealItem key={p.slug}><ProductCard product={p} /></RevealItem>
-          ))}
+          {products.slice(0, 8).map((p, i) =>
+            i < 4 ? (
+              // First row: visible immediately (no JS-gated reveal) so Speed Index
+              // doesn't wait for idle hydration; first two images load eager.
+              <ProductCard key={p.slug} product={p} eager={i < 2} />
+            ) : (
+              <RevealItem key={p.slug}><ProductCard product={p} /></RevealItem>
+            ),
+          )}
         </RevealGroup>
         <div className="mt-8 text-center sm:hidden">
           <Link to="/shop" className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">

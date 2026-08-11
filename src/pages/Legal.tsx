@@ -1,12 +1,9 @@
 import { Link } from 'react-router'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 
 export default function Legal() {
-  useSeo({
-    title: 'Research Use Only Policy | Noxptide UK',
-    description:
-      'Every product sold by Noxptide is a chemical reference material supplied strictly for in-vitro laboratory research. Read our full Research Use Only policy.',
-  })
+  useSeo({ pageKey: 'legal', ...coreSeo['/legal'] })
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">

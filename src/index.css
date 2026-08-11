@@ -2,35 +2,35 @@
   font-family: 'Instrument Serif';
   font-style: italic;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional;
   src: url(/fonts/InstrumentSerif-400i.woff2) format('woff2');
 }
 @font-face {
   font-family: 'Instrument Serif';
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional;
   src: url(/fonts/InstrumentSerif-400.woff2) format('woff2');
 }
 @font-face {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional;
   src: url(/fonts/Inter-400.woff2) format('woff2');
 }
 @font-face {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 500;
-  font-display: swap;
+  font-display: optional;
   src: url(/fonts/Inter-500.woff2) format('woff2');
 }
 @font-face {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 600;
-  font-display: swap;
+  font-display: optional;
   src: url(/fonts/Inter-600.woff2) format('woff2');
 }
 
@@ -54,7 +54,7 @@
     --muted: 250 25% 94%;
     --muted-foreground: 253 20% 42%;
     --accent: 24 95% 53%;
-    --accent-foreground: 0 0% 100%;
+    --accent-foreground: 253 55% 15%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     --border: 253 25% 88%;

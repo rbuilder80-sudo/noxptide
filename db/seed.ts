@@ -1,16 +1,35 @@
+import { productVariants } from "./schema";
 import { getDb } from "../api/queries/connection";
-// TODO: import tables from "./schema"
+import { products } from "../src/data/products";
 
+/**
+ * Seeds one stock/pricing row per product size from the static catalogue,
+ * so the admin panel opens with the full current inventory editable.
+ * Safe to re-run: existing rows (with admin edits) are left untouched.
+ */
 async function seed() {
   const db = getDb();
-  console.log("Seeding database...");
+  console.log("Seeding product variants...");
 
-  // TODO: insert seed data, e.g.
-  // await db.insert(schema.posts).values([
-  //   { title: "First post", content: "Hello world" },
-  // ]);
+  const DEFAULT_STOCK = 100;
+  let count = 0;
+  for (const p of products) {
+    for (const s of p.sizes) {
+      await db
+        .insert(productVariants)
+        .values({
+          productSlug: p.slug,
+          sizeLabel: s.label,
+          pricePence: Math.round(s.price * 100),
+          stock: DEFAULT_STOCK,
+          updatedBy: "seed",
+        })
+        .onDuplicateKeyUpdate({ set: { productSlug: p.slug } }); // no-op: keep admin edits
+      count++;
+    }
+  }
 
-  console.log("Done.");
+  console.log(`Done — ${count} variants seeded (existing edits preserved).`);
   process.exit(0); // close MySQL connection pool
 }
 

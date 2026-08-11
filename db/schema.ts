@@ -7,6 +7,7 @@ import {
   timestamp,
   bigint,
   int,
+  uniqueIndex,
 } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
@@ -92,3 +93,39 @@ export const pageContents = mysqlTable("page_contents", {
     .$onUpdate(() => new Date()),
 });
 export type PageContent = typeof pageContents.$inferSelect;
+
+// ── Catalogue control: stock & pricing, managed from the admin panel ────────
+// One row per product size (variant). When a row exists it overrides the
+// static catalogue defaults on the storefront: DB price wins, and stock
+// controls purchasability (0 = out of stock).
+export const productVariants = mysqlTable(
+  "product_variants",
+  {
+    id: serial("id").primaryKey(),
+    productSlug: varchar("productSlug", { length: 128 }).notNull(),
+    sizeLabel: varchar("sizeLabel", { length: 32 }).notNull(),
+    pricePence: int("pricePence").notNull(),
+    stock: int("stock").default(0).notNull(),
+    updatedBy: varchar("updatedBy", { length: 255 }),
+    updatedAt: timestamp("updatedAt")
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [uniqueIndex("product_variants_slug_size").on(t.productSlug, t.sizeLabel)],
+);
+export type ProductVariant = typeof productVariants.$inferSelect;
+
+// Product-level visibility: hide a product from the storefront without
+// touching code (e.g. discontinued or temporarily unavailable ranges).
+export const productStatuses = mysqlTable("product_statuses", {
+  id: serial("id").primaryKey(),
+  productSlug: varchar("productSlug", { length: 128 }).notNull().unique(),
+  status: mysqlEnum("status", ["active", "hidden"]).default("active").notNull(),
+  updatedBy: varchar("updatedBy", { length: 255 }),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+export type ProductStatus = typeof productStatuses.$inferSelect;

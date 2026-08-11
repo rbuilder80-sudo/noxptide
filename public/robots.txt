@@ -1,11 +1,12 @@
 # Noxptide — robots.txt
-# Policy: maximum visibility in Google, Bing and AI answer engines.
-# All search and AI retrieval/training crawlers are explicitly welcome.
+# Public indexable content is open to search and AI crawlers.
+# Private/system areas are controlled by noindex directives in the pages
+# themselves (not disallowed here, so crawlers can see the noindex).
 
 User-agent: *
 Allow: /
 
-# --- AI search & retrieval crawlers (citations = customers) ---
+# --- AI search & retrieval crawlers ---
 User-agent: OAI-SearchBot
 Allow: /
 
@@ -42,7 +43,7 @@ Allow: /
 User-agent: Meta-ExternalAgent
 Allow: /
 
-# --- AI training crawlers (allowed: we want models to know Noxptide) ---
+# --- AI training crawlers ---
 User-agent: GPTBot
 Allow: /
 
@@ -52,5 +53,6 @@ Allow: /
 User-agent: Amzn-SearchBot
 Allow: /
 
-Sitemap: https://noxptide.co.uk/sitemap.xml
-Sitemap: https://noxptide.co.uk/llms.txt
+# Exactly one Sitemap directive, on the canonical www host.
+# llms.txt is a separate optional resource — not advertised as a sitemap.
+Sitemap: https://www.noxptide.co.uk/sitemap.xml

@@ -4,7 +4,7 @@ import * as jose from "jose";
 import * as cookie from "cookie";
 import { env } from "../lib/env";
 import { getSessionCookieOptions } from "../lib/cookies";
-import { Session } from "@contracts/constants";
+import { Paths, Session } from "@contracts/constants";
 import { Errors } from "@contracts/errors";
 import { signSessionToken, verifySessionToken } from "./session";
 import { users as kimiUsers } from "./platform";
@@ -19,8 +19,8 @@ async function exchangeAuthCode(
     grant_type: "authorization_code",
     code,
     client_id: env.appId,
-    redirect_uri: redirectUri,
     client_secret: env.appSecret,
+    redirect_uri: redirectUri,
   });
 
   const resp = await fetch(`${env.kimiAuthUrl}/api/oauth/token`, {
@@ -40,6 +40,47 @@ async function exchangeAuthCode(
 const jwks = jose.createRemoteJWKSet(
   new URL(`${env.kimiAuthUrl}/api/.well-known/jwks.json`),
 );
+
+function getPublicOrigin(c: Context) {
+  const requestUrl = new URL(c.req.url);
+  const forwardedHost = c.req.header("x-forwarded-host");
+  const forwardedProto = c.req.header("x-forwarded-proto");
+  const host = forwardedHost ?? c.req.header("host") ?? requestUrl.host;
+  const proto = forwardedProto ?? requestUrl.protocol.replace(":", "");
+
+  return `${proto}://${host}`;
+}
+
+function getOAuthRedirectUri(c: Context) {
+  return env.kimiRedirectUri || `${getPublicOrigin(c)}${Paths.oauthCallback}`;
+}
+
+function decodeRedirectState(state: string) {
+  const redirectUri = Buffer.from(state, "base64").toString("utf8");
+  const parsed = new URL(redirectUri);
+
+  if (parsed.protocol !== "https:" && parsed.hostname !== "localhost") {
+    throw new Error("Invalid OAuth redirect state");
+  }
+
+  return redirectUri;
+}
+
+export function createOAuthLoginHandler() {
+  return (c: Context) => {
+    const redirectUri = getOAuthRedirectUri(c);
+    const state = Buffer.from(redirectUri, "utf8").toString("base64");
+    const url = new URL(`${env.kimiAuthUrl}/api/oauth/authorize`);
+
+    url.searchParams.set("client_id", env.appId);
+    url.searchParams.set("redirect_uri", redirectUri);
+    url.searchParams.set("response_type", "code");
+    url.searchParams.set("scope", "profile");
+    url.searchParams.set("state", state);
+
+    return c.redirect(url.toString(), 302);
+  };
+}
 
 async function verifyAccessToken(
   accessToken: string,
@@ -93,7 +134,7 @@ export function createOAuthCallbackHandler() {
     }
 
     try {
-      const redirectUri = atob(state);
+      const redirectUri = decodeRedirectState(state);
       const tokenResp = await exchangeAuthCode(code, redirectUri);
       const { userId } = await verifyAccessToken(tokenResp.access_token);
       const userProfile = await kimiUsers.getProfile(tokenResp.access_token);
@@ -122,7 +163,13 @@ export function createOAuthCallbackHandler() {
       return c.redirect("/", 302);
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
-      return c.json({ error: "OAuth callback failed" }, 500);
+      return c.json(
+        {
+          error: "OAuth callback failed",
+          detail: error instanceof Error ? error.message : String(error),
+        },
+        500,
+      );
     }
   };
 }

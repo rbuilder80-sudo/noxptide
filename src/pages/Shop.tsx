@@ -2,33 +2,23 @@ import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Search } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
+import { coreSeo } from '../data/seo'
 import { products } from '../data/products'
 import ProductCard from '../components/ProductCard'
+import { isProductHidden, livePrice, useProductOverrides } from '../hooks/useProductOverrides'
 
 export default function Shop() {
-  useSeo({
-    pageKey: 'shop',
-    title: 'Shop All Research Peptides | Noxptide — UK Supplier, ≥99% Purity',
-    description:
-      'Browse the full Noxptide catalogue: BPC-157, TB-500, GHK-Cu, Ipamorelin, CJC-1295, Semax, Selank and more. Every batch HPLC & MS verified with COA. Tracked UK delivery.',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      itemListElement: products.map((p, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        url: `https://noxptide.co.uk/product/${p.slug}`,
-        name: p.name,
-      })),
-    },
-  })
+  useSeo({ pageKey: 'shop', ...coreSeo['/shop'] })
 
   const [params] = useSearchParams()
   const [q, setQ] = useState(params.get('q') ?? '')
   const [sort, setSort] = useState<'featured' | 'price-asc' | 'price-desc' | 'name'>('featured')
+  const overrides = useProductOverrides()
 
   const filtered = useMemo(() => {
-    let list = [...products]
+    let list = products.filter((p) => !isProductHidden(overrides, p.slug))
+    const fromPrice = (p: (typeof products)[number]) =>
+      livePrice(overrides, p.slug, p.sizes[0].label) ?? p.sizes[0].price
     if (q.trim()) {
       const needle = q.toLowerCase()
       list = list.filter(
@@ -38,18 +28,18 @@ export default function Shop() {
           p.cas.includes(needle),
       )
     }
-    if (sort === 'price-asc') list.sort((a, b) => a.sizes[0].price - b.sizes[0].price)
-    if (sort === 'price-desc') list.sort((a, b) => b.sizes[0].price - a.sizes[0].price)
-    if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name))
+    if (sort === 'price-asc') list = [...list].sort((a, b) => fromPrice(a) - fromPrice(b))
+    if (sort === 'price-desc') list = [...list].sort((a, b) => fromPrice(b) - fromPrice(a))
+    if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name))
     return list
-  }, [q, sort])
+  }, [q, sort, overrides])
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
       <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
         <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-foreground">Peptides</span>
       </nav>
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Peptides</h1>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Research Peptides UK</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
         Every product below is synthesised to ≥99% purity, independently verified by HPLC and mass
         spectrometry, and shipped with a batch-specific Certificate of Analysis.
@@ -87,9 +77,10 @@ export default function Shop() {
         Showing {filtered.length} of {products.length} peptides
       </p>
 
+      <h2 className="sr-only">Product list</h2>
       <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filtered.map((p) => (
-          <ProductCard key={p.slug} product={p} />
+        {filtered.map((p, i) => (
+          <ProductCard key={p.slug} product={p} eager={i < 2} />
         ))}
       </div>
 

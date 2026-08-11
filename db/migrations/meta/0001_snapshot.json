@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "f3f5bfd0-2164-4feb-bd58-3baedd42eae9",
+  "id": "7e04a31c-64ca-40ff-8540-0daf423f615a",
   "prevId": "ae3562a9-95ce-4596-9350-5a90901936c5",
   "tables": {
     "order_items": {
@@ -174,36 +174,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "paymentProvider": {
-          "name": "paymentProvider",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'wallid'"
-        },
-        "paymentId": {
-          "name": "paymentId",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "paymentStatus": {
-          "name": "paymentStatus",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'NEW'"
-        },
-        "paymentReturnToken": {
-          "name": "paymentReturnToken",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "status": {
           "name": "status",
           "type": "enum('pending','paid','processing','dispatched','completed','cancelled')",
@@ -251,18 +221,6 @@
           "name": "orders_orderNumber_unique",
           "columns": [
             "orderNumber"
-          ]
-        },
-        "orders_paymentId_unique": {
-          "name": "orders_paymentId_unique",
-          "columns": [
-            "paymentId"
-          ]
-        },
-        "orders_paymentReturnToken_unique": {
-          "name": "orders_paymentReturnToken_unique",
-          "columns": [
-            "paymentReturnToken"
           ]
         }
       },
@@ -340,6 +298,144 @@
           ]
         }
       },
+      "checkConstraint": {}
+    },
+    "product_statuses": {
+      "name": "product_statuses",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "productSlug": {
+          "name": "productSlug",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('active','hidden')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'active'"
+        },
+        "updatedBy": {
+          "name": "updatedBy",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "product_statuses_id": {
+          "name": "product_statuses_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "product_statuses_productSlug_unique": {
+          "name": "product_statuses_productSlug_unique",
+          "columns": [
+            "productSlug"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "product_variants": {
+      "name": "product_variants",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "productSlug": {
+          "name": "productSlug",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sizeLabel": {
+          "name": "sizeLabel",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pricePence": {
+          "name": "pricePence",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stock": {
+          "name": "stock",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "updatedBy": {
+          "name": "updatedBy",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "product_variants_slug_size": {
+          "name": "product_variants_slug_size",
+          "columns": [
+            "productSlug",
+            "sizeLabel"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "product_variants_id": {
+          "name": "product_variants_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
       "checkConstraint": {}
     },
     "users": {

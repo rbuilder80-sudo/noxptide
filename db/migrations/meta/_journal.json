@@ -12,8 +12,15 @@
     {
       "idx": 1,
       "version": "5",
+      "when": 1786458468505,
+      "tag": "0001_melted_thunderbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
       "when": 1786393387596,
-      "tag": "0001_previous_champions",
+      "tag": "0002_previous_champions",
       "breakpoints": true
     }
   ]

@@ -1,8 +1,9 @@
 import { Link } from 'react-router'
 import { useSeo } from '../hooks/useSeo'
+import { notFoundSeo } from '../data/seo'
 
 export default function NotFound() {
-  useSeo({ title: 'Page Not Found | Noxptide', description: 'The page you requested could not be found.' })
+  useSeo({ ...notFoundSeo })
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center">
       <p className="text-6xl font-extrabold text-primary">404</p>

@@ -1,5 +1,3 @@
-import { Star } from 'lucide-react'
-
 export default function Rating({
   rating,
   reviews,
@@ -14,12 +12,18 @@ export default function Rating({
     <div className="flex items-center gap-1.5" role="img" aria-label={`Rated ${rating} out of 5 from ${reviews} reviews`}>
       <div className="flex gap-0.5" aria-hidden="true">
         {[1, 2, 3, 4, 5].map((i) => (
-          <Star
+          <svg
             key={i}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            aria-hidden="true"
             className={`${starCls} ${
               i <= Math.round(rating) ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'
             }`}
-          />
+          >
+            <use href="#nox-star" />
+          </svg>
         ))}
       </div>
       <span className={`font-semibold text-foreground ${size === 'lg' ? 'text-sm' : 'text-xs'}`}>

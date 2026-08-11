@@ -6,7 +6,7 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter } from "./router";
 import { createContext } from "./context";
 import { env } from "./lib/env";
-import { createOAuthCallbackHandler } from "./kimi/auth";
+import { createOAuthCallbackHandler, createOAuthLoginHandler } from "./kimi/auth";
 import { processWallidWebhookEvents } from "./orders-router";
 import { parseWallidWebhook, verifyWallidWebhook } from "./lib/wallid";
 import { Paths } from "@contracts/constants";
@@ -15,6 +15,7 @@ const app = new Hono<{ Bindings: HttpBindings }>();
 
 app.use(compress());
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
+app.get(Paths.oauthLogin, createOAuthLoginHandler());
 app.get(Paths.oauthCallback, createOAuthCallbackHandler());
 app.post("/api/wallid/webhook", async (c) => {
   const rawBody = await c.req.text();
@@ -71,10 +72,26 @@ if (env.isProduction) {
     }
   });
 
+  // Canonical host + legacy route redirects (audit P0-2, §8):
+  // apex -> www in one permanent, path-preserving hop; legacy category
+  // URLs permanently redirect to the catalogue hub.
+  app.use("*", async (c, next) => {
+    const host = (c.req.header("host") ?? "").split(":")[0];
+    if (host === "noxptide.co.uk") {
+      const url = new URL(c.req.url);
+      c.header("Cache-Control", "public, max-age=86400");
+      return c.redirect(`https://www.noxptide.co.uk${url.pathname}${url.search}`, 301);
+    }
+    if (c.req.path.startsWith("/category/")) {
+      c.header("Cache-Control", "public, max-age=86400");
+      return c.redirect("/shop", 301);
+    }
+    await next();
+  });
+
   serveStaticFiles(app);
 
-  const port = parseInt(process.env.PORT || "3000");
-  serve({ fetch: app.fetch, port, hostname: "0.0.0.0" }, () => {
+  const port = parseInt(process.env.PORT || "3000");  serve({ fetch: app.fetch, port, hostname: "0.0.0.0" }, () => {
     console.log(`Server running on http://localhost:${port}/`);
   });
 
@@ -86,6 +103,36 @@ if (env.isProduction) {
       const { getDb } = await import("./queries/connection");
       await migrate(getDb(), { migrationsFolder: "./db/migrations" });
       console.log("[db] schema synced");
+
+      // First-run seed: populate stock/pricing rows from the static catalogue
+      // so the admin panel opens with the full inventory editable. Existing
+      // rows (admin edits) are never touched.
+      const { productVariants } = await import("@db/schema");
+      const { products } = await import("../src/data/products");
+      const db = getDb();
+      const existing = await db
+        .select({ id: productVariants.id })
+        .from(productVariants)
+        .limit(1);
+      if (existing.length === 0) {
+        let count = 0;
+        for (const p of products) {
+          for (const s of p.sizes) {
+            await db
+              .insert(productVariants)
+              .values({
+                productSlug: p.slug,
+                sizeLabel: s.label,
+                pricePence: Math.round(s.price * 100),
+                stock: 100,
+                updatedBy: "seed",
+              })
+              .onDuplicateKeyUpdate({ set: { productSlug: p.slug } });
+            count++;
+          }
+        }
+        console.log(`[db] seeded ${count} product variants`);
+      }
     } catch (err) {
       console.warn("[db] schema sync skipped:", (err as Error).message);
     }
