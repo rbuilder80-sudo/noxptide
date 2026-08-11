@@ -16,6 +16,7 @@ export default function Checkout() {
   const [searchParams] = useSearchParams()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'next-day'>('standard')
+  const checkoutReadiness = trpc.orders.checkoutReadiness.useQuery()
   const createOrder = trpc.orders.create.useMutation()
   const confirmPayment = trpc.orders.confirmPayment.useMutation()
   const paymentResult = searchParams.get('payment')
@@ -32,6 +33,8 @@ export default function Checkout() {
   const confirmationStarted = useRef(false)
   const cartCleared = useRef(false)
   const shipping = shippingMethod === 'next-day' ? 8.99 : subtotal >= 25 ? 0 : 4.99
+  const payByBankReady = checkoutReadiness.data?.payByBankReady ?? false
+  const checkoutDisabled = createOrder.isPending || checkoutReadiness.isLoading || !payByBankReady
 
   useEffect(() => {
     if (paymentResult !== 'success' || !validReturn || confirmationStarted.current) return
@@ -51,6 +54,10 @@ export default function Checkout() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSubmitError(null)
+    if (!payByBankReady) {
+      setSubmitError('Pay by Bank is being connected right now. Please contact support@noxptide.co.uk before placing an order.')
+      return
+    }
     const fd = new FormData(e.currentTarget)
     try {
       const res = await createOrder.mutateAsync({
@@ -298,12 +305,23 @@ export default function Checkout() {
           </dl>
           <button
             type="submit"
-            disabled={createOrder.isPending}
+            disabled={checkoutDisabled}
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90 disabled:opacity-60"
           >
             <Lock className="h-4 w-4" aria-hidden="true" />
-            {createOrder.isPending ? 'Opening Wallid…' : `Pay by Bank — ${formatGBP(discountedSubtotal + shipping)}`}
+            {createOrder.isPending
+              ? 'Opening Wallid…'
+              : checkoutReadiness.isLoading
+                ? 'Checking secure payment…'
+                : payByBankReady
+                  ? `Pay by Bank — ${formatGBP(discountedSubtotal + shipping)}`
+                  : 'Pay by Bank being connected'}
           </button>
+          {!checkoutReadiness.isLoading && !payByBankReady && !submitError && (
+            <p className="mt-3 rounded-lg bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+              Pay by Bank is being connected right now. Email support@noxptide.co.uk and we will help complete the order.
+            </p>
+          )}
           {submitError && (
             <p className="mt-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{submitError}</p>
           )}

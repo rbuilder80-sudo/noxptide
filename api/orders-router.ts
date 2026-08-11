@@ -8,6 +8,7 @@ import { getDb } from "./queries/connection";
 import { createRouter, publicQuery, staffQuery } from "./middleware";
 import { syncOrderToHubSpot } from "./lib/hubspot";
 import {
+  checkWallidReadiness,
   createWallidPayment,
   getWallidPaymentStatus,
   type WallidItem,
@@ -231,8 +232,21 @@ export async function processWallidWebhookEvents(events: WallidWebhookEvent[]) {
 }
 
 export const ordersRouter = createRouter({
+  /** Public: expose only whether checkout can safely start a Wallid payment. */
+  checkoutReadiness: publicQuery.query(() => {
+    const wallid = checkWallidReadiness();
+    return { payByBankReady: wallid.ready };
+  }),
+
   /** Public: create an order and a Wallid hosted Pay-by-Bank session. */
   create: publicQuery.input(orderInput).mutation(async ({ input, ctx }) => {
+    if (!checkWallidReadiness().ready) {
+      throw new TRPCError({
+        code: "SERVICE_UNAVAILABLE",
+        message: "Pay by Bank is temporarily unavailable. Please try again shortly.",
+      });
+    }
+
     const db = getDb();
     const calculated = calculateOrder(input);
     const orderNumber = `NOX-${Date.now().toString(36).toUpperCase()}${Math.floor(
