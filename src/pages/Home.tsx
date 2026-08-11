@@ -63,25 +63,18 @@ export default function Home() {
         <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 pb-16 pt-32 sm:pb-24">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <Enter>
               <p className="inline-flex items-center gap-2 rounded-full border border-[#1B133C]/10 bg-white/70 px-4 py-1.5 text-xs font-semibold text-foreground backdrop-blur-sm">
                 <ShieldCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
                 Every batch independently verified to ≥99% purity
               </p>
-              </Enter>
-              <Enter>
               <h1 className="mt-6 font-display text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                 UK research peptides with{' '}
                 <em className="italic text-accent">verifiable ≥99% purity</em>
               </h1>
-              </Enter>
-              <Enter>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
                 The UK's quality-first research peptide supplier — synthesis-grade compounds,
                 batch-specific Certificates of Analysis, and same-day dispatch from UK stock.
               </p>
-              </Enter>
-              <Enter>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
                   to="/shop"
@@ -96,7 +89,6 @@ export default function Home() {
                   Our Quality Standard
                 </Link>
               </div>
-              </Enter>
             </div>
 
             {/* Floating stat cards over hero visual */}
