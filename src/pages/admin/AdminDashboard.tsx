@@ -76,7 +76,13 @@ export default function AdminDashboard() {
           <IntegrationTile
             label="HubSpot CRM"
             ready={integrationStatus?.hubspot.ready}
-            detail="Contacts, deals, line items and product catalogue sync"
+            detail={
+              integrationStatus?.hubspot.verified
+                ? `Verified: ${integrationStatus.hubspot.checkedObjects.join(', ')}`
+                : integrationStatus?.hubspot.error
+                  ? `Token found, but verification failed: ${integrationStatus.hubspot.error}`
+                  : 'Contacts, deals, line items and product catalogue sync'
+            }
           />
           <IntegrationTile
             label="Wallid Pay-by-Bank"

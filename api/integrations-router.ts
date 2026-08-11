@@ -1,4 +1,5 @@
 import { createRouter, staffQuery } from "./middleware";
+import { checkHubSpotReadiness } from "./lib/hubspot";
 
 const requiredLiveVariables = [
   "HUBSPOT_ACCESS_TOKEN",
@@ -14,19 +15,22 @@ function configured(name: string) {
 
 export const integrationsRouter = createRouter({
   /** Staff: safe readiness status for external ecommerce integrations. */
-  status: staffQuery.query(() => {
+  status: staffQuery.query(async () => {
     const missing = requiredLiveVariables.filter((name) => !configured(name));
-    const hubspotReady = configured("HUBSPOT_ACCESS_TOKEN");
+    const hubspot = await checkHubSpotReadiness();
     const wallidReady =
       configured("WALLID_API_KEY_ID") &&
       configured("WALLID_API_KEY_SECRET") &&
       configured("WALLID_WEBHOOK_SECRET");
 
     return {
-      ecommerceReady: hubspotReady && wallidReady && configured("PUBLIC_SITE_URL"),
+      ecommerceReady: hubspot.ready && wallidReady && configured("PUBLIC_SITE_URL"),
       hubspot: {
-        ready: hubspotReady,
-        tokenConfigured: hubspotReady,
+        ready: hubspot.ready,
+        tokenConfigured: hubspot.tokenConfigured,
+        verified: hubspot.verified,
+        checkedObjects: hubspot.checkedObjects,
+        error: hubspot.error,
         syncs: ["contacts", "deals", "line_items", "products"],
       },
       wallid: {

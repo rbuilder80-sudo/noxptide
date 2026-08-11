@@ -31,6 +31,7 @@ export type EcommerceOrderItem = {
 
 type HubSpotRecord = { id: string; properties?: Record<string, string> };
 type HubSpotSearch = { results: HubSpotRecord[] };
+type HubSpotReadinessObject = "contacts" | "deals" | "line_items" | "products";
 
 const DEAL_PIPELINE_ID = process.env.HUBSPOT_DEAL_PIPELINE_ID?.trim() || "default";
 const statusDealStage: Record<OrderStatus, string> = {
@@ -67,6 +68,13 @@ async function hubSpotRequest<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
+}
+
+async function verifyReadableObject(objectType: HubSpotReadinessObject) {
+  await hubSpotRequest<HubSpotSearch>(`/crm/v3/objects/${objectType}/search`, {
+    method: "POST",
+    body: JSON.stringify({ properties: [], limit: 1 }),
+  });
 }
 
 function splitName(fullName: string) {
@@ -278,4 +286,41 @@ export async function syncOrderToHubSpot(
     contactId: contact.id,
     dealId: deal.id,
   };
+}
+
+export async function checkHubSpotReadiness() {
+  if (!hubSpotToken()) {
+    return {
+      ready: false,
+      tokenConfigured: false,
+      verified: false,
+      checkedObjects: [] as HubSpotReadinessObject[],
+      error: undefined as string | undefined,
+    };
+  }
+
+  const requiredObjects: HubSpotReadinessObject[] = ["contacts", "deals", "line_items", "products"];
+  const checkedObjects: HubSpotReadinessObject[] = [];
+
+  try {
+    for (const objectType of requiredObjects) {
+      await verifyReadableObject(objectType);
+      checkedObjects.push(objectType);
+    }
+    return {
+      ready: true,
+      tokenConfigured: true,
+      verified: true,
+      checkedObjects,
+      error: undefined as string | undefined,
+    };
+  } catch (error) {
+    return {
+      ready: false,
+      tokenConfigured: true,
+      verified: false,
+      checkedObjects,
+      error: error instanceof Error ? error.message.slice(0, 240) : "HubSpot verification failed",
+    };
+  }
 }

@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { syncOrderToHubSpot, type EcommerceOrder, type EcommerceOrderItem } from "./hubspot";
+import {
+  checkHubSpotReadiness,
+  syncOrderToHubSpot,
+  type EcommerceOrder,
+  type EcommerceOrderItem,
+} from "./hubspot";
 
 const order: EcommerceOrder = {
   orderNumber: "NOX-TEST-1001",
@@ -116,5 +121,45 @@ describe("syncOrderToHubSpot", () => {
     expect(fetchMock.mock.calls[9][0]).toBe(
       "https://api.hubapi.com/crm/v4/objects/deals/deal-1/associations/default/line_items/line-1",
     );
+  });
+});
+
+describe("checkHubSpotReadiness", () => {
+  afterEach(() => {
+    delete process.env.HUBSPOT_ACCESS_TOKEN;
+    vi.unstubAllGlobals();
+  });
+
+  it("reports not ready when the token is missing", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(checkHubSpotReadiness()).resolves.toEqual({
+      ready: false,
+      tokenConfigured: false,
+      verified: false,
+      checkedObjects: [],
+      error: undefined,
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("verifies required ecommerce CRM objects without writing data", async () => {
+    process.env.HUBSPOT_ACCESS_TOKEN = "private-token";
+    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(json({ results: [] })));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(checkHubSpotReadiness()).resolves.toEqual({
+      ready: true,
+      tokenConfigured: true,
+      verified: true,
+      checkedObjects: ["contacts", "deals", "line_items", "products"],
+      error: undefined,
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    for (const [, init] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
+      expect(init.method).toBe("POST");
+      expect(new Headers(init.headers).get("Authorization")).toBe("Bearer private-token");
+    }
   });
 });
