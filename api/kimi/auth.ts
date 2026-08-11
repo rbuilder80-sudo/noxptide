@@ -15,7 +15,12 @@ async function exchangeAuthCode(
   code: string,
   redirectUri: string,
 ): Promise<TokenResponse> {
-  const requestToken = (includeRedirectUri: boolean) => {
+  const tokenUrls = [
+    env.kimiTokenUrl || `${env.kimiAuthUrl}/api/oauth/token`,
+    "https://auth.kimi.com/api/oauth/token",
+  ].filter((url, index, urls) => url && urls.indexOf(url) === index);
+
+  const requestToken = (tokenUrl: string, includeRedirectUri: boolean) => {
     const body = new URLSearchParams({
       grant_type: "authorization_code",
       code,
@@ -27,24 +32,34 @@ async function exchangeAuthCode(
       body.set("redirect_uri", redirectUri);
     }
 
-    return fetch(`${env.kimiAuthUrl}/api/oauth/token`, {
+    return fetch(tokenUrl, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: body.toString(),
     });
   };
 
-  let resp = await requestToken(true);
+  let resp = await requestToken(tokenUrls[0], true);
 
   if (!resp.ok) {
     const text = await resp.text();
     if (/invalid[_ ]redirect_uri|Invalid redirect_uri/i.test(text)) {
-      resp = await requestToken(false);
-      if (resp.ok) {
-        return resp.json() as Promise<TokenResponse>;
+      const retryErrors: string[] = [`${tokenUrls[0]}: ${text}`];
+      const retryAttempts = [
+        { tokenUrl: tokenUrls[0], includeRedirectUri: false },
+        ...tokenUrls.slice(1).flatMap((tokenUrl) => [
+          { tokenUrl, includeRedirectUri: true },
+          { tokenUrl, includeRedirectUri: false },
+        ]),
+      ];
+      for (const { tokenUrl, includeRedirectUri } of retryAttempts) {
+        resp = await requestToken(tokenUrl, includeRedirectUri);
+        if (resp.ok) {
+          return resp.json() as Promise<TokenResponse>;
+        }
+        retryErrors.push(`${tokenUrl}: ${(await resp.text()).slice(0, 240)}`);
       }
-      const retryText = await resp.text();
-      throw new Error(`Token exchange failed (${resp.status}): ${retryText}`);
+      throw new Error(`Token exchange failed after Kimi redirect fallback: ${retryErrors.join(" | ")}`);
     }
     throw new Error(`Token exchange failed (${resp.status}): ${text}`);
   }
