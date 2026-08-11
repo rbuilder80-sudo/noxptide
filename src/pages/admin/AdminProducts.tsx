@@ -171,7 +171,8 @@ export default function AdminProducts() {
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         Set the live price and stock level for every vial size. Changes apply to the storefront
         immediately — no redeploy. Setting stock to 0 marks the size as out of stock; hiding a
-        product removes it from the shop entirely. Orders themselves are handled in HubSpot.
+        product removes it from the shop entirely. Use the dashboard to push this catalogue into
+        HubSpot Products or import HubSpot Product edits back into the live shop.
       </p>
       <input
         value={q}

@@ -27,10 +27,13 @@ export type EcommerceOrderItem = {
   sizeLabel: string;
   unitPricePence: number;
   qty: number;
+  stock?: number;
+  status?: "active" | "hidden";
 };
 
 type HubSpotRecord = { id: string; properties?: Record<string, string> };
 type HubSpotSearch = { results: HubSpotRecord[] };
+type HubSpotList = { results: HubSpotRecord[]; paging?: { next?: { after?: string } } };
 type HubSpotReadinessObject = "contacts" | "companies" | "deals" | "line_items" | "products";
 type HubSpotProperty = {
   name: string;
@@ -285,6 +288,20 @@ function productImageUrl(item: EcommerceOrderItem) {
   return `${publicSiteUrl()}/images/products/${item.productSlug}-${size}.webp`;
 }
 
+function productDescription(item: EcommerceOrderItem) {
+  const stock = item.stock ?? 0;
+  const status = item.status ?? "active";
+  return [
+    `Noxptide stock: ${stock}`,
+    `Noxptide status: ${status}`,
+    `Noxptide SKU: ${productSku(item)}`,
+    "",
+    `${item.productName} ${item.sizeLabel} research peptide sold by Noxptide.`,
+    "",
+    "Edit the two Noxptide lines above in HubSpot, then use “Import from HubSpot” in the Noxptide admin to update the live shop.",
+  ].join("\n");
+}
+
 async function upsertProduct(item: EcommerceOrderItem) {
   const sku = productSku(item);
   const found = await hubSpotRequest<HubSpotSearch>("/crm/v3/objects/products/search", {
@@ -299,7 +316,7 @@ async function upsertProduct(item: EcommerceOrderItem) {
     name: `${item.productName} ${item.sizeLabel}`,
     hs_sku: sku,
     price: (item.unitPricePence / 100).toFixed(2),
-    description: `${item.productName} ${item.sizeLabel} research peptide sold by Noxptide.`,
+    description: productDescription(item),
     hs_url: `${publicSiteUrl()}/product/${item.productSlug}`,
     hs_images: productImageUrl(item),
   };
@@ -396,6 +413,71 @@ export async function syncProductCatalogToHubSpot(items: EcommerceOrderItem[]) {
   }
 
   return { status: "synced" as const, synced };
+}
+
+export type HubSpotCatalogImportItem = {
+  productSlug: string;
+  sizeLabel: string;
+  pricePence: number;
+  stock?: number;
+  status?: "active" | "hidden";
+  hubspotProductId: string;
+};
+
+function parseNoxptideSku(sku?: string) {
+  const match = sku?.match(/^noxptide:([^:]+):(.+)$/i);
+  if (!match) return undefined;
+  return { productSlug: match[1], sizeLabel: match[2] };
+}
+
+function parseNoxptideStock(description?: string) {
+  const value =
+    description?.match(/Noxptide stock:\s*(\d+)/i)?.[1] ??
+    description?.match(/\[noxptide_stock=(\d+)\]/i)?.[1];
+  if (!value) return undefined;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
+}
+
+function parseNoxptideStatus(description?: string): "active" | "hidden" | undefined {
+  const value =
+    description?.match(/Noxptide status:\s*(active|hidden)/i)?.[1] ??
+    description?.match(/\[noxptide_status=(active|hidden)\]/i)?.[1];
+  if (!value) return undefined;
+  return value.toLowerCase() === "hidden" ? "hidden" : "active";
+}
+
+export async function importHubSpotProductCatalog() {
+  if (!hubSpotToken()) return { status: "disabled" as const, imported: [] as HubSpotCatalogImportItem[] };
+
+  const imported: HubSpotCatalogImportItem[] = [];
+  let after: string | undefined;
+
+  do {
+    const params = new URLSearchParams({
+      limit: "100",
+      properties: "name,hs_sku,price,description",
+    });
+    if (after) params.set("after", after);
+
+    const page = await hubSpotRequest<HubSpotList>(`/crm/v3/objects/products?${params.toString()}`);
+    for (const product of page.results) {
+      const sku = parseNoxptideSku(product.properties?.hs_sku);
+      if (!sku) continue;
+      const price = Number.parseFloat(product.properties?.price ?? "");
+      if (!Number.isFinite(price) || price < 0) continue;
+      imported.push({
+        ...sku,
+        pricePence: Math.round(price * 100),
+        stock: parseNoxptideStock(product.properties?.description),
+        status: parseNoxptideStatus(product.properties?.description),
+        hubspotProductId: product.id,
+      });
+    }
+    after = page.paging?.next?.after;
+  } while (after);
+
+  return { status: "synced" as const, imported };
 }
 
 export async function checkHubSpotReadiness() {

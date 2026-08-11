@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   checkHubSpotReadiness,
+  importHubSpotProductCatalog,
   syncProductCatalogToHubSpot,
   syncOrderToHubSpot,
   type EcommerceOrder,
@@ -171,12 +172,72 @@ describe("syncProductCatalogToHubSpot", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const productCreate = fetchMock.mock.calls[1] as [string, RequestInit];
     expect(productCreate[0]).toBe("https://api.hubapi.com/crm/v3/objects/products");
-    expect(JSON.parse(String(productCreate[1].body)).properties).toMatchObject({
+    const properties = JSON.parse(String(productCreate[1].body)).properties;
+    expect(properties).toMatchObject({
       name: "BPC-157 5mg",
       hs_sku: "noxptide:bpc-157:5mg",
       price: "34.99",
       hs_url: "https://www.noxptide.co.uk/product/bpc-157",
     });
+    expect(properties.description).toContain("Noxptide stock: 0");
+    expect(properties.description).toContain("Noxptide status: active");
+  });
+});
+
+describe("importHubSpotProductCatalog", () => {
+  afterEach(() => {
+    delete process.env.HUBSPOT_ACCESS_TOKEN;
+    vi.unstubAllGlobals();
+  });
+
+  it("does not read products when the private app token is missing", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(importHubSpotProductCatalog()).resolves.toEqual({ status: "disabled", imported: [] });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("reads Noxptide product price, stock and status from HubSpot Products", async () => {
+    process.env.HUBSPOT_ACCESS_TOKEN = "private-token";
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      json({
+        results: [
+          {
+            id: "product-1",
+            properties: {
+              hs_sku: "noxptide:bpc-157:5mg",
+              price: "41.50",
+              description: "Noxptide stock: 12\nNoxptide status: hidden",
+            },
+          },
+          {
+            id: "product-2",
+            properties: {
+              hs_sku: "other:sku",
+              price: "1.00",
+              description: "Ignore me",
+            },
+          },
+        ],
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(importHubSpotProductCatalog()).resolves.toEqual({
+      status: "synced",
+      imported: [
+        {
+          productSlug: "bpc-157",
+          sizeLabel: "5mg",
+          pricePence: 4150,
+          stock: 12,
+          status: "hidden",
+          hubspotProductId: "product-1",
+        },
+      ],
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 

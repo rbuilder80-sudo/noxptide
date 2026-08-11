@@ -4,7 +4,11 @@ import { productStatuses, productVariants } from "@db/schema";
 import { products as storefrontProducts } from "@/data/products";
 import { getDb } from "./queries/connection";
 import { createRouter, publicQuery, editorQuery } from "./middleware";
-import { syncProductCatalogToHubSpot, type EcommerceOrderItem } from "./lib/hubspot";
+import {
+  importHubSpotProductCatalog,
+  syncProductCatalogToHubSpot,
+  type EcommerceOrderItem,
+} from "./lib/hubspot";
 
 /**
  * Catalogue control: stock & pricing overrides, managed from the admin panel.
@@ -118,10 +122,12 @@ export const productsRouter = createRouter({
     const variantPrice = new Map(
       variants.map((variant) => [`${variant.productSlug}:${variant.sizeLabel}`, variant.pricePence]),
     );
+    const variantStock = new Map(
+      variants.map((variant) => [`${variant.productSlug}:${variant.sizeLabel}`, variant.stock]),
+    );
     const status = new Map(statuses.map((row) => [row.productSlug, row.status]));
     const hidden = storefrontProducts.filter((product) => status.get(product.slug) === "hidden").length;
     const items: EcommerceOrderItem[] = storefrontProducts
-      .filter((product) => status.get(product.slug) !== "hidden")
       .flatMap((product) =>
         product.sizes.map((size) => ({
           productSlug: product.slug,
@@ -129,6 +135,8 @@ export const productsRouter = createRouter({
           sizeLabel: size.label,
           unitPricePence:
             variantPrice.get(`${product.slug}:${size.label}`) ?? Math.round(size.price * 100),
+          stock: variantStock.get(`${product.slug}:${size.label}`) ?? 100,
+          status: status.get(product.slug) === "hidden" ? "hidden" : "active",
           qty: 1,
         })),
       );
@@ -138,6 +146,68 @@ export const productsRouter = createRouter({
       ...result,
       checked: items.length,
       skippedHiddenProducts: hidden,
+    };
+  }),
+
+  /** Editor+: pull HubSpot Product prices/stock/status back into the live storefront. */
+  importHubSpotCatalog: editorQuery.mutation(async ({ ctx }) => {
+    const result = await importHubSpotProductCatalog();
+    if (result.status === "disabled") {
+      return { status: "disabled" as const, imported: 0, ignored: 0, hiddenProducts: 0 };
+    }
+
+    const db = getDb();
+    const by = ctx.user.name ?? ctx.user.email ?? "hubspot";
+    const validProducts = new Map(storefrontProducts.map((product) => [product.slug, product]));
+    const currentVariants = await db.select().from(productVariants);
+    const currentStock = new Map(
+      currentVariants.map((variant) => [`${variant.productSlug}:${variant.sizeLabel}`, variant.stock]),
+    );
+    const statuses = new Map<string, "active" | "hidden">();
+    let imported = 0;
+    let ignored = 0;
+
+    for (const item of result.imported) {
+      const product = validProducts.get(item.productSlug);
+      if (!product || !product.sizes.some((size) => size.label === item.sizeLabel)) {
+        ignored++;
+        continue;
+      }
+
+      const stock = item.stock ?? currentStock.get(`${item.productSlug}:${item.sizeLabel}`) ?? 100;
+      await db
+        .insert(productVariants)
+        .values({
+          productSlug: item.productSlug,
+          sizeLabel: item.sizeLabel,
+          pricePence: item.pricePence,
+          stock,
+          updatedBy: by,
+        })
+        .onDuplicateKeyUpdate({
+          set: {
+            pricePence: item.pricePence,
+            stock,
+            updatedBy: by,
+          },
+        });
+
+      if (item.status) statuses.set(item.productSlug, item.status);
+      imported++;
+    }
+
+    for (const [productSlug, status] of statuses) {
+      await db
+        .insert(productStatuses)
+        .values({ productSlug, status, updatedBy: by })
+        .onDuplicateKeyUpdate({ set: { status, updatedBy: by } });
+    }
+
+    return {
+      status: "synced" as const,
+      imported,
+      ignored,
+      hiddenProducts: [...statuses.values()].filter((status) => status === "hidden").length,
     };
   }),
 });

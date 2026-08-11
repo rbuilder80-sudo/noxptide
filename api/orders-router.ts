@@ -1,8 +1,8 @@
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { orders, orderItems, type Order } from "@db/schema";
+import { orders, orderItems, productStatuses, productVariants, type Order } from "@db/schema";
 import { categories, getProduct } from "@/data/products";
 import { getDb } from "./queries/connection";
 import { createRouter, publicQuery, staffQuery } from "./middleware";
@@ -76,18 +76,38 @@ function withHubSpotLinks<T extends { hubspotContactId?: string | null; hubspotC
   };
 }
 
-function calculateOrder(input: z.infer<typeof orderInput>) {
+async function calculateOrder(input: z.infer<typeof orderInput>) {
+  const db = getDb();
+  const [variants, statuses] = await Promise.all([
+    db.select().from(productVariants),
+    db.select().from(productStatuses),
+  ]);
+  const variantMap = new Map(
+    variants.map((variant) => [`${variant.productSlug}:${variant.sizeLabel}`, variant]),
+  );
+  const statusMap = new Map(statuses.map((status) => [status.productSlug, status.status]));
+
   const items = input.items.map((item) => {
     const product = getProduct(item.productSlug);
     const size = product?.sizes.find((candidate) => candidate.label === item.sizeLabel);
-    if (!product || !size) {
+    if (!product || !size || statusMap.get(item.productSlug) === "hidden") {
       throw new TRPCError({ code: "BAD_REQUEST", message: "A product in your basket is unavailable." });
+    }
+    const liveVariant = variantMap.get(`${item.productSlug}:${item.sizeLabel}`);
+    if (liveVariant && liveVariant.stock < item.qty) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message:
+          liveVariant.stock <= 0
+            ? `${product.name} ${size.label} is out of stock.`
+            : `Only ${liveVariant.stock} × ${product.name} ${size.label} left in stock.`,
+      });
     }
     return {
       productSlug: product.slug,
       productName: product.name,
       sizeLabel: size.label,
-      unitPricePence: Math.round(size.price * 100),
+      unitPricePence: liveVariant?.pricePence ?? Math.round(size.price * 100),
       qty: item.qty,
       category: categories.find((category) => category.slug === product.category)?.name ?? "Research Peptides",
     };
@@ -107,7 +127,7 @@ function productImageUrl(origin: string, slug: string, sizeLabel: string) {
 
 function toWallidItems(
   origin: string,
-  calculated: ReturnType<typeof calculateOrder>,
+  calculated: Awaited<ReturnType<typeof calculateOrder>>,
 ): WallidItem[] {
   let allocatedDiscount = 0;
   const result = calculated.items.map((item, index) => {
@@ -199,6 +219,24 @@ async function syncOrderOrThrow(order: Order) {
   return result;
 }
 
+const stockDeductingStatuses = new Set(["paid", "processing", "dispatched", "completed"]);
+
+async function deductStockForOrder(orderId: number) {
+  const db = getDb();
+  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+  for (const item of items) {
+    await db
+      .update(productVariants)
+      .set({ stock: sql`GREATEST(${productVariants.stock} - ${item.qty}, 0)` })
+      .where(
+        and(
+          eq(productVariants.productSlug, item.productSlug),
+          eq(productVariants.sizeLabel, item.sizeLabel),
+        ),
+      );
+  }
+}
+
 export async function applyWallidStatus(event: {
   api_payment_id: string;
   order_id: string;
@@ -213,6 +251,8 @@ export async function applyWallidStatus(event: {
     .where(and(eq(orders.orderNumber, event.order_id), eq(orders.paymentId, event.api_payment_id)));
   if (!order || event.amount !== order.totalPence || event.currency !== "GBP") return false;
 
+  const shouldDeductStock =
+    event.status === "SUCCESS" && !stockDeductingStatuses.has(order.status);
   let status = order.status;
   if (event.status === "SUCCESS") status = "paid";
   if ((event.status === "FAILED" || event.status === "EXPIRED") && order.status === "pending") {
@@ -222,6 +262,7 @@ export async function applyWallidStatus(event: {
     .update(orders)
     .set({ paymentStatus: event.status, status })
     .where(eq(orders.id, order.id));
+  if (shouldDeductStock) await deductStockForOrder(order.id);
   await syncOrder({ ...order, paymentStatus: event.status, status });
   return true;
 }
@@ -251,7 +292,7 @@ export const ordersRouter = createRouter({
     }
 
     const db = getDb();
-    const calculated = calculateOrder(input);
+    const calculated = await calculateOrder(input);
     const orderNumber = `NOX-${Date.now().toString(36).toUpperCase()}${Math.floor(
       Math.random() * 900 + 100,
     )}`;
@@ -406,11 +447,20 @@ export const ordersRouter = createRouter({
     )
     .mutation(async ({ input }) => {
       const db = getDb();
+      const [existing] = await db.select().from(orders).where(eq(orders.id, input.id));
       await db
         .update(orders)
         .set({ status: input.status, ...(input.notes !== undefined ? { notes: input.notes } : {}) })
         .where(eq(orders.id, input.id));
       const [order] = await db.select().from(orders).where(eq(orders.id, input.id));
+      if (
+        order &&
+        existing &&
+        stockDeductingStatuses.has(input.status) &&
+        !stockDeductingStatuses.has(existing.status)
+      ) {
+        await deductStockForOrder(order.id);
+      }
       if (order) await syncOrder(order);
       return { success: true };
     }),

@@ -24,6 +24,13 @@ export default function AdminDashboard() {
   const syncCatalog = trpc.products.syncHubSpotCatalog.useMutation({
     onSuccess: () => utils.integrations.status.invalidate(),
   })
+  const importCatalog = trpc.products.importHubSpotCatalog.useMutation({
+    onSuccess: () => {
+      utils.products.overrides.invalidate()
+      utils.products.variants.invalidate()
+      utils.integrations.status.invalidate()
+    },
+  })
   const testHubSpotSync = trpc.integrations.testHubSpotSync.useMutation({
     onSuccess: () => utils.integrations.status.invalidate(),
   })
@@ -190,10 +197,18 @@ export default function AdminDashboard() {
             <button
               type="button"
               onClick={() => syncCatalog.mutate()}
-              disabled={syncCatalog.isPending}
+              disabled={syncCatalog.isPending || importCatalog.isPending}
               className="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-primary-foreground hover:opacity-90 disabled:opacity-60"
             >
               {syncCatalog.isPending ? 'Syncing catalogue…' : 'Sync catalogue to HubSpot'}
+            </button>
+            <button
+              type="button"
+              onClick={() => importCatalog.mutate()}
+              disabled={syncCatalog.isPending || importCatalog.isPending}
+              className="ml-2 rounded-lg border border-primary bg-card px-4 py-2 text-xs font-bold text-primary hover:bg-secondary disabled:opacity-60"
+            >
+              {importCatalog.isPending ? 'Importing HubSpot…' : 'Import from HubSpot'}
             </button>
           </div>
           {syncCatalog.data && (
@@ -203,9 +218,21 @@ export default function AdminDashboard() {
                 : `HubSpot token is not configured yet. ${syncCatalog.data.checked} catalogue variants are ready to sync once the Railway token is added.`}
             </p>
           )}
+          {importCatalog.data && (
+            <p className="mt-3 rounded-lg bg-secondary px-3 py-2 text-xs font-semibold">
+              {importCatalog.data.status === 'synced'
+                ? `Imported ${importCatalog.data.imported} HubSpot product rows into the live shop. ${importCatalog.data.hiddenProducts} products marked hidden. ${importCatalog.data.ignored} unmatched rows ignored.`
+                : 'HubSpot token is not configured yet. Add HUBSPOT_ACCESS_TOKEN in Railway, then import again.'}
+            </p>
+          )}
           {syncCatalog.error && (
             <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
               {syncCatalog.error.message}
+            </p>
+          )}
+          {importCatalog.error && (
+            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+              {importCatalog.error.message}
             </p>
           )}
         </div>
