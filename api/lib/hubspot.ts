@@ -36,6 +36,13 @@ type HubSpotProperty = {
   name: string;
   options?: Array<{ label: string; value: string }>;
 };
+type HubSpotPipeline = {
+  id: string;
+  stages?: Array<{ id: string; label: string }>;
+};
+type HubSpotPipelineResponse = {
+  results: HubSpotPipeline[];
+};
 
 const DEAL_PIPELINE_ID = process.env.HUBSPOT_DEAL_PIPELINE_ID?.trim() || "default";
 const statusDealStage: Record<OrderStatus, string> = {
@@ -89,17 +96,15 @@ async function verifyProperty(objectType: HubSpotReadinessObject, propertyName: 
 }
 
 async function verifyDealMappings() {
-  const [pipelineProperty, stageProperty] = await Promise.all([
-    hubSpotRequest<HubSpotProperty>("/crm/v3/properties/deals/pipeline"),
-    hubSpotRequest<HubSpotProperty>("/crm/v3/properties/deals/dealstage"),
-  ]);
+  const pipelines = await hubSpotRequest<HubSpotPipelineResponse>("/crm/v3/pipelines/deals");
+  const pipeline = pipelines.results.find((candidate) => candidate.id === DEAL_PIPELINE_ID);
 
-  if (!pipelineProperty.options?.some((option) => option.value === DEAL_PIPELINE_ID)) {
+  if (!pipeline) {
     throw new Error(`HubSpot deal pipeline '${DEAL_PIPELINE_ID}' was not found`);
   }
 
   const requiredStages = [...new Set(Object.values(statusDealStage))];
-  const stageOptions = new Set(stageProperty.options?.map((option) => option.value) ?? []);
+  const stageOptions = new Set(pipeline.stages?.map((stage) => stage.id) ?? []);
   const missingStages = requiredStages.filter((stage) => !stageOptions.has(stage));
   if (missingStages.length > 0) {
     throw new Error(`HubSpot deal stages missing: ${missingStages.join(", ")}`);

@@ -205,17 +205,19 @@ describe("checkHubSpotReadiness", () => {
   it("verifies required ecommerce CRM objects without writing data", async () => {
     process.env.HUBSPOT_ACCESS_TOKEN = "private-token";
     const fetchMock = vi.fn().mockImplementation((url: string) => {
-      if (url.endsWith("/crm/v3/properties/deals/pipeline")) {
-        return Promise.resolve(json({ name: "pipeline", options: [{ value: "default", label: "Default" }] }));
-      }
-      if (url.endsWith("/crm/v3/properties/deals/dealstage")) {
+      if (url.endsWith("/crm/v3/pipelines/deals")) {
         return Promise.resolve(
           json({
-            name: "dealstage",
-            options: [
-              { value: "appointmentscheduled", label: "New Enquiry" },
-              { value: "closedwon", label: "Won" },
-              { value: "closedlost", label: "Lost" },
+            results: [
+              {
+                id: "default",
+                label: "Default",
+                stages: [
+                  { id: "appointmentscheduled", label: "New Enquiry" },
+                  { id: "closedwon", label: "Won" },
+                  { id: "closedlost", label: "Lost" },
+                ],
+              },
             ],
           }),
         );
@@ -248,7 +250,7 @@ describe("checkHubSpotReadiness", () => {
       error: undefined,
     });
     expect(result.checkedProperties).toHaveLength(27);
-    expect(fetchMock).toHaveBeenCalledTimes(34);
+    expect(fetchMock).toHaveBeenCalledTimes(33);
     for (const [, init] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
       expect(new Headers(init.headers).get("Authorization")).toBe("Bearer private-token");
     }
