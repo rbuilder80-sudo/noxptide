@@ -31,7 +31,7 @@ export const integrationsRouter = createRouter({
         checkedProperties: hubspot.checkedProperties,
         dealMapping: hubspot.dealMapping,
         error: hubspot.error,
-        syncs: ["contacts", "deals", "line_items", "products"],
+        syncs: ["contacts", "companies", "deals", "line_items", "products"],
       },
       wallid: {
         ready: wallid.ready,
