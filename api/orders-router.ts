@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { orders, orderItems, type Order } from "@db/schema";
 import { categories, getProduct } from "@/data/products";
@@ -386,4 +386,36 @@ export const ordersRouter = createRouter({
       }
       return syncOrderOrThrow(order);
     }),
+
+  /** Staff: push a safe batch of unsynced orders to HubSpot after credentials are added/fixed. */
+  syncHubSpotPending: staffQuery.mutation(async () => {
+    const db = getDb();
+    const pending = await db
+      .select()
+      .from(orders)
+      .where(isNull(orders.hubspotSyncedAt))
+      .orderBy(desc(orders.createdAt))
+      .limit(50);
+
+    let synced = 0;
+    let disabled = 0;
+    let failed = 0;
+
+    for (const order of pending) {
+      try {
+        const result = await syncOrderOrThrow(order);
+        if (result.status === "synced") synced++;
+        else disabled++;
+      } catch (error) {
+        failed++;
+        const message = error instanceof Error ? error.message : "HubSpot sync failed";
+        await db
+          .update(orders)
+          .set({ hubspotSyncError: message.slice(0, 2000) })
+          .where(eq(orders.id, order.id));
+      }
+    }
+
+    return { checked: pending.length, synced, disabled, failed };
+  }),
 });

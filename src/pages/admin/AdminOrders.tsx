@@ -19,10 +19,20 @@ function gbp(pence: number) {
 
 export default function AdminOrders() {
   const [filter, setFilter] = useState<string>('open')
+  const [syncMessage, setSyncMessage] = useState<string | null>(null)
   const utils = trpc.useUtils()
   const { data: orders, isLoading } = trpc.orders.list.useQuery()
   const update = trpc.orders.updateStatus.useMutation({
     onSuccess: () => utils.orders.list.invalidate(),
+  })
+  const syncPending = trpc.orders.syncHubSpotPending.useMutation({
+    onSuccess: (result) => {
+      utils.orders.list.invalidate()
+      setSyncMessage(
+        `HubSpot batch checked ${result.checked} orders: ${result.synced} synced, ${result.disabled} disabled, ${result.failed} failed.`,
+      )
+    },
+    onError: (error) => setSyncMessage(`HubSpot batch sync failed: ${error.message}`),
   })
 
   const all = orders ?? []
@@ -37,20 +47,38 @@ export default function AdminOrders() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-extrabold tracking-tight">Orders</h1>
-        <div className="flex gap-1.5 rounded-xl border border-border bg-card p-1 text-xs font-semibold shadow-sm">
-          {['open', 'all', ...STATUSES].map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`rounded-lg px-3 py-1.5 capitalize transition ${
-                filter === s ? 'bg-primary text-primary-foreground' : 'text-foreground/70 hover:bg-slate-100'
-              }`}
-            >
-              {s}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            disabled={syncPending.isPending}
+            onClick={() => {
+              setSyncMessage(null)
+              syncPending.mutate()
+            }}
+            className="rounded-xl border border-primary bg-card px-3 py-2 text-xs font-bold text-primary transition hover:bg-secondary disabled:opacity-60"
+          >
+            {syncPending.isPending ? 'Syncing HubSpot…' : 'Sync unsynced HubSpot'}
+          </button>
+          <div className="flex gap-1.5 rounded-xl border border-border bg-card p-1 text-xs font-semibold shadow-sm">
+            {['open', 'all', ...STATUSES].map((s) => (
+              <button
+                key={s}
+                onClick={() => setFilter(s)}
+                className={`rounded-lg px-3 py-1.5 capitalize transition ${
+                  filter === s ? 'bg-primary text-primary-foreground' : 'text-foreground/70 hover:bg-slate-100'
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
+
+      {syncMessage && (
+        <p className="mt-4 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground">
+          {syncMessage}
+        </p>
+      )}
 
       {isLoading ? (
         <p className="mt-8 text-sm text-muted-foreground">Loading…</p>
