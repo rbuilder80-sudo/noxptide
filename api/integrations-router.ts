@@ -14,6 +14,18 @@ function configured(name: string) {
   return Boolean(process.env[name]?.trim());
 }
 
+const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID?.trim() || "148385007";
+
+function hubSpotRecordUrl(objectTypeId: "0-1" | "0-2" | "0-3", recordId?: string) {
+  if (!recordId) return undefined;
+  const params = new URLSearchParams({
+    utm_source: "noxptide_admin",
+    utm_medium: "integration_test",
+    utm_campaign: "noxptide_ecommerce",
+  });
+  return `https://app.hubspot.com/contacts/${HUBSPOT_PORTAL_ID}/record/${objectTypeId}/${recordId}?${params}`;
+}
+
 export const integrationsRouter = createRouter({
   /** Staff: safe readiness status for external ecommerce integrations. */
   status: staffQuery.query(async () => {
@@ -80,6 +92,14 @@ export const integrationsRouter = createRouter({
         qty: 1,
       },
     ];
-    return syncOrderToHubSpot(order, items);
+    const result = await syncOrderToHubSpot(order, items);
+    return result.status === "synced"
+      ? {
+          ...result,
+          contactUrl: hubSpotRecordUrl("0-1", result.contactId),
+          companyUrl: hubSpotRecordUrl("0-2", result.companyId),
+          dealUrl: hubSpotRecordUrl("0-3", result.dealId),
+        }
+      : result;
   }),
 });

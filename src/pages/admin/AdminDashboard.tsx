@@ -218,9 +218,43 @@ export default function AdminDashboard() {
           {testHubSpotSync.data && (
             <p className="mt-3 rounded-lg bg-secondary px-3 py-2 text-xs font-semibold">
               {testHubSpotSync.data.status === 'synced'
-                ? `Test synced: contact ${testHubSpotSync.data.contactId}, company ${testHubSpotSync.data.companyId ?? '—'}, deal ${testHubSpotSync.data.dealId}.`
+                ? 'Test synced. Open the created HubSpot records below.'
                 : 'HubSpot token is not configured yet. Add HUBSPOT_ACCESS_TOKEN in Railway, then run this test again.'}
             </p>
+          )}
+          {testHubSpotSync.data?.status === 'synced' && (
+            <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold">
+              {testHubSpotSync.data.contactUrl && (
+                <a
+                  href={testHubSpotSync.data.contactUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:opacity-90"
+                >
+                  Open contact {testHubSpotSync.data.contactId}
+                </a>
+              )}
+              {testHubSpotSync.data.companyUrl && (
+                <a
+                  href={testHubSpotSync.data.companyUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:opacity-90"
+                >
+                  Open company {testHubSpotSync.data.companyId}
+                </a>
+              )}
+              {testHubSpotSync.data.dealUrl && (
+                <a
+                  href={testHubSpotSync.data.dealUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:opacity-90"
+                >
+                  Open deal {testHubSpotSync.data.dealId}
+                </a>
+              )}
+            </div>
           )}
           {testHubSpotSync.error && (
             <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
