@@ -110,12 +110,92 @@ function faqPageLd(faqs: { q: string; a: string }[]) {
 /* Product pages (audit §6)                                            */
 /* ------------------------------------------------------------------ */
 
-/** Title-tag overrides where the product name is long (audit table). */
+/**
+ * Keyword-mapped product titles (Keyword Planner / autocomplete research, Aug 2026).
+ * Default template: "Buy {name} UK | ≥99% Purity & COA | Noxptide".
+ * Overrides cover long names, disambiguation (VIP/MGF/KPV/DSIP + "peptide")
+ * and high-volume variants (Melanotan 2 / MT-2, Glutathione).
+ */
 const PRODUCT_TITLE_OVERRIDES: Record<string, string> = {
-  'cjc-1295-no-dac': 'CJC-1295 (No DAC) Peptide UK | ≥99% Purity | Noxptide',
-  'hgh-fragment-176-191': 'HGH Fragment 176-191 Peptide UK | ≥99% Purity | Noxptide',
-  'cjc-1295-dac': 'CJC-1295 With DAC Peptide UK | ≥99% Purity | Noxptide',
-  'thymosin-alpha-1': 'Thymosin Alpha-1 Peptide UK | ≥99% Purity | Noxptide',
+  'ghk-cu': 'Buy GHK-Cu UK | ≥99% Pure Copper Peptide | Noxptide',
+  'cjc-1295-no-dac': 'Buy CJC-1295 No DAC UK | ≥99% Purity | Noxptide',
+  'melanotan-2': 'Buy Melanotan 2 (MT-2) UK | ≥99% Purity | Noxptide',
+  glutathione: 'Buy Glutathione UK | ≥99% Purity & COA | Noxptide',
+  kpv: 'Buy KPV Peptide UK | ≥99% Purity & COA | Noxptide',
+  dsip: 'Buy DSIP Peptide UK | ≥99% Purity & COA | Noxptide',
+  vip: 'Buy VIP Peptide UK | ≥99% Purity & COA | Noxptide',
+  'hgh-fragment-176-191': 'Buy HGH Fragment 176-191 UK | ≥99% Purity | Noxptide',
+  'cjc-1295-dac': 'Buy CJC-1295 DAC UK | ≥99% Purity | Noxptide',
+  mgf: 'Buy MGF Peptide UK | ≥99% Purity & COA | Noxptide',
+  'thymosin-alpha-1': 'Buy Thymosin Alpha-1 UK | ≥99% Purity | Noxptide',
+}
+
+/** Sales-focused product meta descriptions (all ≤160 chars, verified). */
+const PRODUCT_DESCRIPTION_OVERRIDES: Record<string, string> = {
+  'bpc-157':
+    'Buy BPC-157 UK — ≥99% HPLC purity, batch COA. The most-researched gastric pentadecapeptide for tissue-repair models. Tracked UK delivery. Research use only.',
+  'tb-500':
+    'Buy TB-500 UK — ≥99% HPLC purity, batch COA. Thymosin Beta-4 fragment for cell-migration research. Tracked UK delivery. Research use only.',
+  'ghk-cu':
+    'Buy GHK-Cu UK — ≥99% HPLC purity, batch COA. Copper Tripeptide-1 for matrix and collagen-pathway research. Tracked UK delivery. Research use only.',
+  ipamorelin:
+    'Buy Ipamorelin UK — ≥99% HPLC purity, batch COA. Selective GHSR-1a agonist for GH-axis research. Tracked UK delivery. Research use only.',
+  'cjc-1295-no-dac':
+    'Buy CJC-1295 No DAC UK — ≥99% HPLC purity, batch COA. Mod GRF(1-29) GHRH analogue for GH-axis models. Tracked UK delivery. Research use only.',
+  tesamorelin:
+    'Buy Tesamorelin UK — ≥99% HPLC purity, batch COA. GHRH analogue for GH-axis and metabolic research. Tracked UK delivery. Research use only.',
+  semax:
+    'Buy Semax UK — ≥99% HPLC purity, batch COA. ACTH(4-10) analogue neuropeptide for CNS research. Tracked UK delivery. Research use only.',
+  selank:
+    'Buy Selank UK — ≥99% HPLC purity, batch COA. Heptapeptide for GABAergic-pathway research models. Tracked UK delivery. Research use only.',
+  epitalon:
+    'Buy Epitalon UK — ≥99% HPLC purity, batch COA. Tetrapeptide for telomerase-pathway and pineal research. Tracked UK delivery. Research use only.',
+  'aod-9604':
+    'Buy AOD-9604 UK — ≥99% HPLC purity, batch COA. HGH fragment analogue for metabolic research models. Tracked UK delivery. Research use only.',
+  'melanotan-2':
+    'Buy Melanotan 2 UK — ≥99% HPLC purity, batch COA. Cyclic α-MSH analogue for melanocortin research. Tracked UK delivery. Research use only.',
+  'pt-141':
+    'Buy PT-141 UK — ≥99% HPLC purity, batch COA. Bremelanotide melanocortin agonist for MC4R research. Tracked UK delivery. Research use only.',
+  sermorelin:
+    'Buy Sermorelin UK — ≥99% HPLC purity, batch COA. GHRH(1-29) analogue for GH-axis research. Tracked UK delivery. Research use only.',
+  'mots-c':
+    'Buy MOTS-c UK — ≥99% HPLC purity, batch COA. Mitochondrial-derived peptide for metabolic research. Tracked UK delivery. Research use only.',
+  cagrilintide:
+    'Buy Cagrilintide UK — ≥99% HPLC purity, batch COA. Amylin analogue for appetite-signalling research. Tracked UK delivery. Research use only.',
+  'nad-plus':
+    'Buy NAD+ UK — ≥99% HPLC purity, batch COA. Nicotinamide adenine dinucleotide for redox research. Tracked UK delivery. Research use only.',
+  glutathione:
+    'Buy Glutathione UK — ≥99% HPLC purity, batch COA. Tripeptide antioxidant for redox-biology research. Tracked UK delivery. Research use only.',
+  kpv:
+    'Buy KPV peptide UK — ≥99% HPLC purity, batch COA. α-MSH(11-13) tripeptide for inflammation-pathway research. Tracked UK delivery. Research use only.',
+  dsip:
+    'Buy DSIP peptide UK — ≥99% HPLC purity, batch COA. Delta-sleep-inducing peptide for CNS research models. Tracked UK delivery. Research use only.',
+  hexarelin:
+    'Buy Hexarelin UK — ≥99% HPLC purity, batch COA. Hexapeptide secretagogue for GH-axis research. Tracked UK delivery. Research use only.',
+  vip:
+    'Buy VIP peptide UK — ≥99% HPLC purity, batch COA. Vasoactive intestinal peptide for receptor-signalling research. Tracked UK delivery. Research use only.',
+  testagen:
+    'Buy Testagen UK — ≥99% HPLC purity, batch COA. Lys-Glu-Asp-Gly tetrapeptide for endocrine research. Tracked UK delivery. Research use only.',
+  'ghrp-6':
+    'Buy GHRP-6 UK — ≥99% HPLC purity, batch COA. Ghrelin-mimetic hexapeptide for GHSR research. Tracked UK delivery. Research use only.',
+  'ghrp-2':
+    'Buy GHRP-2 UK — ≥99% HPLC purity, batch COA. Selective GHSR agonist for GH-axis research. Tracked UK delivery. Research use only.',
+  'hgh-fragment-176-191':
+    'Buy HGH Fragment 176-191 UK — ≥99% HPLC purity, batch COA. C-terminal HGH fragment for lipid-metabolism research. Tracked UK delivery. Research use only.',
+  'cjc-1295-dac':
+    'Buy CJC-1295 DAC UK — ≥99% HPLC purity, batch COA. Long-acting GHRH analogue with drug affinity complex. Tracked UK delivery. Research use only.',
+  'igf-1-lr3':
+    'Buy IGF-1 LR3 UK — ≥99% HPLC purity, batch COA. Long-acting IGF-1 analogue for growth-factor research. Tracked UK delivery. Research use only.',
+  'peg-mgf':
+    'Buy PEG-MGF UK — ≥99% HPLC purity, batch COA. PEGylated MGF variant for muscle-cell research models. Tracked UK delivery. Research use only.',
+  mgf:
+    'Buy MGF peptide UK — ≥99% HPLC purity, batch COA. Mechano growth factor for muscle-cell research. Tracked UK delivery. Research use only.',
+  'thymosin-alpha-1':
+    'Buy Thymosin Alpha-1 UK — ≥99% HPLC purity, batch COA. 28-amino-acid thymic peptide for immune-pathway research. Tracked UK delivery. Research use only.',
+  'kisspeptin-10':
+    'Buy Kisspeptin-10 UK — ≥99% HPLC purity, batch COA. KISS1-derived decapeptide for HPG-axis research. Tracked UK delivery. Research use only.',
+  'igf-1-des':
+    'Buy IGF-1 DES UK — ≥99% HPLC purity, batch COA. Des(1-3) IGF-1 variant for growth-factor research. Tracked UK delivery. Research use only.',
 }
 
 export function productImageUrl(product: Product, sizeLabel?: string) {
@@ -127,8 +207,10 @@ export function productSeo(product: Product): RouteSeo {
   const path = `/product/${product.slug}`
   const title =
     PRODUCT_TITLE_OVERRIDES[product.slug] ??
-    `${product.name} Research Peptide UK | ≥99% Purity | Noxptide`
-  const description = `Order ${product.name} research peptide in the UK with ≥99% purity, batch-specific COA and tracked delivery. For laboratory research use only.`
+    `Buy ${product.name} UK | ≥99% Purity & COA | Noxptide`
+  const description =
+    PRODUCT_DESCRIPTION_OVERRIDES[product.slug] ??
+    `Buy ${product.name} UK — ≥99% HPLC purity, batch COA. Tracked UK delivery. Research use only.`
   return {
     title,
     description,
@@ -178,40 +260,40 @@ export function productSeo(product: Product): RouteSeo {
 /* ------------------------------------------------------------------ */
 
 const GUIDE_TITLE_OVERRIDES: Record<string, string> = {
-  'bpc-157-research-guide': 'BPC-157 Research Guide: Evidence, Handling & Storage',
-  'tb-500-research-guide': 'TB-500 Research Guide: Thymosin Beta-4 in the Laboratory',
-  'bpc-157-vs-tb-500': 'BPC-157 vs TB-500: Which Peptide for Your Research Model?',
-  'ipamorelin-vs-cjc-1295': 'Ipamorelin vs CJC-1295: Secretagogue Research Compared',
-  'semax-research-guide': 'Semax Research Guide: The ACTH(4-10) Analogue in CNS Studies',
-  'ghk-cu-research-guide': 'GHK-Cu Research Guide: The Copper Peptide in Matrix Research',
-  'peptide-reconstitution-storage-guide': 'How to Reconstitute & Store Research Peptides | Noxptide',
-  'how-to-read-peptide-coa': 'How to Read a Peptide Certificate of Analysis | Noxptide',
-  'melanotan-2-vs-pt-141': 'Melanotan II vs PT-141: Melanocortin Research Compared',
-  'epitalon-research-guide': 'Epitalon Research Guide: The Telomerase-Pathway Tetrapeptide',
+  'bpc-157-research-guide': 'What Is BPC-157? Research Guide & Handling | Noxptide',
+  'tb-500-research-guide': 'What Is TB-500? Research Guide & Handling | Noxptide',
+  'bpc-157-vs-tb-500': 'BPC-157 vs TB-500: Which Peptide for Your Research?',
+  'ipamorelin-vs-cjc-1295': 'Ipamorelin vs CJC-1295: Research Compared | Noxptide',
+  'semax-research-guide': 'Semax Research Guide: Mechanisms, Handling & COA',
+  'ghk-cu-research-guide': 'GHK-Cu Research Guide: The Copper Peptide | Noxptide',
+  'peptide-reconstitution-storage-guide': 'How to Reconstitute Peptides: Guide & Storage | Noxptide',
+  'how-to-read-peptide-coa': 'How to Read a Peptide COA: Purity Explained | Noxptide',
+  'melanotan-2-vs-pt-141': 'Melanotan 2 vs PT-141: Research Compared | Noxptide',
+  'epitalon-research-guide': 'Epitalon Research Guide: Mechanisms & Handling | Noxptide',
 }
 
 /** Meta descriptions per audit (≤160 chars; the on-page card copy stays longer). */
 const GUIDE_DESCRIPTION_OVERRIDES: Record<string, string> = {
   'bpc-157-research-guide':
-    'The complete laboratory guide to BPC-157: what it is, what the published research covers, how to store and reconstitute it, and how to verify purity.',
+    'What BPC-157 is, what the published research covers, and how to store, reconstitute and verify it. Buy BPC-157 UK with batch COA at Noxptide.',
   'tb-500-research-guide':
-    'A laboratory guide to TB-500: mechanism coverage in the literature, correct storage and reconstitution, purity verification, and how it differs from BPC-157.',
+    'What TB-500 is, what the Thymosin Beta-4 literature covers, and how to store, reconstitute and verify it. Buy TB-500 UK with batch COA at Noxptide.',
   'bpc-157-vs-tb-500':
-    'BPC-157 and TB-500 compared for research design: mechanisms, literature coverage, handling differences, purity verification, and when to choose each.',
+    'BPC-157 and TB-500 compared: mechanisms, literature coverage, handling and when labs choose each. Buy both in the UK with batch COAs at Noxptide.',
   'ipamorelin-vs-cjc-1295':
-    'Ipamorelin vs CJC-1295 (No DAC) compared for endocrine research: receptor mechanisms, selectivity, literature coverage, handling, and why labs pair them.',
+    'Ipamorelin vs CJC-1295 (No DAC): receptor mechanisms, selectivity, literature and why labs pair them. Buy both UK with batch COAs at Noxptide.',
   'semax-research-guide':
-    'A laboratory guide to Semax: its origin as an ACTH(4-10) analogue, neurotrophin literature, light-sensitive handling, and purity verification.',
+    'Semax explained: the ACTH(4-10) analogue, neurotrophin literature, light-sensitive handling and purity checks. Buy Semax UK with COA at Noxptide.',
   'ghk-cu-research-guide':
-    'A laboratory guide to GHK-Cu (Copper Tripeptide-1): four decades of skin and matrix research, what the blue colour tells you about quality, and correct storage.',
+    'GHK-Cu (Copper Tripeptide-1) explained: decades of matrix research, quality signals and correct storage. Buy GHK-Cu UK with batch COA at Noxptide.',
   'peptide-reconstitution-storage-guide':
-    'Step-by-step laboratory guidance on reconstituting lyophilised peptides with bacteriostatic water, storage temperatures, shelf life and freeze-thaw limits.',
+    'Step-by-step: reconstituting lyophilised peptides with bacteriostatic water, storage temperatures, shelf life and freeze-thaw limits. Lab-grade guidance.',
   'how-to-read-peptide-coa':
-    'What every section of a peptide COA actually means: HPLC purity traces, mass spectrometry identity, batch numbers, appearance testing, and red flags.',
+    'What every COA section means: HPLC purity traces, mass-spec identity, batch numbers and red flags. Verify before you buy — every Noxptide batch has one.',
   'melanotan-2-vs-pt-141':
-    'Melanotan II vs PT-141 (Bremelanotide) compared for melanocortin research: the one-atom structural difference, receptor profiles, literature and handling.',
+    'Melanotan II vs PT-141 (Bremelanotide): structural difference, receptor profiles, literature and handling. Buy both UK with batch COAs at Noxptide.',
   'epitalon-research-guide':
-    'A laboratory guide to Epitalon (Epithalon): the Ala-Glu-Asp-Gly tetrapeptide, telomerase and pineal research literature, handling, and analytical verification.',
+    'Epitalon (Epithalon) explained: the Ala-Glu-Asp-Gly tetrapeptide, telomerase and pineal literature, handling and verification. Buy UK with COA.',
 }
 
 export function guideSeo(guide: Guide): RouteSeo {
@@ -281,14 +363,14 @@ const noindex = (path: string, title: string, description: string): RouteSeo =>
 export const coreSeo: Record<string, RouteSeo> = {
   '/': base(
     '/',
-    'UK Research Peptides | ≥99% Purity & Batch COAs',
-    'UK research peptides with ≥99% HPLC purity, independent verification and batch-specific COAs. Tracked delivery. For laboratory research use only.',
+    'Buy Research Peptides UK | ≥99% Purity & COAs | Noxptide',
+    'Buy research peptides in the UK with ≥99% HPLC purity and batch-specific COAs. 32 compounds in stock, tracked delivery. For laboratory research use only.',
     { jsonLd: [organizationLd(), websiteLd()] },
   ),
   '/shop': base(
     '/shop',
-    'Research Peptides UK | Shop the Noxptide Catalogue',
-    'Browse Noxptide research peptides with ≥99% HPLC purity, batch-specific COAs and tracked UK delivery. Supplied strictly for laboratory research.',
+    'Peptides for Sale UK | ≥99% Pure, Batch COA | Noxptide',
+    'Shop 32 research peptides for sale in the UK — ≥99% HPLC purity with batch-specific COAs. Tracked delivery. For laboratory research use only.',
     {
       jsonLd: [
         {
@@ -314,8 +396,8 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/guides': base(
     '/guides',
-    'Research Peptide Guides, Handling & COA Resources',
-    'Evidence-led guides to research peptide handling, storage, COAs and compound comparisons. Written for laboratory research; not medical advice.',
+    'Peptide Research Guides & Lab Resources | Noxptide',
+    'Evidence-led peptide research guides: reconstitution, storage, COA verification and compound comparisons — from a UK supplier with batch-tested stock.',
     {
       jsonLd: [
         {
@@ -339,14 +421,14 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/quality': base(
     '/quality',
-    'Peptide Quality Testing & Certificates of Analysis',
-    'See how Noxptide verifies identity and ≥99% purity using HPLC, mass spectrometry and batch-specific Certificates of Analysis for research peptides.',
+    'Peptide Purity Testing: HPLC, MS & Batch COAs | Noxptide',
+    'How Noxptide verifies every peptide batch: HPLC purity ≥99%, mass-spec identity and batch-specific COAs you can check before you buy. See the process.',
     {
       jsonLd: [
         webPageLd(
           'Peptide Quality Testing You Can Verify',
           '/quality',
-          'How Noxptide verifies identity and ≥99% purity using HPLC, mass spectrometry and batch-specific Certificates of Analysis.',
+          'How Noxptide verifies every peptide batch: HPLC purity ≥99%, mass-spec identity and batch-specific COAs you can check before you buy.',
         ),
         breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Quality & COAs' }]),
       ],
@@ -354,14 +436,14 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/faq': base(
     '/faq',
-    'Research Peptide FAQ: Purity, COAs, Storage & Delivery',
-    'Answers about research peptide purity, COAs, storage, UK delivery, ordering and research-use compliance from Noxptide.',
+    'Research Peptide FAQs: Purity, Shipping & Legal | Noxptide',
+    'Answers on peptide purity, COAs, storage, UK delivery and ordering — plus are research peptides legal in the UK? Straight answers from Noxptide.',
     {
       jsonLd: [
         webPageLd(
           'Research Peptide Frequently Asked Questions',
           '/faq',
-          'Answers about research peptide purity, COAs, storage, UK delivery, ordering and research-use compliance.',
+          'Answers on peptide purity, COAs, storage, UK delivery and ordering — plus whether research peptides are legal in the UK.',
         ),
         faqPageLd(allFaqs),
         breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'FAQ' }]),
@@ -371,13 +453,13 @@ export const coreSeo: Record<string, RouteSeo> = {
   '/about': base(
     '/about',
     'About Noxptide | UK Research Peptide Supplier',
-    'Learn how Noxptide approaches research peptide quality, independent verification, batch documentation and research-use compliance in the UK.',
+    'Why researchers choose Noxptide: ≥99% HPLC purity, independent batch verification, transparent COAs and fast UK dispatch. Meet the team behind it.',
     {
       jsonLd: [
         webPageLd(
           'About Noxptide',
           '/about',
-          'How Noxptide approaches research peptide quality, independent verification, batch documentation and research-use compliance in the UK.',
+          'Why researchers choose Noxptide: ≥99% HPLC purity, independent batch verification, transparent COAs and fast UK dispatch.',
           'AboutPage',
         ),
         breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'About' }]),
@@ -386,14 +468,14 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/shipping': base(
     '/shipping',
-    'Research Peptide Shipping & UK Delivery | Noxptide',
-    'Noxptide shipping information: dispatch cut-offs, tracked UK delivery, packaging, costs and European options for laboratory research peptide orders.',
+    'Peptide Delivery UK: Tracked Shipping Times | Noxptide',
+    'Dispatch cut-offs, tracked UK delivery options, packaging and European shipping for research peptide orders — costs and times explained.',
     {
       jsonLd: [
         webPageLd(
           'Research Peptide Shipping & Delivery',
           '/shipping',
-          'Dispatch cut-offs, tracked UK delivery, packaging, costs and European options for laboratory research peptide orders.',
+          'Dispatch cut-offs, tracked UK delivery options, packaging and European shipping for research peptide orders.',
         ),
         breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Shipping & Delivery' }]),
       ],
@@ -401,14 +483,14 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/legal': base(
     '/legal',
-    'Research Use Only Policy | Noxptide UK',
-    "Read Noxptide's research-use-only policy for chemical reference materials supplied strictly for in-vitro laboratory research, not human or veterinary use.",
+    'Are Research Peptides Legal in the UK? | Noxptide',
+    'The rules on buying and holding research peptides in the UK: research-use-only status, human-use restrictions and handling. Plain-English answers.',
     {
       jsonLd: [
         webPageLd(
           'Research Use Only Policy',
           '/legal',
-          'Chemical reference materials supplied strictly for in-vitro laboratory research, not human or veterinary use.',
+          'The rules on buying and holding research peptides in the UK: research-use-only status, human-use restrictions and handling.',
         ),
         breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Research Use Only Policy' }]),
       ],
@@ -416,8 +498,8 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/contact': base(
     '/contact',
-    'Contact Noxptide | COA Requests & Order Support',
-    'Contact Noxptide for batch COA requests, order support and research enquiries. UK-based assistance via support@noxptide.co.uk.',
+    'Contact Noxptide | UK Research Peptide Support',
+    'Questions about an order, a batch COA or stock? Contact the Noxptide team — fast, knowledgeable support from a UK research peptide supplier.',
     {
       jsonLd: [
         webPageLd(

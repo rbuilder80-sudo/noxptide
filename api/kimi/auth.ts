@@ -20,18 +20,14 @@ async function exchangeAuthCode(
     "https://auth.kimi.com/api/oauth/token",
   ].filter((url, index, urls) => url && urls.indexOf(url) === index);
 
-  const requestToken = (tokenUrl: string, includeRedirectUri: boolean) => {
+  const requestTokenWithUri = (tokenUrl: string, uri: string | null) => {
     const body = new URLSearchParams({
       grant_type: "authorization_code",
       code,
       client_id: env.appId,
       client_secret: env.appSecret,
     });
-
-    if (includeRedirectUri) {
-      body.set("redirect_uri", redirectUri);
-    }
-
+    if (uri) body.set("redirect_uri", uri);
     return fetch(tokenUrl, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -39,25 +35,34 @@ async function exchangeAuthCode(
     });
   };
 
-  let resp = await requestToken(tokenUrls[0], true);
+  // Candidate redirect_uris: the one used at authorize time, plus every
+  // origin this app has historically been reachable at. Kimi's token endpoint
+  // validates the param against the app's registered URIs; after a domain move
+  // (kimi.link → Railway → www.noxptide.co.uk) the registered URI may lag.
+  const candidateUris = [
+    redirectUri,
+    env.kimiRedirectUri,
+    "https://noxptide-production.up.railway.app/api/oauth/callback",
+    "https://noxptide.co.uk/api/oauth/callback",
+    "https://www.noxptide.co.uk/api/oauth/callback",
+  ].filter((uri, index, uris): uri is string => Boolean(uri) && uris.indexOf(uri) === index);
+
+  let resp = await requestTokenWithUri(tokenUrls[0], redirectUri);
 
   if (!resp.ok) {
     const text = await resp.text();
     if (/invalid[_ ]redirect_uri|Invalid redirect_uri/i.test(text)) {
-      const retryErrors: string[] = [`${tokenUrls[0]}: ${text}`];
-      const retryAttempts = [
-        { tokenUrl: tokenUrls[0], includeRedirectUri: false },
-        ...tokenUrls.slice(1).flatMap((tokenUrl) => [
-          { tokenUrl, includeRedirectUri: true },
-          { tokenUrl, includeRedirectUri: false },
-        ]),
-      ];
-      for (const { tokenUrl, includeRedirectUri } of retryAttempts) {
-        resp = await requestToken(tokenUrl, includeRedirectUri);
+      const retryErrors: string[] = [`${tokenUrls[0]} (${redirectUri}): ${text}`];
+      const retryAttempts = tokenUrls.flatMap((tokenUrl) => [
+        ...candidateUris.map((uri) => ({ tokenUrl, uri })),
+        { tokenUrl, uri: null },
+      ]);
+      for (const { tokenUrl, uri } of retryAttempts) {
+        resp = await requestTokenWithUri(tokenUrl, uri);
         if (resp.ok) {
           return resp.json() as Promise<TokenResponse>;
         }
-        retryErrors.push(`${tokenUrl}: ${(await resp.text()).slice(0, 240)}`);
+        retryErrors.push(`${tokenUrl} (${uri ?? "no-uri"}): ${(await resp.text()).slice(0, 240)}`);
       }
       throw new Error(`Token exchange failed after Kimi redirect fallback: ${retryErrors.join(" | ")}`);
     }
