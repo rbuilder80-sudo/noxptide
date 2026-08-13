@@ -4,20 +4,6 @@ import { useSeo } from '../hooks/useSeo'
 import { coreSeo } from '../data/seo'
 import { guides } from '../data/guides'
 
-/** Natural topic labels for guide cards (replaces raw keyword kickers). */
-const topicLabels: Record<string, string> = {
-  'bpc-157-research-guide': 'Compound Guide',
-  'tb-500-research-guide': 'Compound Guide',
-  'bpc-157-vs-tb-500': 'Comparison',
-  'ipamorelin-vs-cjc-1295': 'Comparison',
-  'semax-research-guide': 'Compound Guide',
-  'ghk-cu-research-guide': 'Compound Guide',
-  'peptide-reconstitution-storage-guide': 'Handling & Storage',
-  'how-to-read-peptide-coa': 'Quality & COAs',
-  'melanotan-2-vs-pt-141': 'Comparison',
-  'epitalon-research-guide': 'Compound Guide',
-}
-
 export default function Guides() {
   useSeo({ pageKey: 'guides', ...coreSeo['/guides'] })
 

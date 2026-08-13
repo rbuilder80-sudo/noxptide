@@ -78,10 +78,10 @@ function applySeo(html, seo) {
   return out;
 }
 
-// Every route the SPA serves publicly. /category/* is intentionally absent:
-// legacy category URLs 301 to /shop at the server (audit §8). /checkout is
-// served as a noindex shell by the server — with an empty SSR cart it only
-// redirects to /cart, so there is no useful content to prerender.
+// Every route the SPA serves publicly, including the four crawlable category
+// hub pages (audit §8). /checkout is served as a noindex shell by the server —
+// with an empty SSR cart it only redirects to /cart, so there is no useful
+// content to prerender.
 const staticRoutes = [
   "/", "/shop", "/quality", "/faq", "/about", "/shipping", "/legal",
   "/terms", "/privacy", "/data-retention", "/contact", "/cart",
@@ -89,6 +89,7 @@ const staticRoutes = [
 ];
 const routes = [
   ...staticRoutes,
+  ...INDEXABLE_PATHS.filter((p) => p.startsWith("/category/")),
   ...products.map((p) => `/product/${p.slug}`),
   ...guides.map((g) => `/guides/${g.slug}`),
 ];

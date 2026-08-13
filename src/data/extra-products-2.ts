@@ -20,7 +20,7 @@ export const extraProducts2: Product[] = [
     short:
       'The original GHRP-class hexapeptide — the compound that defined ghrelin-receptor research. ≥99% purity, batch COA with every vial.',
     description: [
-      'GHRP-6 is the pioneering synthetic hexapeptide of the growth-hormone-releasing peptide class. Its discovery opened the entire research field around the ghrelin receptor (GHS-R1a), and it remains the standard reference compound for comparative secretagogue pharmacology, including studies of its documented orexigenic (appetite-pathway) activity.',
+      'GHRP-6 is the pioneering synthetic hexapeptide of the growth-hormone-releasing peptide class. Its discovery opened the entire research field around the ghrelin receptor (GHS-R1a), and it remains the standard reference compound for comparative secretagogue pharmacology, including studies of its documented orexigenic (appetite-pathway) activity. All findings described here derive from preclinical research; GHRP-6 is supplied strictly for laboratory use.',
       'Noxptide GHRP-6 is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry. Every order ships with a batch-specific Certificate of Analysis.',
       'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
     ],
@@ -164,9 +164,9 @@ export const extraProducts2: Product[] = [
     short:
       'The long-acting DAC-conjugated GHRH analogue for sustained-exposure endocrine research. ≥99% purity, batch-specific COA included.',
     description: [
-      'CJC-1295 With DAC pairs the Modified GRF 1-29 peptide with a Drug Affinity Complex — a reactive group that binds circulating albumin and dramatically extends the compound\'s research half-life. Where the No-DAC form suits pulsatile protocols, the DAC form is the tool for sustained-exposure endocrine models.',
+      'CJC-1295 With DAC pairs the Modified GRF 1-29 peptide with a Drug Affinity Complex — a reactive group that binds circulating albumin and dramatically extends the compound\'s research half-life. Where the No-DAC form suits pulsatile protocols, the DAC form is the tool for sustained-exposure endocrine models. All findings described here derive from preclinical research; CJC-1295 is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Because the DAC conjugate is a different molecular entity, analytical verification matters: our material is independently HPLC-verified to ≥99% purity with mass spectrometry characterisation, and every vial ships with its batch-specific COA.',
-      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
+      'UK laboratories looking to buy CJC-1295 will find the DAC-conjugated form in CJC-1295 2 mg and 5 mg vials, supplied lyophilised in sterile, tamper-evident packaging with tracked UK delivery — for research use only. Correct CJC-1295 storage applies as for the No-DAC form: lyophilised at -20°C, then refrigerated at 2–8°C after reconstitution and used within 14 days.',
     ],
     applications: [
       'Sustained-exposure GHRH receptor research',
@@ -212,7 +212,7 @@ export const extraProducts2: Product[] = [
     short:
       'The extended-stability IGF-1 analogue for growth-factor signalling research. Recombinant-grade, ≥99% purity, full batch documentation.',
     description: [
-      'IGF-1 LR3 is an engineered analogue of insulin-like growth factor-1: an Arg3 substitution reduces binding-protein affinity and a 13-amino-acid N-terminal extension extends activity, making it the standard tool for sustained IGF signalling research in cell and tissue models.',
+      'IGF-1 LR3 is an engineered analogue of insulin-like growth factor-1: an Arg3 substitution reduces binding-protein affinity and a 13-amino-acid N-terminal extension extends activity, making it the standard tool for sustained IGF signalling research in cell and tissue models. All findings described here derive from preclinical research; IGF-1 LR3 is supplied strictly for laboratory use.',
       'At 83 amino acids, IGF-1 LR3 is a recombinant-class protein rather than a simple synthetic peptide — and one of the most counterfeited compounds in the research market. Our material is independently verified to ≥99% purity with MS identity confirmation, and every vial ships with its batch-specific COA.',
       'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility with cold-pack options available.',
     ],
@@ -229,7 +229,11 @@ export const extraProducts2: Product[] = [
       },
       {
         q: 'How should IGF-1 LR3 be reconstituted?',
-        a: 'The literature standard is dilute (e.g., 0.6%) acetic acid rather than plain water for stability, followed by refrigeration and prompt use. Confirm solvent choice against your assay requirements.',
+        a: 'The literature standard for IGF-1 LR3 1 mg reconstitution is dilute (e.g., 0.6%) acetic acid rather than plain water for stability, followed by refrigeration and prompt use. Confirm solvent choice against your assay requirements.',
+      },
+      {
+        q: 'CJC-1295/Ipamorelin vs IGF-1 LR3 — how do they differ?',
+        a: 'Secretagogues such as CJC-1295 and Ipamorelin act upstream at the pituitary level, while IGF-1 LR3 acts directly at the IGF-1 receptor; the literature treats them as distinct research axes rather than interchangeable tools.',
       },
       {
         q: 'Why is IGF-1 LR3 supplied in 1 mg vials?',
@@ -308,7 +312,7 @@ export const extraProducts2: Product[] = [
     short:
       'The native IGF-1Ec splice peptide for mechanotransduction and muscle-repair research. ≥99% purity, independently batch-verified.',
     description: [
-      'MGF (Mechano Growth Factor) is the IGF-1Ec splice-variant peptide expressed in response to mechanical loading, examined in the literature for its role in initiating muscle-repair signalling. The unmodified form is used where native, short-duration kinetics are required — in contrast to its PEGylated counterpart.',
+      'MGF (Mechano Growth Factor) is the IGF-1Ec splice-variant peptide expressed in response to mechanical loading, examined in the literature for its role in initiating muscle-repair signalling. The unmodified form is used where native, short-duration kinetics are required — in contrast to its PEGylated counterpart, the PEG-MGF peptide. All findings described here derive from preclinical research; MGF is supplied strictly for laboratory use.',
       'Noxptide MGF is synthesised to ≥99% purity, independently verified by HPLC and mass spectrometry, and shipped with a batch-specific Certificate of Analysis.',
       'Laboratories looking to buy MGF peptide in the UK can choose 2 mg and 5 mg vials, supplied lyophilised in sterile packaging and dispatched tracked from our UK facility. As a UK peptide supplier of research peptides, UK laboratories receive a batch-specific COA with every vial — supplied for research use only.',
     ],
@@ -355,7 +359,7 @@ export const extraProducts2: Product[] = [
     short:
       'The clinically documented thymic peptide for immune-response research. ≥99% purity, batch-verified, COA with every vial.',
     description: [
-      'Thymosin Alpha-1 is a 28-amino-acid peptide originally isolated from thymic tissue, and one of the most extensively documented immune-modulating peptides in the research literature — with studies spanning T-cell maturation, immune-response regulation and vaccine-adjuvant research models.',
+      'Thymosin Alpha-1 is a 28-amino-acid peptide originally isolated from thymic tissue, and one of the most extensively documented immune-modulating peptides in the research literature — with studies spanning T-cell maturation, immune-response regulation and vaccine-adjuvant research models. All findings described here derive from preclinical and clinical literature; the material supplied here is strictly for laboratory research use and is not for human or veterinary use.',
       'Our Thymosin Alpha-1 is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry against its theoretical 3108.3 g/mol. Every order ships with a batch-specific Certificate of Analysis.',
       'Thymosin Alpha-1 price reflects its 28-residue length and demanding synthesis. Laboratories seeking to buy Thymosin Alpha-1 in the UK can choose 5 mg and 10 mg vials, supplied lyophilised in sterile, tamper-evident packaging with tracked UK delivery — for research use only.',
     ],
@@ -451,9 +455,9 @@ export const extraProducts2: Product[] = [
     short:
       'The truncated, binding-protein-resistant IGF-1 analogue for localised growth-factor research. ≥99% purity with full COA documentation.',
     description: [
-      'IGF-1 DES (des(1-3) IGF-1) is a truncated analogue of insulin-like growth factor-1 missing the N-terminal three amino acids. The literature documents dramatically reduced binding-protein affinity as a result, making it the tool of choice for research into localised, high-availability IGF signalling.',
+      'IGF-1 DES (des(1-3) IGF-1) is a truncated analogue of insulin-like growth factor-1 missing the N-terminal three amino acids. The literature documents dramatically reduced binding-protein affinity as a result, making it the tool of choice for research into localised, high-availability IGF signalling. All findings described here derive from preclinical research; IGF-1 DES is supplied strictly for laboratory use.',
       'Like IGF-1 LR3, this is a recombinant-class protein where analytical verification is everything: our material is independently verified to ≥99% purity with MS identity confirmation at 7371.4 g/mol, and every vial ships with its batch-specific COA.',
-      'Supplied lyophilised in sterile vials with tracked UK delivery and cold-pack options available.',
+      'Supplied lyophilised in sterile vials with tracked UK delivery and cold-pack options available. As a UK peptide supplier and peptide shop specialising in research peptides, UK laboratories receive batch-verified IGF-1 DES in 1 mg and 2 mg vials, for research use only.',
     ],
     applications: [
       'Localised IGF signalling research',
@@ -468,7 +472,7 @@ export const extraProducts2: Product[] = [
       },
       {
         q: 'How should IGF-1 DES be reconstituted?',
-        a: 'As with other IGF analogues, dilute acetic acid is the literature-standard solvent for stability, followed by refrigeration and prompt use.',
+        a: 'As with other IGF analogues, dilute acetic acid is the literature-standard solvent for peptide reconstitution and stability, followed by refrigeration and prompt use. For long-term peptide storage, keep the lyophilised vial at -20°C.',
       },
       {
         q: 'What purity is supplied?',

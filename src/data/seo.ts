@@ -258,6 +258,38 @@ export function guideSeo(guide: Guide): RouteSeo {
 }
 
 /* ------------------------------------------------------------------ */
+/* Category hub routes (audit §8)                                      */
+/* ------------------------------------------------------------------ */
+
+export function categorySeo(category: Category): RouteSeo {
+  const path = `/category/${category.slug}`
+  const description = category.description
+  return {
+    title: `${category.name} | UK Research Peptides — Noxptide`,
+    description,
+    robots: INDEX_ROBOTS,
+    canonical: `${SITE_URL}${path}`,
+    ogType: 'website',
+    ogImage: DEFAULT_OG_IMAGE,
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: category.name,
+        description,
+        url: `${SITE_URL}${path}`,
+        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/` },
+      },
+      breadcrumbLd([
+        { name: 'Home', path: '/' },
+        { name: 'Shop', path: '/shop' },
+        { name: category.name },
+      ]),
+    ],
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Core + system routes (audit §5, §8)                                 */
 /* ------------------------------------------------------------------ */
 
