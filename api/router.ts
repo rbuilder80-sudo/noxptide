@@ -11,30 +11,6 @@ import { createRouter, publicQuery } from "./middleware";
 
 export const appRouter = createRouter({
   ping: publicQuery.query(() => ({ ok: true, ts: Date.now() })),
-  // TEMPORARY debug probe — remove after discounts migration is verified.
-  dbDebug: publicQuery.query(async () => {
-    const { getDb } = await import("./queries/connection");
-    const { sql } = await import("drizzle-orm");
-    const db = getDb();
-    const out: Record<string, unknown> = {};
-    try {
-      out.discounts = await db.execute(sql`select count(*) as n from discounts`);
-    } catch (e) {
-      out.discountsError = String((e as Error).message).slice(0, 300);
-      out.discountsCause = String((e as { cause?: Error }).cause?.message ?? "").slice(0, 300);
-    }
-    try {
-      out.journal = await db.execute(sql`select tag, created_at from __drizzle_migrations order by id`);
-    } catch (e) {
-      out.journalError = String((e as { cause?: Error }).cause?.message ?? (e as Error).message).slice(0, 300);
-    }
-    try {
-      out.orderCols = await db.execute(sql`show columns from orders like 'discountCode'`);
-    } catch (e) {
-      out.orderColsError = String((e as { cause?: Error }).cause?.message ?? (e as Error).message).slice(0, 300);
-    }
-    return out;
-  }),
   auth: authRouter,
   orders: ordersRouter,
   users: usersRouter,
