@@ -5,6 +5,7 @@ import { useSeo } from '../hooks/useSeo'
 import { guideSeo, notFoundSeo } from '../data/seo'
 import { getGuide, guides } from '../data/guides'
 import { getProduct } from '../data/products'
+import { livePrice, useProductOverrides } from '../hooks/useProductOverrides'
 import ProductCard from '../components/ProductCard'
 
 function FaqItem({ q, a }: { q: string; a: string }) {
@@ -25,6 +26,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function GuideArticle() {
+  const overrides = useProductOverrides()
   const { slug = '' } = useParams()
   const guide = getGuide(slug)
   const related = guide ? guide.relatedProducts.map(getProduct).filter(Boolean) : []
@@ -167,7 +169,7 @@ export default function GuideArticle() {
                       >
                         <div>
                           <p className="text-sm font-bold">{p.name}</p>
-                          <p className="text-xs text-muted-foreground">{p.purity} · from £{p.sizes[0].price}</p>
+                          <p className="text-xs text-muted-foreground">{p.purity} · from £{livePrice(overrides, p.slug, p.sizes[0].label) ?? p.sizes[0].price}</p>
                         </div>
                         <ArrowRight className="h-4 w-4 text-primary" aria-hidden="true" />
                       </Link>

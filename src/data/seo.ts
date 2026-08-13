@@ -1,4 +1,4 @@
-import { products, type Product } from './products'
+import { products, categories, type Category, type Product } from './products'
 import { guides, type Guide } from './guides'
 import { allFaqs } from './faqs'
 
@@ -51,6 +51,55 @@ export function organizationLd() {
       areaServed: 'GB',
       availableLanguage: 'en-GB',
     },
+    // Factual shipping services (see /shipping). MerchantReturnPolicy is
+    // deliberately omitted: our returns terms are restrictive/conditional and
+    // a schema declaration could overstate them.
+    hasShippingService: [
+      {
+        '@type': 'ShippingService',
+        name: 'Standard tracked UK delivery',
+        serviceType: 'Standard tracked',
+        areaServed: { '@type': 'Country', name: 'GB' },
+        provider: { '@id': ORG_ID },
+        costAndShipping: {
+          '@type': 'ShippingCostSpecification',
+          shippingRate: { '@type': 'MonetaryAmount', value: '4.99', currency: 'GBP' },
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+          transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+        },
+      },
+      {
+        '@type': 'ShippingService',
+        name: 'Next-working-day tracked UK delivery',
+        serviceType: 'Next-working-day tracked',
+        areaServed: { '@type': 'Country', name: 'GB' },
+        provider: { '@id': ORG_ID },
+        costAndShipping: {
+          '@type': 'ShippingCostSpecification',
+          shippingRate: { '@type': 'MonetaryAmount', value: '8.99', currency: 'GBP' },
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+          transitTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+        },
+      },
+      {
+        '@type': 'ShippingService',
+        name: 'Tracked European delivery',
+        serviceType: 'Tracked international',
+        areaServed: { '@type': 'GeoShape', addressContinent: 'EU' },
+        provider: { '@id': ORG_ID },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+          transitTime: { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7, unitCode: 'DAY' },
+        },
+      },
+    ],
   }
 }
 
@@ -58,6 +107,7 @@ export function websiteLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
     name: SITE_NAME,
     url: `${SITE_URL}/`,
     publisher: { '@id': ORG_ID },
@@ -251,6 +301,73 @@ export function guideSeo(guide: Guide): RouteSeo {
         { name: 'Home', path: '/' },
         { name: 'Guides', path: '/guides' },
         { name: guide.title },
+      ]),
+    ],
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Category hub pages (audit §8: crawlable category URLs)               */
+/* ------------------------------------------------------------------ */
+
+const CATEGORY_META: Record<string, { title: string; description: string }> = {
+  'recovery-repair': {
+    title: 'Recovery & Repair Peptides UK | ≥99% Purity | Noxptide',
+    description:
+      'Browse recovery and repair research peptides — BPC-157, TB-500, GHK-Cu and more. ≥99% purity with batch-specific COAs. Laboratory research use only.',
+  },
+  'growth-hormone-secretagogues': {
+    title: 'Growth Hormone Secretagogues UK | Noxptide Peptides',
+    description:
+      'GHRH analogues and GHRPs for GH-axis research — CJC-1295, ipamorelin, sermorelin, tesamorelin. Batch COAs, UK dispatch. Research use only.',
+  },
+  'cognitive-neuropeptides': {
+    title: 'Cognitive & Neuropeptides UK | Noxptide Research',
+    description:
+      'Neuropeptides and bioregulators for CNS research — Semax, Selank, DSIP, Epitalon. ≥99% purity, batch-specific COAs. Laboratory research use only.',
+  },
+  'metabolic-pigmentation': {
+    title: 'Metabolic & Melanocortin Peptides UK | Noxptide',
+    description:
+      'Metabolic and melanocortin-receptor research peptides — AOD-9604, Melanotan II, PT-141, MOTS-c. Batch COAs, UK dispatch. Research use only.',
+  },
+}
+
+export function categorySeo(category: Category): RouteSeo {
+  const path = `/category/${category.slug}`
+  const meta = CATEGORY_META[category.slug]
+  const items = products.filter((p) => p.category === category.slug)
+  const title = meta?.title ?? `${category.name} | Noxptide Research Peptides`
+  const description = meta?.description ?? category.description
+  return {
+    title,
+    description,
+    robots: INDEX_ROBOTS,
+    canonical: `${SITE_URL}${path}`,
+    ogType: 'website',
+    ogImage: DEFAULT_OG_IMAGE,
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: category.name,
+        description,
+        url: `${SITE_URL}${path}`,
+        isPartOf: { '@id': `${SITE_URL}/#website` },
+        mainEntity: {
+          '@type': 'ItemList',
+          itemListElement: items.map((p, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            url: `${SITE_URL}/product/${p.slug}`,
+            name: p.name,
+          })),
+        },
+      },
+      breadcrumbLd([
+        { name: 'Home', path: '/' },
+        { name: 'Shop', path: '/shop' },
+        { name: category.name },
       ]),
     ],
   }
@@ -479,10 +596,15 @@ export function seoForPath(path: string): RouteSeo {
     const guide = guides.find((g) => g.slug === guideMatch[1])
     if (guide) return guideSeo(guide)
   }
+  const categoryMatch = clean.match(/^\/category\/([\w-]+)$/)
+  if (categoryMatch) {
+    const category = categories.find((c) => c.slug === categoryMatch[1])
+    if (category) return categorySeo(category)
+  }
   return { ...notFoundSeo, canonical: `${SITE_URL}${clean}` }
 }
 
-/** Indexable routes advertised in the XML sitemap (audit: 51 URLs). */
+/** Indexable routes advertised in the XML sitemap (audit: 51 URLs + 4 category hubs). */
 export const INDEXABLE_PATHS: string[] = [
   '/',
   '/shop',
@@ -493,6 +615,7 @@ export const INDEXABLE_PATHS: string[] = [
   '/shipping',
   '/legal',
   '/contact',
+  ...categories.map((c) => `/category/${c.slug}`),
   ...products.map((p) => `/product/${p.slug}`),
   ...guides.map((g) => `/guides/${g.slug}`),
 ]

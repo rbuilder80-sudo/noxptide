@@ -4,6 +4,20 @@ import { useSeo } from '../hooks/useSeo'
 import { coreSeo } from '../data/seo'
 import { guides } from '../data/guides'
 
+/** Natural topic labels for guide cards (replaces raw keyword kickers). */
+const topicLabels: Record<string, string> = {
+  'bpc-157-research-guide': 'Compound Guide',
+  'tb-500-research-guide': 'Compound Guide',
+  'bpc-157-vs-tb-500': 'Comparison',
+  'ipamorelin-vs-cjc-1295': 'Comparison',
+  'semax-research-guide': 'Compound Guide',
+  'ghk-cu-research-guide': 'Compound Guide',
+  'peptide-reconstitution-storage-guide': 'Handling & Storage',
+  'how-to-read-peptide-coa': 'Quality & COAs',
+  'melanotan-2-vs-pt-141': 'Comparison',
+  'epitalon-research-guide': 'Compound Guide',
+}
+
 export default function Guides() {
   useSeo({ pageKey: 'guides', ...coreSeo['/guides'] })
 
@@ -22,6 +36,15 @@ export default function Guides() {
           Mechanism coverage from the published literature, correct handling protocols, honest
           comparisons, and the documentation standards your research deserves.
         </p>
+        <p className="mt-4 leading-relaxed text-muted-foreground">
+          Our compound guides cover the peptides UK laboratories ask about most — from gut research
+          peptide work on BPC-157 to growth-hormone secretagogue research involving compounds such
+          as ipamorelin and sermorelin research peptides. Handling guides walk through peptide
+          reconstitution and peptide storage step by step, and our quality guides explain how to
+          read a Certificate of Analysis so you can check any supplier's paperwork — ours included.
+          Everything here describes laboratory research only; no guide covers human or veterinary
+          use.
+        </p>
       </div>
 
       <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -35,7 +58,7 @@ export default function Guides() {
               <BookOpen className="h-5 w-5" aria-hidden="true" />
             </span>
             <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-primary">
-              {g.keyword}
+              {topicLabels[g.slug] ?? 'Research Guide'}
             </p>
             <h2 className="mt-1.5 text-lg font-bold leading-snug group-hover:text-primary">
               {g.title}

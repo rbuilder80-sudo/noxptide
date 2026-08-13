@@ -19,9 +19,12 @@ export default function Legal() {
       <div className="prose-sm mt-8 space-y-8 leading-relaxed text-muted-foreground">
         <p>
           Every product sold on this website is a chemical reference material supplied strictly for{' '}
-          <strong className="text-foreground">in-vitro laboratory research</strong>. Our products are not
-          medicines, are not licensed for human or veterinary use, and are not foods, supplements, or
-          cosmetics. This page sets out what that means in practice, for us and for you.
+          <strong className="text-foreground">in-vitro laboratory research</strong>. Noxptide supplies
+          research use only peptides UK laboratories can order with full batch documentation — but
+          these laboratory peptides are not medicines, are not licensed for human or veterinary use,
+          and are not foods, supplements, or cosmetics. That applies to every compound in the
+          catalogue, from BPC-157 to secretagogues such as sermorelin research peptides. This page
+          sets out what that means in practice, for us and for you.
         </p>
 
         <section aria-labelledby="what-we-do">
@@ -29,8 +32,9 @@ export default function Legal() {
           <ul className="mt-3 list-disc space-y-2 pl-5">
             <li>
               Supply research compounds with batch documentation. Every research compound carries a
-              Safety Data Sheet prepared in accordance with UK REACH/CLP and a Certificate of
-              Analysis, available on its product page.
+              Safety Data Sheet prepared in accordance with UK REACH/CLP and a batch-specific
+              Certificate of Analysis reporting peptide purity by independent HPLC peptide testing,
+              available on its product page.
             </li>
             <li>
               State only identity, purity, and handling information on product pages. We make no

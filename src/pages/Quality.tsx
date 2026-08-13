@@ -99,6 +99,78 @@ export default function Quality() {
         </div>
       </section>
 
+      {/* Methodology */}
+      <section className="mt-14 grid gap-10 lg:grid-cols-2" aria-labelledby="methodology-heading">
+        <div>
+          <h2 id="methodology-heading" className="text-2xl font-extrabold tracking-tight">
+            How HPLC Purity Testing Works
+          </h2>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            High-performance liquid chromatography separates a dissolved sample into its component
+            peaks as it passes through a packed column. The main peptide peak's share of total peak
+            area — its HPLC purity — is the industry-standard measure of peptide purity. A reading
+            of ≥99% means impurities such as truncated or deletion sequences make up less than 1%
+            of the detected material.
+          </p>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            Mass spectrometry answers a different question: not how pure the material is, but what
+            it is. By confirming the molecular weight matches the target sequence, MS identity
+            testing catches the failure mode HPLC alone can miss — a pure sample of the wrong
+            peptide. Every batch we release passes both.
+          </p>
+        </div>
+        <div>
+          <h2 className="text-2xl font-extrabold tracking-tight">What These Tests Cannot Tell You</h2>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            Honest testing means honest limitations. HPLC purity measures the sample tested, at the
+            time it was tested — it cannot guarantee stability after poor peptide storage or
+            incorrect peptide reconstitution in your own laboratory, which is why we publish
+            handling guidance alongside every product. MS confirms molecular weight, not full
+            amino-acid sequence. And a COA is only meaningful when its batch number matches the
+            vial in your hand: a generic, undated certificate proves nothing.
+          </p>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            Counter and residual content (for example water or counter-ions in the lyophilised
+            powder) is normal and does not reduce measured purity, but it is worth understanding
+            when weighing material for assays — our{' '}
+            <Link to="/guides/how-to-read-peptide-coa" className="font-semibold text-primary hover:underline">
+              guide to reading a peptide certificate of analysis
+            </Link>{' '}
+            walks through each field.
+          </p>
+        </div>
+      </section>
+
+      {/* Batch matching & release workflow */}
+      <section className="mt-14 grid gap-10 lg:grid-cols-2" aria-labelledby="batch-heading">
+        <div>
+          <h2 id="batch-heading" className="text-2xl font-extrabold tracking-tight">
+            Matching Your Vial to Its COA
+          </h2>
+          <ol className="mt-4 list-decimal space-y-2 pl-5 leading-relaxed text-muted-foreground">
+            <li>Find the batch number printed on your vial label and on the packing slip.</li>
+            <li>Locate the same batch number at the top of the Certificate of Analysis.</li>
+            <li>
+              Check the HPLC purity result (≥99%) and the MS identity confirmation for that batch.
+            </li>
+            <li>
+              If anything does not match, contact us before using the material — we will replace or
+              refund it.
+            </li>
+          </ol>
+        </div>
+        <div>
+          <h2 className="text-2xl font-extrabold tracking-tight">Our Release Workflow</h2>
+          <ol className="mt-4 list-decimal space-y-2 pl-5 leading-relaxed text-muted-foreground">
+            <li>Synthesis by solid-phase methods, then preparative HPLC purification.</li>
+            <li>Independent laboratory analysis: HPLC purity and MS identity on the finished batch.</li>
+            <li>Results reviewed against our acceptance standard — batches below 99% are destroyed.</li>
+            <li>Batch number assigned and Certificate of Analysis issued.</li>
+            <li>Only then is the batch released to stock and made available to order.</li>
+          </ol>
+        </div>
+      </section>
+
       <section className="mt-14 rounded-3xl bg-gradient-to-r from-secondary to-accent p-8 text-center sm:p-12">
         <h2 className="text-2xl font-extrabold sm:text-3xl">
           Request Any Batch COA Before You Order

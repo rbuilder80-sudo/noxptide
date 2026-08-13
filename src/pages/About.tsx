@@ -113,7 +113,8 @@ export default function About() {
       <section className="mt-12 rounded-3xl bg-gradient-to-r from-secondary to-accent p-8 text-center sm:p-12">
         <h2 className="text-2xl font-extrabold sm:text-3xl">Experience the Difference Yourself</h2>
         <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-          Browse the catalogue, request a batch COA, and see why UK laboratories switch to Noxptide.
+          Browse the catalogue, request a batch COA, and see why laboratories choose Noxptide as
+          their peptide supplier UK-wide for laboratory research.
         </p>
         <Link
           to="/shop"

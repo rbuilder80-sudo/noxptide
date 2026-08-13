@@ -55,7 +55,11 @@ export const faqGroups: { heading: string; items: { q: string; a: string }[] }[]
     items: [
       {
         q: 'How should I store lyophilised peptides?',
-        a: 'Store lyophilised peptides at -20°C for long-term stability (24+ months). Protect light-sensitive compounds such as GHK-Cu, Semax and Melanotan II from light.',
+        a: 'Store lyophilised peptides at -20°C for long-term stability (24+ months). Protect light-sensitive compounds such as GHK-Cu, Semax and Melanotan II from light. Our Research Guides section includes a complete peptide storage and reconstitution guide.',
+      },
+      {
+        q: 'How do I reconstitute a lyophilised peptide?',
+        a: 'Add the specified solvent slowly down the inside wall of the vial and allow the cake to dissolve gently — do not shake or vortex. Solvent choice and volumes depend on the compound; see the reconstitution guide in Research Guides and the compound-specific notes on each product page. Reconstitution guidance applies to laboratory research material only.',
       },
       {
         q: 'How long do peptides last after reconstitution?',

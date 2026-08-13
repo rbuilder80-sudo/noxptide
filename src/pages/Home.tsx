@@ -179,7 +179,7 @@ export default function Home() {
             The Noxptide Standard
           </p>
           <p className="mt-6 font-display text-2xl leading-snug tracking-tight text-foreground sm:text-3xl md:text-[2.5rem] md:leading-[1.2]">
-            Synthesis-grade peptides for UK laboratories — every batch verified by independent HPLC
+            High purity peptides for UK laboratories — every batch verified by independent HPLC
             and mass spectrometry, every vial shipped with its Certificate of Analysis.
           </p>
           <p className="mt-6 font-display text-lg italic tracking-tight text-muted-foreground sm:text-xl">

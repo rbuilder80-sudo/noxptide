@@ -143,7 +143,7 @@ export default function Product() {
                     }`}
                   >
                     <span className="block text-sm font-bold">{s.label}</span>
-                    <span className="block text-sm text-muted-foreground">{formatGBP(s.price)}</span>
+                    <span className="block text-sm text-muted-foreground">{formatGBP(livePrice(overrides, product.slug, s.label) ?? s.price)}</span>
                   </button>
                 ))}
               </div>

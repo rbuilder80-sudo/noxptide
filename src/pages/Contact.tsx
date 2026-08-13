@@ -18,7 +18,8 @@ export default function Contact() {
       <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Contact Noxptide</h1>
       <p className="mt-3 text-muted-foreground">
         COA requests, order support and research enquiries — handled by people who understand
-        laboratory work.
+        laboratory work. As a UK research peptide supplier, we answer questions about our products,
+        documentation and delivery; we cannot discuss human or veterinary use.
       </p>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-5">
@@ -124,6 +125,14 @@ export default function Contact() {
           )}
         </div>
       </div>
+
+      <p className="mt-10 border-t border-border pt-6 text-sm text-muted-foreground">
+        Prefer to read first? Our <Link to="/faq" className="font-semibold text-primary hover:underline">FAQ</Link>{' '}
+        answers the most common questions about ordering peptides UK researchers ask, and the{' '}
+        <Link to="/quality" className="font-semibold text-primary hover:underline">quality page</Link>{' '}
+        explains the testing behind every batch we ship as a peptide supplier UK laboratories can
+        verify — all supplied for laboratory research use only.
+      </p>
     </div>
   )
 }
