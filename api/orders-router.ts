@@ -1,8 +1,17 @@
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, like, or, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { orders, orderItems, productStatuses, productVariants, type Order } from "@db/schema";
+import {
+  discounts,
+  orders,
+  orderItems,
+  productStatuses,
+  productVariants,
+  refunds,
+  type Order,
+} from "@db/schema";
+import { checkDiscount, discountAmountPence, redeemDiscount } from "./discounts-router";
 import { categories, getProduct } from "@/data/products";
 import { getDb } from "./queries/connection";
 import { createRouter, publicQuery, staffQuery } from "./middleware";
@@ -37,6 +46,7 @@ const orderInput = z.object({
     )
     .min(1)
     .max(50),
+  promoCode: z.string().max(32).optional(),
 });
 
 const paymentLookupInput = z.object({
@@ -116,8 +126,24 @@ async function calculateOrder(input: z.infer<typeof orderInput>) {
   const discountRate = subtotalPence >= 50_000 ? 0.3 : subtotalPence >= 15_000 ? 0.2 : 0;
   const discountPence = Math.round(subtotalPence * discountRate);
   const shippingPence = input.shippingMethod === "next-day" ? 899 : subtotalPence >= 2_500 ? 0 : 499;
-  const totalPence = subtotalPence - discountPence + shippingPence;
-  return { items, subtotalPence, discountPence, shippingPence, totalPence };
+
+  // Promo code applies on the volume-discounted subtotal, never below 0.
+  let promoDiscountPence = 0;
+  let promoCode: string | null = null;
+  if (input.promoCode) {
+    const code = input.promoCode.toUpperCase();
+    const [discount] = await db.select().from(discounts).where(eq(discounts.code, code));
+    const discountedSubtotal = subtotalPence - discountPence;
+    const check = checkDiscount(discount, discountedSubtotal);
+    if (!check.valid) {
+      throw new TRPCError({ code: "BAD_REQUEST", message: "That discount code cannot be applied." });
+    }
+    promoDiscountPence = Math.min(discountAmountPence(check.discount, discountedSubtotal), discountedSubtotal);
+    promoCode = code;
+  }
+
+  const totalPence = subtotalPence - discountPence - promoDiscountPence + shippingPence;
+  return { items, subtotalPence, discountPence, promoDiscountPence, promoCode, shippingPence, totalPence };
 }
 
 function productImageUrl(origin: string, slug: string, sizeLabel: string) {
@@ -310,12 +336,15 @@ export const ordersRouter = createRouter({
       country: input.country,
       subtotalPence: calculated.subtotalPence,
       discountPence: calculated.discountPence,
+      promoDiscountPence: calculated.promoDiscountPence,
+      discountCode: calculated.promoCode,
       shippingPence: calculated.shippingPence,
       totalPence: calculated.totalPence,
       paymentReturnToken,
       notes,
     });
     const orderId = result.insertId;
+    if (calculated.promoCode) await redeemDiscount(db, calculated.promoCode);
     await db.insert(orderItems).values(
       calculated.items.map((item) => ({
         orderId,
@@ -418,12 +447,41 @@ export const ordersRouter = createRouter({
     }
   }),
 
-  /** Staff: list all orders, newest first. */
-  list: staffQuery.query(async () => {
-    const db = getDb();
-    const rows = await db.select().from(orders).orderBy(desc(orders.createdAt)).limit(500);
-    return rows.map(withHubSpotLinks);
-  }),
+  /** Staff: list orders, newest first, with optional status/search filters. */
+  list: staffQuery
+    .input(
+      z
+        .object({
+          status: z.enum(orderStatuses).optional(),
+          q: z.string().max(255).optional(),
+          limit: z.number().int().min(1).max(500).default(500),
+          offset: z.number().int().min(0).default(0),
+        })
+        .optional(),
+    )
+    .query(async ({ input }) => {
+      const db = getDb();
+      const conditions = [];
+      if (input?.status) conditions.push(eq(orders.status, input.status));
+      if (input?.q) {
+        const term = `%${input.q}%`;
+        conditions.push(
+          or(
+            like(orders.orderNumber, term),
+            like(orders.email, term),
+            like(orders.customerName, term),
+          ),
+        );
+      }
+      const rows = await db
+        .select()
+        .from(orders)
+        .where(conditions.length ? and(...conditions) : undefined)
+        .orderBy(desc(orders.createdAt))
+        .limit(input?.limit ?? 500)
+        .offset(input?.offset ?? 0);
+      return rows.map(withHubSpotLinks);
+    }),
 
   /** Staff: single order with its items. */
   get: staffQuery
@@ -462,6 +520,79 @@ export const ordersRouter = createRouter({
         await deductStockForOrder(order.id);
       }
       if (order) await syncOrder(order);
+      return { success: true };
+    }),
+
+  /** Staff: record a refund against an order (payment refunded externally). */
+  addRefund: staffQuery
+    .input(
+      z.object({
+        orderId: z.number().int().positive(),
+        amountPence: z.number().int().positive(),
+        reason: z.string().max(2000).optional(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = getDb();
+      const [order] = await db.select().from(orders).where(eq(orders.id, input.orderId));
+      if (!order) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Order not found." });
+      }
+      if (order.refundedPence + input.amountPence > order.totalPence) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Refund would exceed the order total.",
+        });
+      }
+      await db.insert(refunds).values({
+        orderId: input.orderId,
+        amountPence: input.amountPence,
+        reason: input.reason,
+        createdBy: ctx.user.email ?? ctx.user.name ?? undefined,
+      });
+      const refundedPence = order.refundedPence + input.amountPence;
+      const fullyRefunded = refundedPence >= order.totalPence;
+      await db
+        .update(orders)
+        .set({ refundedPence, ...(fullyRefunded ? { status: "cancelled" as const } : {}) })
+        .where(eq(orders.id, input.orderId));
+      return { success: true, refundedPence, fullyRefunded };
+    }),
+
+  /** Staff: refund history for an order, newest first. */
+  listRefunds: staffQuery
+    .input(z.object({ orderId: z.number().int().positive() }))
+    .query(async ({ input }) => {
+      const db = getDb();
+      return db
+        .select()
+        .from(refunds)
+        .where(eq(refunds.orderId, input.orderId))
+        .orderBy(desc(refunds.createdAt));
+    }),
+
+  /** Staff: attach courier / tracking details to an order. */
+  updateTracking: staffQuery
+    .input(
+      z.object({
+        orderId: z.number().int().positive(),
+        courier: z.string().max(64).optional(),
+        trackingNumber: z.string().max(64).optional(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const db = getDb();
+      const [order] = await db.select().from(orders).where(eq(orders.id, input.orderId));
+      if (!order) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Order not found." });
+      }
+      await db
+        .update(orders)
+        .set({
+          ...(input.courier !== undefined ? { courier: input.courier } : {}),
+          ...(input.trackingNumber !== undefined ? { trackingNumber: input.trackingNumber } : {}),
+        })
+        .where(eq(orders.id, input.orderId));
       return { success: true };
     }),
 

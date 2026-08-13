@@ -1,5 +1,6 @@
 import {
   mysqlTable,
+  boolean,
   mysqlEnum,
   serial,
   varchar,
@@ -54,6 +55,11 @@ export const orders = mysqlTable("orders", {
   hubspotDealId: varchar("hubspotDealId", { length: 64 }),
   hubspotSyncedAt: timestamp("hubspotSyncedAt"),
   hubspotSyncError: text("hubspotSyncError"),
+  discountCode: varchar("discountCode", { length: 32 }),
+  promoDiscountPence: int("promoDiscountPence").default(0).notNull(),
+  refundedPence: int("refundedPence").default(0).notNull(),
+  courier: varchar("courier", { length: 64 }),
+  trackingNumber: varchar("trackingNumber", { length: 64 }),
   status: mysqlEnum("status", [
     "pending",
     "paid",
@@ -134,3 +140,57 @@ export const productStatuses = mysqlTable("product_statuses", {
     .$onUpdate(() => new Date()),
 });
 export type ProductStatus = typeof productStatuses.$inferSelect;
+
+// Discount codes redeemed at checkout. Codes are stored UPPERCASE; the
+// volume discount in calculateOrder is separate and stacks with these.
+export const discounts = mysqlTable("discounts", {
+  id: serial("id").primaryKey(),
+  code: varchar("code", { length: 32 }).notNull().unique(),
+  description: varchar("description", { length: 255 }),
+  type: mysqlEnum("type", ["percent", "fixed"]).notNull(),
+  value: int("value").notNull(), // percent 1-90 OR fixed amount in pence
+  minSubtotalPence: int("minSubtotalPence").default(0).notNull(),
+  maxUses: int("maxUses"), // null = unlimited
+  usedCount: int("usedCount").default(0).notNull(),
+  startsAt: timestamp("startsAt"),
+  expiresAt: timestamp("expiresAt"),
+  active: boolean("active").default(true).notNull(),
+  createdBy: varchar("createdBy", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+export type Discount = typeof discounts.$inferSelect;
+export type InsertDiscount = typeof discounts.$inferInsert;
+
+// Staff-recorded refunds against an order (payment is refunded externally).
+export const refunds = mysqlTable("refunds", {
+  id: serial("id").primaryKey(),
+  orderId: bigint("orderId", { mode: "number", unsigned: true }).notNull(),
+  amountPence: int("amountPence").notNull(),
+  reason: text("reason"),
+  createdBy: varchar("createdBy", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type Refund = typeof refunds.$inferSelect;
+
+// Per-product content overrides: any non-null field wins over the static
+// catalogue value on the storefront; null = fall back to the static value.
+export const productOverrides = mysqlTable("product_overrides", {
+  id: serial("id").primaryKey(),
+  productSlug: varchar("productSlug", { length: 128 }).notNull().unique(),
+  name: varchar("name", { length: 255 }),
+  tagline: varchar("tagline", { length: 255 }),
+  description: text("description"),
+  categorySlug: varchar("categorySlug", { length: 128 }),
+  imageUrl: text("imageUrl"),
+  detailsJson: text("detailsJson"), // JSON of arbitrary editable fields
+  updatedBy: varchar("updatedBy", { length: 255 }),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+export type ProductOverride = typeof productOverrides.$inferSelect;
