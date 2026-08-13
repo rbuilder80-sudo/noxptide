@@ -103,6 +103,13 @@ export default function Legal() {
           </a>
           . We can discuss orders, delivery, and documentation — never the use of any product.
         </p>
+
+        <p>
+          Researchers who meet these obligations can browse our{' '}
+          <Link to="/shop" className="font-semibold text-primary hover:underline">research peptide catalogue</Link>{' '}
+          of research peptides UK stock, or learn how we work as a{' '}
+          <Link to="/about" className="font-semibold text-primary hover:underline">UK research peptide supplier</Link>.
+        </p>
       </div>
     </div>
   )

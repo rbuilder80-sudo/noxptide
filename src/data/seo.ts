@@ -1,4 +1,4 @@
-import { products, type Product } from './products'
+import { products, categories, type Category, type Product } from './products'
 import { guides, type Guide } from './guides'
 import { allFaqs } from './faqs'
 
@@ -58,6 +58,7 @@ export function websiteLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
     name: SITE_NAME,
     url: `${SITE_URL}/`,
     publisher: { '@id': ORG_ID },
@@ -482,7 +483,7 @@ export function seoForPath(path: string): RouteSeo {
   return { ...notFoundSeo, canonical: `${SITE_URL}${clean}` }
 }
 
-/** Indexable routes advertised in the XML sitemap (audit: 51 URLs). */
+/** Indexable routes advertised in the XML sitemap (audit: 51 URLs + 4 category hubs). */
 export const INDEXABLE_PATHS: string[] = [
   '/',
   '/shop',
@@ -493,6 +494,7 @@ export const INDEXABLE_PATHS: string[] = [
   '/shipping',
   '/legal',
   '/contact',
+  ...categories.map((c) => `/category/${c.slug}`),
   ...products.map((p) => `/product/${p.slug}`),
   ...guides.map((g) => `/guides/${g.slug}`),
 ]

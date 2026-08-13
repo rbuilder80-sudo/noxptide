@@ -105,17 +105,32 @@ export default function GuideArticle() {
           {/* References */}
           <section className="mt-10" aria-labelledby="references">
             <h2 id="references" className="text-xl font-extrabold">Scientific References</h2>
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-4 space-y-4">
               {guide.references.map((r) => (
-                <li key={r.url}>
-                  <a
-                    href={r.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-                  >
-                    <BookOpen className="h-4 w-4" aria-hidden="true" /> {r.title}
-                  </a>
+                <li key={r.url} className="rounded-xl border border-border bg-card p-4">
+                  <div className="flex items-start gap-3">
+                    <BookOpen className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                    <div>
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-semibold text-primary hover:underline"
+                      >
+                        {r.title}
+                      </a>
+                      {(r.authors || r.journal || r.year) && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {[r.authors, r.journal, r.year].filter(Boolean).join(' · ')}
+                        </p>
+                      )}
+                      {r.studyType && (
+                        <span className="mt-2 inline-block rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
+                          {r.studyType}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>

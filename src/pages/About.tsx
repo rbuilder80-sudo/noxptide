@@ -66,6 +66,50 @@ export default function About() {
         ))}
       </div>
 
+      {/* Factual business identity */}
+      <section className="mt-12 rounded-2xl border border-border bg-card p-7 shadow-sm sm:p-8" aria-labelledby="identity-heading">
+        <h2 id="identity-heading" className="text-xl font-bold">How We Operate</h2>
+        <div className="mt-4 grid gap-6 sm:grid-cols-2">
+          <div>
+            <h3 className="font-semibold">Quality approach</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              We supply high purity laboratory peptides for in-vitro research only. Every batch is
+              verified by an independent analytical laboratory — HPLC for peptide purity, mass
+              spectrometry for identity — before it is released to stock. Batches below 99% are
+              destroyed, never discounted.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Verification before purchase</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Any customer can request the current batch Certificate of Analysis for any product
+              before ordering — no account needed. We would rather you run your own peptide
+              supplier comparison on documented facts than take our marketing at face value.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Batch documentation</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Every vial carries a batch number matching its COA, giving full traceability from
+              synthesis to dispatch. Our guides also cover correct peptide reconstitution and
+              storage so verified purity survives into your experiments.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Research-use compliance</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              As a UK research peptide supplier, we sell strictly for laboratory research. No
+              medical claims, no human-use advice, and orders are declined where communication
+              suggests otherwise — see our{' '}
+              <Link to="/legal" className="font-semibold text-primary hover:underline">
+                Research Use Only Policy
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="mt-12 rounded-3xl bg-gradient-to-r from-secondary to-accent p-8 text-center sm:p-12">
         <h2 className="text-2xl font-extrabold sm:text-3xl">Experience the Difference Yourself</h2>
         <p className="mx-auto mt-3 max-w-xl text-muted-foreground">

@@ -45,7 +45,29 @@ export default function Contact() {
             <h2 className="font-bold">Requesting a batch COA?</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               Include the product name in your message and we will send the current batch Certificate
-              of Analysis — no purchase required.
+              of Analysis — no purchase required. Every COA reports peptide purity by independent
+              HPLC peptide testing with MS identity confirmation.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <h2 className="font-bold">Which Team Handles Your Enquiry?</h2>
+            <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+              <li>
+                <strong className="text-foreground">Order support</strong> — dispatch status,
+                tracking, delivery issues and returns.
+              </li>
+              <li>
+                <strong className="text-foreground">COA requests</strong> — batch documentation for
+                any product, sent within one working hour.
+              </li>
+              <li>
+                <strong className="text-foreground">Research enquiries</strong> — compound
+                specifications, peptide storage and reconstitution guidance for laboratory work.
+              </li>
+            </ul>
+            <p className="mt-3 text-sm text-muted-foreground">
+              One address reaches all three; the subject line routes it. Messages sent outside
+              working hours are answered the next working day.
             </p>
           </div>
         </div>

@@ -15,6 +15,10 @@ export const faqGroups: { heading: string; items: { q: string; a: string }[] }[]
         q: 'Who performs your analytical testing?',
         a: 'HPLC purity analysis and MS identity confirmation are performed by an independent analytical laboratory, separate from our synthesis and fulfilment operations.',
       },
+      {
+        q: 'How do I read a peptide Certificate of Analysis?',
+        a: 'Start by matching the batch number on the COA to the one on your vial — a certificate without a matching batch proves nothing. Then check the HPLC purity result (ours is ≥99%) and the MS identity confirmation. Our guide "How to Read a Peptide COA" in the Research Guides section walks through every field.',
+      },
     ],
   },
   {

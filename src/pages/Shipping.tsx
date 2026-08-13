@@ -14,7 +14,10 @@ export default function Shipping() {
 
       <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Research Peptide Shipping &amp; Delivery</h1>
       <p className="mt-3 text-muted-foreground">
-        Fast, tracked and discreet — because research timelines do not wait.
+        Fast, tracked and discreet — because research timelines do not wait. This page covers
+        research peptide delivery UK-wide and across Europe: dispatch times, delivery estimates,
+        weekend and bank-holiday handling, what happens if a parcel goes missing, and how
+        temperature is managed in transit.
       </p>
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2">

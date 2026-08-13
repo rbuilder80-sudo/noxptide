@@ -105,7 +105,12 @@ export default function Quality() {
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
           Email us the product and we will send the current batch Certificate of Analysis within one
-          working hour. No account required, no obligation.
+          working hour. No account required, no obligation. Browse{' '}
+          <Link to="/shop" className="font-semibold text-primary hover:underline">
+            research peptides UK
+          </Link>{' '}
+          laboratories can verify batch by batch — every product in our peptide shop carries the
+          paperwork described on this page, supplied for laboratory research use only.
         </p>
         <Link
           to="/contact"

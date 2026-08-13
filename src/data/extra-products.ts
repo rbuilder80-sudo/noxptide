@@ -23,9 +23,9 @@ export const extraProducts: Product[] = [
     short:
       'The minimal active fragment of human GHRH — the reference standard for hypothalamic–pituitary signalling research. ≥99% purity, COA with every batch.',
     description: [
-      'Sermorelin comprises the first 29 amino acids of endogenous growth-hormone-releasing hormone — the smallest fragment retaining full biological activity at the GHRH receptor. Decades of endocrine literature use it as the reference tool for studying hypothalamic–pituitary signalling and pulsatile hormone regulation.',
+      'The Sermorelin peptide comprises the first 29 amino acids of endogenous growth-hormone-releasing hormone — the smallest fragment retaining full biological activity at the GHRH receptor. Decades of endocrine literature use it as the reference tool for studying hypothalamic–pituitary signalling and pulsatile hormone regulation. All findings described here derive from preclinical and clinical literature; the material supplied here is strictly for laboratory research use.',
       'Noxptide Sermorelin is synthesised by SPPS, purified to ≥99% by preparative HPLC, and identity-confirmed by mass spectrometry against its theoretical 3357.96 g/mol. Every batch ships with its Certificate of Analysis.',
-      'Supplied lyophilised in sterile, tamper-evident vials and dispatched tracked from our UK facility.',
+      'Sermorelin storage is lyophilised at -20°C; Sermorelin reconstitution uses bacteriostatic water under sterile conditions, followed by refrigeration at 2–8°C and use within 14 days. The Sermorelin peptide UK laboratories use as their GHRH reference is available in Sermorelin 2 mg and Sermorelin 5 mg vials, supplied lyophilised in sterile, tamper-evident packaging and dispatched tracked from our UK facility — for research use only.',
     ],
     applications: [
       'GHRH receptor binding and signalling research',
@@ -76,7 +76,7 @@ export const extraProducts: Product[] = [
     description: [
       'MOTS-c is a 16-amino-acid peptide encoded within the mitochondrial 12S rRNA gene — part of a recently discovered class of mitochondrial-derived peptides that has reshaped how researchers think about mitochondrial–nuclear signalling. The literature concentrates on metabolic regulation, insulin sensitivity pathways and exercise-mimetic models.',
       'Because MOTS-c sits at the frontier of metabolic research, batch quality matters doubly: our material is independently verified to ≥99% purity by HPLC with MS identity confirmation, and every order ships with a batch-specific COA.',
-      'Lyophilised, sterile-vialed and dispatched tracked from the UK with same-day dispatch before 4pm.',
+      'Lyophilised, sterile-vialed and dispatched tracked from the UK with same-day dispatch before 4pm. MOTS-c for sale here is research-grade material in MOTS-c 10 mg and 20 mg vials, each with a batch-specific COA — supplied strictly for laboratory research use.',
     ],
     applications: [
       'Mitochondrial–nuclear signalling research',
@@ -178,7 +178,7 @@ export const extraProducts: Product[] = [
     description: [
       'NAD+ (Nicotinamide Adenine Dinucleotide) is the universal redox coenzyme at the heart of cellular energy metabolism — and one of the most active areas of ageing and mitochondrial research. Laboratories use it in studies of sirtuin signalling, PARP activity and NAD+-decline models.',
       'NAD+ degrades readily with heat, light and moisture, which makes sourcing discipline critical. Noxptide NAD+ is independently verified to ≥99% purity, lyophilised, light-protected, and shipped with a batch-specific Certificate of Analysis.',
-      'Dispatched tracked from our UK facility with cold-pack options available on request.',
+      'Dispatched tracked from our UK facility with cold-pack options available on request. As a UK peptide supplier and peptide shop stocking research peptides, UK laboratories receive batch-verified NAD+ in 500 mg and 1000 mg vials, for research use only. All findings described here derive from preclinical research.',
     ],
     applications: [
       'Cellular energy and redox metabolism research',
@@ -190,6 +190,10 @@ export const extraProducts: Product[] = [
       {
         q: 'Is NAD+ a peptide?',
         a: 'No — NAD+ is a dinucleotide coenzyme, supplied here as a high-purity research compound alongside our peptide catalogue, to the same documentation standard.',
+      },
+      {
+        q: 'Is this an NAD Plus supplement?',
+        a: 'No. Although "NAD Plus supplement" is a common search, this listing is a research-grade compound supplied strictly for laboratory use — not a dietary supplement and not for human use.',
       },
       {
         q: 'Why does NAD+ need careful handling?',
@@ -228,7 +232,7 @@ export const extraProducts: Product[] = [
     short:
       'The master antioxidant tripeptide for oxidative-stress and redox-biology research. ≥99% purity, independently verified, COA included.',
     description: [
-      'Reduced L-Glutathione is the cell\'s primary endogenous antioxidant — a tripeptide (γ-Glu-Cys-Gly) central to redox homeostasis, detoxification pathways and oxidative-stress research across cell biology.',
+      'Reduced L-Glutathione is the cell\'s primary endogenous antioxidant — the glutathione peptide is a tripeptide (γ-Glu-Cys-Gly) central to redox homeostasis, detoxification pathways and oxidative-stress research across cell biology. This glutathione tripeptide is supplied strictly for laboratory research; all findings described here derive from preclinical research.',
       'Glutathione oxidises readily, so purity and handling determine whether your assay measures the reduced form or its disulphide. Our material is independently verified to ≥99% purity by HPLC and ships with a batch-specific COA.',
       'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
     ],
@@ -281,7 +285,7 @@ export const extraProducts: Product[] = [
     description: [
       'KPV (Lys-Pro-Val) is the C-terminal tripeptide of alpha-melanocyte-stimulating hormone — the smallest fragment retaining the parent hormone\'s anti-inflammatory activity in research models, without its melanocortin pigmentation effects. That separation makes KPV a clean tool for immune-modulation research.',
       'Published work examines KPV in intestinal inflammation models, NF-κB pathway regulation and epithelial barrier research. Our KPV is independently verified to ≥99% purity by HPLC and MS, and ships with a batch-specific Certificate of Analysis.',
-      'Supplied lyophilised, sterile-vialed and dispatched tracked from the UK.',
+      'Supplied lyophilised, sterile-vialed and dispatched tracked from the UK. For laboratories looking to buy the KPV peptide, UK research institutions can choose 10 mg and 20 mg vials, each with a batch-specific COA — supplied strictly for laboratory research use.',
     ],
     applications: [
       'Inflammatory pathway (NF-κB) research',
@@ -330,7 +334,7 @@ export const extraProducts: Product[] = [
     short:
       'The classic neuropeptide for sleep-regulation and stress-axis research since 1977. ≥99% purity, independently batch-verified.',
     description: [
-      'DSIP (Delta Sleep-Inducing Peptide) is a nonapeptide first isolated in 1977 during research into sleep-regulating factors. Its literature spans sleep-architecture models, HPA-axis (stress) regulation and neuroendocrine signalling, making it one of the longest-studied neuropeptides in the catalogue.',
+      'DSIP (Delta Sleep-Inducing Peptide) is a nonapeptide first isolated in 1977 during research into sleep-regulating factors. Its literature spans sleep-architecture models, HPA-axis (stress) regulation and neuroendocrine signalling, making the DSIP peptide one of the longest-studied neuropeptides in the catalogue. All findings described here derive from preclinical research; DSIP is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Noxptide DSIP is synthesised to ≥99% purity, independently verified by HPLC and mass spectrometry, and supplied with a batch-specific Certificate of Analysis.',
       'Lyophilised, sterile-vialed and dispatched tracked from our UK facility.',
     ],
@@ -380,7 +384,7 @@ export const extraProducts: Product[] = [
     short:
       'The high-potency GHRP for secretagogue-receptor and cardioprotection research. ≥99% purity, COA supplied with every batch.',
     description: [
-      'Hexarelin (Examorelin) is a synthetic hexapeptide growth hormone secretagogue — among the most potent of the GHRP class at the ghrelin receptor (GHS-R1a) in published research, with an additional literature strand examining CD36-mediated cardiac pathways.',
+      'Hexarelin (Examorelin) is a synthetic hexapeptide growth hormone secretagogue — among the most potent of the GHRP class at the ghrelin receptor (GHS-R1a) in published research, with an additional literature strand examining CD36-mediated cardiac pathways. All findings described here derive from preclinical research; Hexarelin is supplied strictly for laboratory use.',
       'Our Hexarelin is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry. Every order ships with a batch-specific Certificate of Analysis.',
       'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
     ],
@@ -431,9 +435,9 @@ export const extraProducts: Product[] = [
     short:
       'The 28-amino-acid neuropeptide for VPAC-receptor, immunomodulation and circadian research. ≥99% purity with full batch documentation.',
     description: [
-      'VIP (Vasoactive Intestinal Peptide) is a 28-amino-acid neuropeptide of the secretin/glucagon family, examined in the literature across VPAC1/VPAC2 receptor signalling, immunomodulation, circadian regulation in the suprachiasmatic nucleus, and smooth-muscle models.',
+      'VIP (Vasoactive Intestinal Peptide) is a 28-amino-acid neuropeptide of the secretin/glucagon family, examined in the literature across VPAC1/VPAC2 receptor signalling, immunomodulation, circadian regulation in the suprachiasmatic nucleus, and smooth-muscle models. All findings described here derive from preclinical research; the VIP peptide is supplied strictly for laboratory use and is not for human or veterinary use.',
       'VIP is synthesis-intensive and oxidation-sensitive — a compound where supplier quality shows immediately in the analytics. Our material is independently verified to ≥99% purity by HPLC with MS identity confirmation, and ships with a batch-specific COA.',
-      'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility.',
+      'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility. As a UK peptide supplier and peptide shop for research peptides, UK laboratories receive batch-verified VIP in 1 mg and 2 mg vials, for research use only.',
     ],
     applications: [
       'VPAC1/VPAC2 receptor signalling research',

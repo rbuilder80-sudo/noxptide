@@ -31,8 +31,18 @@ export default function Faq() {
         Research Peptide Frequently Asked Questions
       </h1>
       <p className="mt-3 text-muted-foreground">
-        Everything researchers ask us before their first order. Can't find your answer?{' '}
+        Everything researchers ask us before their first order — from how to store peptides and
+        how to reconstitute peptides correctly, to how to read a COA before you commit to a batch.
+        Can't find your answer?{' '}
         <Link to="/contact" className="font-semibold text-primary hover:underline">Contact us</Link>.
+      </p>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Looking for a peptide supplier UK laboratories can hold to account? Our{' '}
+        <Link to="/quality" className="font-semibold text-primary hover:underline">quality page</Link>{' '}
+        documents how every batch is tested, and the{' '}
+        <Link to="/shop" className="font-semibold text-primary hover:underline">peptide shop</Link>{' '}
+        lists all research peptides UK stock with batch documentation — supplied strictly for
+        laboratory research use only.
       </p>
 
       {faqGroups.map((g) => (

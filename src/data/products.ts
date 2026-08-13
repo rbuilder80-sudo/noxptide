@@ -343,7 +343,7 @@ export const products: Product[] = [
     short:
       'The most clinically documented GHRH analogue in existence, supplied research-grade at ≥99% purity with full analytical documentation.',
     description: [
-      'Tesamorelin is a stabilised synthetic analogue of human growth-hormone-releasing hormone comprising the full 44-amino-acid GHRH sequence with an N-terminal hexenoyl modification that resists enzymatic degradation. It is among the most extensively documented peptides in the endocrine research literature.',
+      'Tesamorelin is a stabilised synthetic analogue of human growth-hormone-releasing hormone comprising the full 44-amino-acid GHRH sequence with an N-terminal hexenoyl modification that resists enzymatic degradation. It is among the most extensively documented peptides in the endocrine research literature. All findings described here derive from preclinical and clinical literature; the material supplied here is strictly for laboratory research use and is not for human or veterinary use.',
       'Our Tesamorelin is produced to ≥99% purity, independently verified by HPLC and MS, and supplied lyophilised with a batch-specific Certificate of Analysis.',
       'A premium compound for metabolic and endocrine research programmes that demand the highest documentation standards.',
     ],
@@ -368,7 +368,7 @@ export const products: Product[] = [
       },
       {
         q: 'How should it be reconstituted?',
-        a: 'With bacteriostatic water under sterile laboratory conditions, then refrigerated at 2–8°C and used within 14 days.',
+        a: 'Standard peptide reconstitution practice applies: bacteriostatic water under sterile laboratory conditions, then refrigerated at 2–8°C and used within 14 days. For longer-term peptide storage, keep the lyophilised vial at -20°C.',
       },
     ],
   },
@@ -394,7 +394,7 @@ export const products: Product[] = [
     short:
       'The benchmark nootropic research peptide — an ACTH(4-10) analogue with decades of CNS literature. ≥99% purity, COA supplied with every batch.',
     description: [
-      'Semax is a synthetic heptapeptide based on the ACTH(4-10) fragment, extended with a C-terminal Pro-Gly-Pro sequence for stability. Developed through decades of neuroscience research, it is one of the most studied peptides in cognitive and neuroprotective research models.',
+      'Semax is a synthetic heptapeptide based on the ACTH(4-10) fragment, extended with a C-terminal Pro-Gly-Pro sequence for stability. Developed through decades of neuroscience research, it is one of the most studied peptides in cognitive and neuroprotective research models. All findings described here derive from preclinical research; Semax is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Noxptide Semax is synthesised to ≥99% purity, verified by independent HPLC and mass spectrometry, and supplied with a batch-specific Certificate of Analysis.',
       'Lyophilised and light-protected for stability, dispatched from the UK with tracked delivery.',
     ],
@@ -415,7 +415,7 @@ export const products: Product[] = [
       },
       {
         q: 'Is Semax light-sensitive?',
-        a: 'Yes — we recommend storing the lyophilised powder protected from light at -20°C, and our packaging reflects this.',
+        a: 'Yes — we recommend peptide storage of the lyophilised powder protected from light at -20°C, and our packaging reflects this. Standard peptide reconstitution practice applies: bacteriostatic water under sterile conditions, then refrigerate at 2–8°C.',
       },
       {
         q: 'How quickly do you dispatch?',
@@ -445,7 +445,7 @@ export const products: Product[] = [
     short:
       'The anxiolytic-class tuftsin analogue for neuroimmune and CNS research. Independently verified ≥99% purity with full COA documentation.',
     description: [
-      'Selank is a synthetic heptapeptide analogue of the immunomodulatory tetrapeptide tuftsin, extended with a Pro-Gly-Pro tail for metabolic stability. It occupies a unique position in the research literature at the intersection of neuroimmune signalling and CNS regulation.',
+      'Selank is a synthetic heptapeptide analogue of the immunomodulatory tetrapeptide tuftsin, extended with a Pro-Gly-Pro tail for metabolic stability. It occupies a unique position in the research literature at the intersection of neuroimmune signalling and CNS regulation. All findings described here derive from preclinical research; Selank is supplied strictly for laboratory use.',
       'Our Selank is synthesised to ≥99% purity and independently verified by HPLC and MS. Every batch ships with its Certificate of Analysis.',
       'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery as standard.',
     ],
@@ -467,6 +467,10 @@ export const products: Product[] = [
       {
         q: 'Can Semax and Selank be studied together?',
         a: 'They are frequently examined in parallel in research programmes due to their complementary mechanisms documented in the literature.',
+      },
+      {
+        q: 'Do you sell Selank spray or N-Acetyl Selank?',
+        a: 'No — "selank spray" formats and the N-acetylated variant serve non-laboratory channels. We supply the reference Selank heptapeptide as a lyophilised research powder, verified to ≥99% peptide purity by independent HPLC peptide testing, for in-vitro research only.',
       },
       {
         q: 'Is a COA provided?',
@@ -496,9 +500,9 @@ export const products: Product[] = [
     short:
       'The telomerase-pathway tetrapeptide for ageing and pineal research. ≥99% purity, independently batch-tested, COA with every order.',
     description: [
-      'Epitalon (also spelled Epithalon) is a synthetic tetrapeptide based on epithalamin, a peptide preparation derived from the pineal gland. It is one of the most discussed compounds in gerontology research, with literature examining telomerase activation and circadian regulation models.',
+      'Epitalon (also spelled Epithalon) is a synthetic tetrapeptide based on epithalamin, a peptide preparation derived from the pineal gland. It is one of the most discussed compounds in gerontology research, with literature examining telomerase activation and circadian regulation models. All findings described here derive from preclinical research; Epitalon is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Noxptide Epitalon is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry. Batch-specific Certificates of Analysis ship with every order.',
-      'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility.',
+      'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility. As a UK peptide supplier and peptide shop specialising in research peptides, UK laboratories receive batch-verified material in 10 mg and 20 mg vials, for research use only.',
     ],
     applications: [
       'Telomerase activation pathway research',
@@ -547,9 +551,9 @@ export const products: Product[] = [
     short:
       'The lipolytic hGH fragment for metabolic research — the C-terminal region of growth hormone without the growth activity. COA-verified ≥99%.',
     description: [
-      'AOD-9604 is a modified fragment of human growth hormone (residues 176-191) developed to isolate the lipolytic region of the molecule. In the research literature it is studied for fat-metabolism pathways without the proliferative activity of full-length growth hormone.',
+      'AOD-9604 is a modified fragment of human growth hormone (residues 176-191) developed to isolate the lipolytic region of the molecule. In the research literature it is studied for fat-metabolism pathways without the proliferative activity of full-length growth hormone. All findings described here derive from preclinical research; AOD-9604 is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Our AOD-9604 is synthesised to ≥99% purity, independently verified by HPLC and MS, and supplied with a batch-specific Certificate of Analysis.',
-      'Lyophilised for stability and dispatched from the UK with tracked, discreet delivery.',
+      'AOD-9604 reconstitution follows standard laboratory practice: bacteriostatic water under sterile conditions, then refrigeration at 2–8°C with use within 21 days. Researchers looking to buy AOD-9604 in the UK can choose AOD-9604 2 mg or AOD-9604 5 mg vials, lyophilised for stability and dispatched from the UK with tracked, discreet delivery — supplied for research use only.',
     ],
     applications: [
       'Lipolysis and fat-metabolism pathway research',
@@ -598,7 +602,7 @@ export const products: Product[] = [
     short:
       'The reference melanocortin receptor agonist for pigmentation and MC-receptor research. ≥99% purity, COA supplied with every batch.',
     description: [
-      'Melanotan II (MT-2) is a synthetic cyclic heptapeptide analogue of alpha-melanocyte-stimulating hormone (α-MSH) and one of the most widely used reference compounds in melanocortin receptor research, with activity documented across MC1R through MC5R subtypes.',
+      'Melanotan II (MT-2) is a synthetic cyclic heptapeptide analogue of alpha-melanocyte-stimulating hormone (α-MSH) and one of the most widely used reference compounds in melanocortin receptor research, with activity documented across MC1R through MC5R subtypes. All findings described here derive from preclinical research; Melanotan II is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Noxptide Melanotan II is synthesised to ≥99% purity, independently verified by HPLC and mass spectrometry, and shipped with a batch-specific Certificate of Analysis.',
       'Light-protected, lyophilised and dispatched tracked from our UK facility.',
     ],
@@ -651,7 +655,7 @@ export const products: Product[] = [
     description: [
       'PT-141 (Bremelanotide) is a metabolite-derived melanocortin peptide closely related to Melanotan II but with a free C-terminal carboxyl group, shifting its research profile toward MC4R-mediated central nervous system pathways. It is one of the most clinically documented melanocortin peptides in existence.',
       'Our PT-141 is synthesised to ≥99% purity, independently verified by HPLC and MS, and supplied with a batch-specific Certificate of Analysis.',
-      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
+      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery. PT-141 price reflects its cyclic, synthesis-intensive structure; UK laboratories that order PT-141 for research can choose PT-141 10 mg or 20 mg vials, each with a batch-specific COA, supplied for research use only.',
     ],
     applications: [
       'MC4R receptor pharmacology research',
@@ -671,6 +675,10 @@ export const products: Product[] = [
       {
         q: 'What purity is supplied?',
         a: '≥99% by HPLC, confirmed by mass spectrometry, with the batch COA included in every order.',
+      },
+      {
+        q: 'How should PT-141 be stored and reconstituted?',
+        a: 'PT-141 storage is lyophilised at -20°C. For PT-141 reconstitution, bacteriostatic water under sterile conditions is standard; refrigerate at 2–8°C afterwards and use within 21 days.',
       },
       {
         q: 'Is this for human use?',

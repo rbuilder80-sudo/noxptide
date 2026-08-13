@@ -68,7 +68,7 @@ export const extraProducts2: Product[] = [
     short:
       'Pralmorelin — the high-potency second-generation GHRP for secretagogue research. ≥99% purity, independently batch-verified.',
     description: [
-      'GHRP-2 (Pralmorelin) is a second-generation synthetic hexapeptide secretagogue, documented in the literature as among the most potent of the GHRP class at the ghrelin receptor. It is widely used as a benchmark compound in comparative studies of secretagogue potency, pharmacokinetics and pituitary signalling.',
+      'GHRP-2 (Pralmorelin) is a second-generation synthetic hexapeptide secretagogue, documented in the literature as among the most potent of the GHRP class at the ghrelin receptor. It is widely used as a benchmark compound in comparative studies of secretagogue potency, pharmacokinetics and pituitary signalling. All findings described here derive from preclinical research; GHRP-2 is supplied strictly for laboratory use.',
       'Our GHRP-2 is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry against its theoretical 817.98 g/mol. Every batch ships with its Certificate of Analysis.',
       'Supplied lyophilised in sterile, tamper-evident vials, dispatched tracked from our UK facility.',
     ],
@@ -116,9 +116,9 @@ export const extraProducts2: Product[] = [
     short:
       'The unmodified lipolytic C-terminal fragment of human growth hormone — the reference compound behind AOD-9604 research. COA-verified ≥99%.',
     description: [
-      'HGH Fragment 176-191 is the unmodified C-terminal region of human growth hormone examined in the literature for its lipolytic activity without the growth-promoting effects of the full-length hormone. It is the parent sequence from which the modified analogue AOD-9604 was derived.',
+      'HGH Fragment 176-191 is the unmodified C-terminal region of human growth hormone examined in the literature for its lipolytic activity without the growth-promoting effects of the full-length hormone. It is the parent sequence from which the modified analogue AOD-9604 was derived. All findings described here derive from preclinical research; the HGH fragment is supplied strictly for laboratory use.',
       'Laboratories use the unmodified fragment as a comparator against AOD-9604 when studying how sequence modification alters stability and activity. Both are stocked at ≥99% purity, independently HPLC and MS verified, with batch-specific COAs.',
-      'Supplied lyophilised in sterile vials with tracked UK delivery and same-day dispatch before 4pm.',
+      'Laboratories looking to buy Fragment 176-191 in the UK can choose the Fragment 176-191 2 mg or 5 mg vial — the HGH Fragment 5 mg format suits longer comparator panels — supplied lyophilised in sterile vials with tracked UK delivery and same-day dispatch before 4pm, for research use only.',
     ],
     applications: [
       'Lipolysis and fat-metabolism pathway research',
