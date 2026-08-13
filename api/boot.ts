@@ -7,6 +7,7 @@ import { appRouter } from "./router";
 import { createContext } from "./context";
 import { env } from "./lib/env";
 import { createOAuthCallbackHandler, createOAuthLoginHandler } from "./kimi/auth";
+import { createPasswordLoginHandler } from "./password-auth";
 import { processWallidWebhookEvents } from "./orders-router";
 import { parseWallidWebhook, verifyWallidWebhook } from "./lib/wallid";
 import { Paths } from "@contracts/constants";
@@ -17,6 +18,7 @@ app.use(compress());
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
 app.get(Paths.oauthLogin, createOAuthLoginHandler());
 app.get(Paths.oauthCallback, createOAuthCallbackHandler());
+app.post("/api/auth/login", createPasswordLoginHandler());
 app.post("/api/wallid/webhook", async (c) => {
   const rawBody = await c.req.text();
   const valid = verifyWallidWebhook(
@@ -72,19 +74,14 @@ if (env.isProduction) {
     }
   });
 
-  // Canonical host + legacy route redirects (audit P0-2, §8):
-  // apex -> www in one permanent, path-preserving hop; legacy category
-  // URLs permanently redirect to the catalogue hub.
+  // Canonical host redirect (audit P0-2, §8):
+  // apex -> www in one permanent, path-preserving hop.
   app.use("*", async (c, next) => {
     const host = (c.req.header("host") ?? "").split(":")[0];
     if (host === "noxptide.co.uk") {
       const url = new URL(c.req.url);
       c.header("Cache-Control", "public, max-age=86400");
       return c.redirect(`https://www.noxptide.co.uk${url.pathname}${url.search}`, 301);
-    }
-    if (c.req.path.startsWith("/category/")) {
-      c.header("Cache-Control", "public, max-age=86400");
-      return c.redirect("/shop", 301);
     }
     await next();
   });

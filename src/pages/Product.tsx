@@ -296,7 +296,11 @@ export default function Product() {
           <Link to="/contact" className="font-semibold text-primary hover:underline">
             Contact our team
           </Link>{' '}
-          and we will send it within one working hour.
+          and we will send it within one working hour. Batch COA and testing methods are described on our{' '}
+          <Link to="/quality" className="font-semibold text-primary hover:underline">
+            quality page
+          </Link>
+          .
         </p>
       </section>
 

@@ -260,7 +260,7 @@ export const extraProducts2: Product[] = [
     short:
       'The PEG-stabilised form of Mechano Growth Factor for muscle-repair signalling research. ≥99% purity, batch COA supplied.',
     description: [
-      'PEG-MGF is the polyethylene-glycol-conjugated form of Mechano Growth Factor, the IGF-1Ec splice variant examined in the literature for its role in muscle repair and satellite-cell activation following mechanical damage. PEGylation protects the peptide from rapid degradation, extending its experimental window.',
+      'PEG-MGF is the polyethylene-glycol-conjugated form of Mechano Growth Factor, the IGF-1Ec splice variant examined in the literature for its role in muscle repair and satellite-cell activation following mechanical damage. PEGylation protects the peptide from rapid degradation, extending its experimental window. All findings described here derive from preclinical research; PEG-MGF is supplied strictly for laboratory use.',
       'Our PEG-MGF is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry. Every order ships with a batch-specific Certificate of Analysis.',
       'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
     ],
@@ -310,7 +310,7 @@ export const extraProducts2: Product[] = [
     description: [
       'MGF (Mechano Growth Factor) is the IGF-1Ec splice-variant peptide expressed in response to mechanical loading, examined in the literature for its role in initiating muscle-repair signalling. The unmodified form is used where native, short-duration kinetics are required — in contrast to its PEGylated counterpart.',
       'Noxptide MGF is synthesised to ≥99% purity, independently verified by HPLC and mass spectrometry, and shipped with a batch-specific Certificate of Analysis.',
-      'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility.',
+      'Laboratories looking to buy MGF peptide in the UK can choose 2 mg and 5 mg vials, supplied lyophilised in sterile packaging and dispatched tracked from our UK facility. As a UK peptide supplier of research peptides, UK laboratories receive a batch-specific COA with every vial — supplied for research use only.',
     ],
     applications: [
       'Mechanotransduction and load-response research',
@@ -357,7 +357,7 @@ export const extraProducts2: Product[] = [
     description: [
       'Thymosin Alpha-1 is a 28-amino-acid peptide originally isolated from thymic tissue, and one of the most extensively documented immune-modulating peptides in the research literature — with studies spanning T-cell maturation, immune-response regulation and vaccine-adjuvant research models.',
       'Our Thymosin Alpha-1 is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry against its theoretical 3108.3 g/mol. Every order ships with a batch-specific Certificate of Analysis.',
-      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
+      'Thymosin Alpha-1 price reflects its 28-residue length and demanding synthesis. Laboratories seeking to buy Thymosin Alpha-1 in the UK can choose 5 mg and 10 mg vials, supplied lyophilised in sterile, tamper-evident packaging with tracked UK delivery — for research use only.',
     ],
     applications: [
       'T-cell maturation and immune-response research',
@@ -403,7 +403,7 @@ export const extraProducts2: Product[] = [
     short:
       'The minimal active kisspeptin fragment for KISS1R and reproductive-axis research. ≥99% purity, batch COA included.',
     description: [
-      'Kisspeptin-10 is the shortest fully active fragment of the kisspeptin family — the peptide system the literature places at the top of the reproductive endocrine cascade, signalling through the KISS1R (GPR54) receptor. It is a standard tool in hypothalamic–pituitary–gonadal axis research.',
+      'Kisspeptin-10 is the shortest fully active fragment of the kisspeptin family — the peptide system the literature places at the top of the reproductive endocrine cascade, signalling through the KISS1R (GPR54) receptor. It is a standard tool in hypothalamic–pituitary–gonadal axis research. All findings described here derive from preclinical research; the Kisspeptin-10 peptide is supplied strictly for laboratory use.',
       'Our Kisspeptin-10 is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry. Every order ships with a batch-specific Certificate of Analysis.',
       'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility.',
     ],

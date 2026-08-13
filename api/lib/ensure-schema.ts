@@ -55,6 +55,7 @@ const STATEMENTS = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS refundedPence int DEFAULT 0 NOT NULL`,
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS courier varchar(64)`,
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS trackingNumber varchar(64)`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS passwordHash varchar(255)`,
 ];
 
 export async function ensureSalesBackendSchema() {
@@ -71,6 +72,23 @@ export async function ensureSalesBackendSchema() {
     console.warn("[db] ensure-schema failures:", failures);
   } else {
     console.log("[db] sales backend schema ensured");
+  }
+
+  // Seed the local admin login (email/password) — self-hosted site, Kimi
+  // OAuth only accepts its original platform redirect URI. Only inserts when
+  // no local admin row exists; never overwrites an existing password.
+  try {
+    const db2 = getDb();
+    await db2.execute(sql.raw(
+      `INSERT INTO users (unionId, name, email, role, passwordHash, lastSignInAt)
+       SELECT 'local:rbuilder@gmail.com', 'Rob (Owner)', 'rbuilder@gmail.com', 'admin',
+              'scrypt:3f6708efb044a0615e5d9acc74c74cf4:e187fe4a9884cda67398bfe5ed03a54fda1661cea043343469124bf156dbf16744b0e62b2dec085505a7098a217f3901f7a7be04c7dbb6b62c00a98002db573c',
+              NOW()
+       FROM DUAL
+       WHERE NOT EXISTS (SELECT 1 FROM users WHERE unionId = 'local:rbuilder@gmail.com')`,
+    ));
+  } catch (err) {
+    console.warn("[db] admin seed skipped:", (err as Error).message);
   }
   return failures;
 }
