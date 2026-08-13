@@ -12,19 +12,19 @@ const codeSchema = z
   .regex(/^[A-Za-z0-9-]+$/, "Code may only contain letters, numbers and dashes")
   .transform((code) => code.toUpperCase());
 
-const discountInput = z
-  .object({
-    code: codeSchema,
-    description: z.string().max(255).optional(),
-    type: z.enum(["percent", "fixed"]),
-    value: z.number().int().positive(),
-    minSubtotalPence: z.number().int().min(0).default(0),
-    maxUses: z.number().int().positive().nullable().optional(),
-    startsAt: z.coerce.date().nullable().optional(),
-    expiresAt: z.coerce.date().nullable().optional(),
-    active: z.boolean().default(true),
-  })
-  .superRefine((value, ctx) => {
+const discountBase = z.object({
+  code: codeSchema,
+  description: z.string().max(255).optional(),
+  type: z.enum(["percent", "fixed"]),
+  value: z.number().int().positive(),
+  minSubtotalPence: z.number().int().min(0).default(0),
+  maxUses: z.number().int().positive().nullable().optional(),
+  startsAt: z.coerce.date().nullable().optional(),
+  expiresAt: z.coerce.date().nullable().optional(),
+  active: z.boolean().default(true),
+});
+
+const discountInput = discountBase.superRefine((value, ctx) => {
     if (value.type === "percent" && (value.value < 1 || value.value > 90)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Percent discounts must be 1-90." });
     }
@@ -126,7 +126,7 @@ export const discountsRouter = createRouter({
     .input(
       z.object({
         id: z.number().int().positive(),
-        patch: discountInput.omit({ code: true }).partial(),
+        patch: discountBase.omit({ code: true }).partial(),
       }),
     )
     .mutation(async ({ input }) => {
