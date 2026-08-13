@@ -1,4 +1,4 @@
-CREATE TABLE `discounts` (
+CREATE TABLE IF NOT EXISTS `discounts` (
 	`id` serial AUTO_INCREMENT NOT NULL,
 	`code` varchar(32) NOT NULL,
 	`description` varchar(255),
@@ -17,7 +17,7 @@ CREATE TABLE `discounts` (
 	CONSTRAINT `discounts_code_unique` UNIQUE(`code`)
 );
 --> statement-breakpoint
-CREATE TABLE `product_overrides` (
+CREATE TABLE IF NOT EXISTS `product_overrides` (
 	`id` serial AUTO_INCREMENT NOT NULL,
 	`productSlug` varchar(128) NOT NULL,
 	`name` varchar(255),
@@ -32,7 +32,7 @@ CREATE TABLE `product_overrides` (
 	CONSTRAINT `product_overrides_productSlug_unique` UNIQUE(`productSlug`)
 );
 --> statement-breakpoint
-CREATE TABLE `refunds` (
+CREATE TABLE IF NOT EXISTS `refunds` (
 	`id` serial AUTO_INCREMENT NOT NULL,
 	`orderId` bigint unsigned NOT NULL,
 	`amountPence` int NOT NULL,
@@ -42,19 +42,17 @@ CREATE TABLE `refunds` (
 	CONSTRAINT `refunds_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-ALTER TABLE `orders` ADD `paymentProvider` varchar(32) DEFAULT 'wallid' NOT NULL;--> statement-breakpoint
-ALTER TABLE `orders` ADD `paymentId` varchar(64);--> statement-breakpoint
-ALTER TABLE `orders` ADD `paymentStatus` varchar(32) DEFAULT 'NEW' NOT NULL;--> statement-breakpoint
-ALTER TABLE `orders` ADD `paymentReturnToken` varchar(64);--> statement-breakpoint
-ALTER TABLE `orders` ADD `hubspotContactId` varchar(64);--> statement-breakpoint
-ALTER TABLE `orders` ADD `hubspotCompanyId` varchar(64);--> statement-breakpoint
-ALTER TABLE `orders` ADD `hubspotDealId` varchar(64);--> statement-breakpoint
-ALTER TABLE `orders` ADD `hubspotSyncedAt` timestamp;--> statement-breakpoint
-ALTER TABLE `orders` ADD `hubspotSyncError` text;--> statement-breakpoint
-ALTER TABLE `orders` ADD `discountCode` varchar(32);--> statement-breakpoint
-ALTER TABLE `orders` ADD `promoDiscountPence` int DEFAULT 0 NOT NULL;--> statement-breakpoint
-ALTER TABLE `orders` ADD `refundedPence` int DEFAULT 0 NOT NULL;--> statement-breakpoint
-ALTER TABLE `orders` ADD `courier` varchar(64);--> statement-breakpoint
-ALTER TABLE `orders` ADD `trackingNumber` varchar(64);--> statement-breakpoint
-ALTER TABLE `orders` ADD CONSTRAINT `orders_paymentId_unique` UNIQUE(`paymentId`);--> statement-breakpoint
-ALTER TABLE `orders` ADD CONSTRAINT `orders_paymentReturnToken_unique` UNIQUE(`paymentReturnToken`);
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `paymentProvider` varchar(32) DEFAULT 'wallid' NOT NULL;--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `paymentId` varchar(64);--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `paymentStatus` varchar(32) DEFAULT 'NEW' NOT NULL;--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `paymentReturnToken` varchar(64);--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `hubspotContactId` varchar(64);--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `hubspotCompanyId` varchar(64);--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `hubspotDealId` varchar(64);--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `hubspotSyncedAt` timestamp;--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `hubspotSyncError` text;--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `discountCode` varchar(32);--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `promoDiscountPence` int DEFAULT 0 NOT NULL;--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `refundedPence` int DEFAULT 0 NOT NULL;--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `courier` varchar(64);--> statement-breakpoint
+ALTER TABLE `orders` ADD COLUMN IF NOT EXISTS `trackingNumber` varchar(64);
