@@ -60,6 +60,15 @@ const COLUMNS: Array<{ table: string; column: string; ddl: string }> = [
   { table: "orders", column: "refundedPence", ddl: "int DEFAULT 0 NOT NULL" },
   { table: "orders", column: "courier", ddl: "varchar(64)" },
   { table: "orders", column: "trackingNumber", ddl: "varchar(64)" },
+  { table: "orders", column: "paymentProvider", ddl: "varchar(32) DEFAULT 'wallid' NOT NULL" },
+  { table: "orders", column: "paymentId", ddl: "varchar(64)" },
+  { table: "orders", column: "paymentStatus", ddl: "varchar(32) DEFAULT 'NEW' NOT NULL" },
+  { table: "orders", column: "paymentReturnToken", ddl: "varchar(64)" },
+  { table: "orders", column: "hubspotContactId", ddl: "varchar(64)" },
+  { table: "orders", column: "hubspotCompanyId", ddl: "varchar(64)" },
+  { table: "orders", column: "hubspotDealId", ddl: "varchar(64)" },
+  { table: "orders", column: "hubspotSyncedAt", ddl: "timestamp NULL" },
+  { table: "orders", column: "hubspotSyncError", ddl: "text" },
   { table: "users", column: "passwordHash", ddl: "varchar(255)" },
 ];
 
