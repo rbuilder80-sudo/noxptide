@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { and, asc, eq } from "drizzle-orm";
-import { productStatuses, productVariants } from "@db/schema";
+import { productOverrides, productStatuses, productVariants } from "@db/schema";
 import { products as storefrontProducts } from "@/data/products";
 import { getDb } from "./queries/connection";
 import { createRouter, publicQuery, editorQuery } from "./middleware";
@@ -91,6 +91,53 @@ export const productsRouter = createRouter({
             eq(productVariants.sizeLabel, input.sizeLabel),
           ),
         );
+      return { success: true };
+    }),
+
+  /** Public: listing-level overrides (name/description/category/image) for storefront rendering. */
+  listingOverrides: publicQuery.query(async () => {
+    const db = getDb();
+    return db.select().from(productOverrides).orderBy(asc(productOverrides.productSlug));
+  }),
+
+  /** Editor+: upsert listing-level overrides for one product. Null/undefined fields fall back to the static catalogue. */
+  upsertListing: editorQuery
+    .input(
+      z.object({
+        productSlug: z.string().min(1).max(128),
+        name: z.string().min(1).max(255).nullish(),
+        tagline: z.string().max(255).nullish(),
+        description: z.string().max(20000).nullish(),
+        categorySlug: z.string().max(128).nullish(),
+        imageUrl: z.string().max(2000).nullish(),
+        detailsJson: z.string().max(50000).nullish(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = getDb();
+      const by = ctx.user.name ?? ctx.user.email ?? "admin";
+      const fields = {
+        name: input.name ?? null,
+        tagline: input.tagline ?? null,
+        description: input.description ?? null,
+        categorySlug: input.categorySlug ?? null,
+        imageUrl: input.imageUrl ?? null,
+        detailsJson: input.detailsJson ?? null,
+        updatedBy: by,
+      };
+      await db
+        .insert(productOverrides)
+        .values({ productSlug: input.productSlug, ...fields })
+        .onDuplicateKeyUpdate({ set: fields });
+      return { success: true };
+    }),
+
+  /** Editor+: delete a listing override, reverting to the static catalogue entry. */
+  removeListing: editorQuery
+    .input(z.object({ productSlug: z.string().max(128) }))
+    .mutation(async ({ input }) => {
+      const db = getDb();
+      await db.delete(productOverrides).where(eq(productOverrides.productSlug, input.productSlug));
       return { success: true };
     }),
 
