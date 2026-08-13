@@ -83,9 +83,9 @@ export const products: Product[] = [
     short:
       'The most-researched gastric pentadecapeptide for tissue repair, tendon and gut-integrity studies. ≥99% purity, batch-verified COA with every vial.',
     description: [
-      'BPC-157 is a synthetic pentadecapeptide derived from a protective protein found in human gastric juice. It has become one of the most extensively studied research peptides in the world, with a substantial body of preclinical literature examining its role in angiogenesis, tendon-to-bone healing, gastrointestinal integrity and systemic wound repair models.',
+      'BPC-157 — the "Body Protection Compound" — is a synthetic pentadecapeptide derived from a protective protein found in human gastric juice. It has become one of the most extensively studied research peptides in the world, with a substantial body of preclinical literature examining its role in angiogenesis, tendon-to-bone healing, gastrointestinal integrity and systemic wound repair models. It is also one half of the most common pairing in repair research, with many laboratories studying BPC-157 and TB-500 in complementary models. All findings described here derive from preclinical research; BPC-157 is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Noxptide BPC-157 is synthesised using solid-phase peptide synthesis (SPPS) and purified by preparative HPLC to ≥99% purity. Every production batch is independently verified by HPLC and mass spectrometry, and the batch-specific Certificate of Analysis is available to download before you order — because serious research demands verifiable quality.',
-      'Supplied as a lyophilised powder in sterile, tamper-evident vials. Each order is dispatched from our UK facility in discreet, temperature-conscious packaging with tracked delivery as standard.',
+      'Supplied as a lyophilised powder in sterile, tamper-evident vials. For BPC-157 reconstitution, bacteriostatic water is the literature-standard solvent; once reconstituted, refrigerate at 2–8°C and use within 28 days. This is the BPC-157 peptide UK laboratories request most: as one of the most-requested UK peptides, BPC-157 is available to research institutions in 5 mg and 10 mg vials, each dispatched from our UK facility in discreet, temperature-conscious packaging with tracked delivery as standard — supplied for research use only.',
     ],
     applications: [
       'Tendon, ligament and soft-tissue repair models',
@@ -137,7 +137,7 @@ export const products: Product[] = [
     description: [
       'TB-500 is a synthetic version of Thymosin Beta-4, a naturally occurring 43-amino-acid peptide that plays a central role in actin regulation, cell migration and tissue repair. It is one of the cornerstones of regenerative research and is frequently studied alongside BPC-157 in complementary repair models. All findings described here derive from preclinical research; TB-500 is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Our TB-500 is produced by solid-phase synthesis, purified via preparative HPLC, and confirmed to ≥99% purity with full mass spectrometry characterisation. Batch-specific Certificates of Analysis ship with every order.',
-      'Lyophilised for maximum stability and dispatched from the UK with tracked, discreet delivery and cold-chain options available on request.',
+      'Correct TB-500 storage preserves activity: keep the lyophilised vial at -20°C and, once reconstituted, refrigerate at 2–8°C and use within 21 days. Laboratories looking to buy TB500 (TB-500) for research can choose TB-500 5 mg or TB-500 10 mg vials, lyophilised for maximum stability and dispatched from the UK with tracked, discreet delivery and cold-chain options available on request — supplied for research use only.',
     ],
     applications: [
       'Cell migration and actin-binding research',
@@ -186,9 +186,9 @@ export const products: Product[] = [
     short:
       'The definitive copper peptide for dermatological, extracellular-matrix and wound-healing research. Batch-verified ≥99% purity with COA.',
     description: [
-      'GHK-Cu (Copper Tripeptide-1) is a naturally occurring copper complex of the tripeptide glycyl-L-histidyl-L-lysine. First isolated from human plasma, it has been the subject of four decades of research into skin remodelling, collagen synthesis, antioxidant defence and wound repair.',
+      'GHK-Cu (Copper Tripeptide-1) is a naturally occurring copper complex of the tripeptide glycyl-L-histidyl-L-lysine. First isolated from human plasma, it has been the subject of four decades of research into skin remodelling, collagen synthesis, antioxidant defence and wound repair. Sometimes shortened to "GHK copper" in the research community, it remains the reference copper peptide in dermatological research. All findings described here derive from preclinical and in-vitro research; GHK-Cu is supplied strictly for laboratory use.',
       'Noxptide GHK-Cu is synthesised to ≥99% purity and independently verified by HPLC and MS. Its characteristic deep-blue colour confirms proper copper chelation — a simple visual marker of quality that cheaper, poorly chelated material fails to show.',
-      'Supplied lyophilised in sterile vials with batch-specific Certificates of Analysis and full traceability.',
+      'Supplied lyophilised in sterile vials with batch-specific Certificates of Analysis and full traceability. GHK-Cu reconstitution follows standard laboratory practice — bacteriostatic water under sterile conditions, then refrigerate at 2–8°C protected from light. Researchers looking to buy GHK-Cu, or to buy copper peptides more broadly, should note that the GHK-Cu for sale here is research-grade material in 50 mg and 100 mg vials, supplied strictly for in-vitro laboratory research.',
     ],
     applications: [
       'Collagen and extracellular-matrix synthesis research',
@@ -239,7 +239,7 @@ export const products: Product[] = [
     description: [
       'Ipamorelin is a pentapeptide growth hormone secretagogue renowned in the research literature for its selectivity: it stimulates growth hormone release via the ghrelin receptor (GHS-R1a) without the significant cortisol or prolactin activity observed with earlier GHRPs, making it a clean tool for endocrine research. The CJC-1295–Ipamorelin pairing is one of the most studied combinations in the field, with the GHRH analogue and the selective GHRP acting on complementary receptors. All findings described here derive from preclinical research; Ipamorelin is supplied strictly for laboratory use.',
       'Our Ipamorelin is synthesised by SPPS, purified by preparative HPLC to ≥99%, and every batch is confirmed by mass spectrometry. The batch Certificate of Analysis is available before purchase on request.',
-      'Dispatched from our UK facility in discreet, tracked packaging with same-day dispatch before 4pm.',
+      'Laboratories comparing CJC-1295–Ipamorelin prices will find both compounds for sale individually at the same documentation standard; Ipamorelin is available in 5 mg and 10 mg vials, the 5 mg format being the usual starting point in a CJC-1295–Ipamorelin research design — supplied for research use only. Dispatched from our UK facility in discreet, tracked packaging with same-day dispatch before 4pm.',
     ],
     applications: [
       'Growth-hormone secretagogue receptor (GHS-R1a) research',
@@ -255,6 +255,10 @@ export const products: Product[] = [
       {
         q: 'Why do researchers choose Ipamorelin over other GHRPs?',
         a: 'Ipamorelin shows the highest selectivity of the GHRP class in published research, with minimal off-target activity on cortisol and prolactin axes.',
+      },
+      {
+        q: 'Ipamorelin vs CJC-1295: which should a research programme use?',
+        a: 'They act on different receptors — CJC-1295 on the GHRH receptor, Ipamorelin on GHS-R1a — so the CJC-1295 vs Ipamorelin question is usually answered by running both in a synergistic design. For Ipamorelin reconstitution, bacteriostatic water under sterile conditions is standard; refrigerate at 2–8°C afterwards and use within 21 days.',
       },
       {
         q: 'What is the shelf life?',
@@ -288,9 +292,9 @@ export const products: Product[] = [
     short:
       'The gold-standard GHRH analogue for pulsatile growth-hormone research. Modified GRF 1-29, ≥99% purity, fully documented with batch COA.',
     description: [
-      'CJC-1295 without DAC (Drug Affinity Complex), also known as Modified GRF 1-29, is a tetrasubstituted analogue of growth-hormone-releasing hormone. The four amino-acid substitutions protect it from DPP-IV cleavage while preserving the short, physiologically pulsatile activity profile preferred in endocrine research.',
+      'CJC-1295 without DAC (Drug Affinity Complex), also known as Modified GRF 1-29, is a tetrasubstituted analogue of growth-hormone-releasing hormone. The four amino-acid substitutions protect it from DPP-IV cleavage while preserving the short, physiologically pulsatile activity profile preferred in endocrine research. All findings described here derive from preclinical research; CJC-1295 is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Each batch is synthesised, purified to ≥99% by preparative HPLC and identity-confirmed by mass spectrometry. Batch-specific Certificates of Analysis ship with every order.',
-      'Frequently studied alongside selective secretagogues such as Ipamorelin in synergistic GHRH/GHRP research models.',
+      'Frequently studied alongside selective secretagogues such as Ipamorelin in synergistic GHRH/GHRP research models — the CJC-1295–Ipamorelin combination is among the most cited designs in the secretagogue literature. Correct CJC-1295 storage is essential: lyophilised at -20°C, then refrigerated at 2–8°C after reconstitution and used within 14 days. UK laboratories looking to buy CJC-1295 will find the No-DAC form in CJC-1295 2 mg and 5 mg vials, supplied with batch COAs for research use only.',
     ],
     applications: [
       'GHRH receptor signalling research',
@@ -345,7 +349,7 @@ export const products: Product[] = [
     description: [
       'Tesamorelin is a stabilised synthetic analogue of human growth-hormone-releasing hormone comprising the full 44-amino-acid GHRH sequence with an N-terminal hexenoyl modification that resists enzymatic degradation. It is among the most extensively documented peptides in the endocrine research literature. All findings described here derive from preclinical and clinical literature; the material supplied here is strictly for laboratory research use and is not for human or veterinary use.',
       'Our Tesamorelin is produced to ≥99% purity, independently verified by HPLC and MS, and supplied lyophilised with a batch-specific Certificate of Analysis.',
-      'A premium compound for metabolic and endocrine research programmes that demand the highest documentation standards.',
+      'A premium compound for metabolic and endocrine research programmes that demand the highest documentation standards. As a UK peptide supplier focused on research peptides, UK laboratories receive the same analytical package on every vial — HPLC peptide testing for purity and mass spectrometry for identity — with Tesamorelin reconstitution of the 2 mg and 5 mg vials following standard laboratory practice (bacteriostatic water, sterile conditions, then refrigeration at 2–8°C for use within 14 days).',
     ],
     applications: [
       'GHRH receptor pharmacology research',
@@ -396,7 +400,7 @@ export const products: Product[] = [
     description: [
       'Semax is a synthetic heptapeptide based on the ACTH(4-10) fragment, extended with a C-terminal Pro-Gly-Pro sequence for stability. Developed through decades of neuroscience research, it is one of the most studied peptides in cognitive and neuroprotective research models. All findings described here derive from preclinical research; Semax is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Noxptide Semax is synthesised to ≥99% purity, verified by independent HPLC and mass spectrometry, and supplied with a batch-specific Certificate of Analysis.',
-      'Lyophilised and light-protected for stability, dispatched from the UK with tracked delivery.',
+      'Lyophilised and light-protected for stability, dispatched from the UK with tracked delivery. As a UK peptide supplier and specialist peptide shop for research peptides, UK neuroscience laboratories receive the same verification package on every batch — HPLC peptide testing to ≥99% purity with mass spectrometry identity confirmation — in 5 mg and 10 mg vials, for research use only.',
     ],
     applications: [
       'Neuroprotection and ischemia research models',
@@ -447,7 +451,7 @@ export const products: Product[] = [
     description: [
       'Selank is a synthetic heptapeptide analogue of the immunomodulatory tetrapeptide tuftsin, extended with a Pro-Gly-Pro tail for metabolic stability. It occupies a unique position in the research literature at the intersection of neuroimmune signalling and CNS regulation. All findings described here derive from preclinical research; Selank is supplied strictly for laboratory use.',
       'Our Selank is synthesised to ≥99% purity and independently verified by HPLC and MS. Every batch ships with its Certificate of Analysis.',
-      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery as standard.',
+      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery as standard. Laboratories searching for Selank for sale will find the research-grade peptide here in 5 mg and 10 mg vials — including researchers who arrive looking to buy Selank spray or to buy N-Acetyl Selank, who should note that this listing is the reference lyophilised Selank sequence for laboratory reconstitution, not a consumer spray format — supplied strictly for research use.',
     ],
     applications: [
       'Neuroimmune signalling research',
@@ -525,7 +529,7 @@ export const products: Product[] = [
       },
       {
         q: 'How is it supplied?',
-        a: 'As a lyophilised powder in sterile tamper-evident vials, with tracked UK delivery.',
+        a: 'As a lyophilised powder in sterile tamper-evident vials, with tracked UK delivery. Standard peptide reconstitution practice applies (bacteriostatic water, sterile conditions), and every batch ships with a Certificate of Analysis from independent HPLC peptide testing.',
       },
     ],
   },
@@ -604,7 +608,7 @@ export const products: Product[] = [
     description: [
       'Melanotan II (MT-2) is a synthetic cyclic heptapeptide analogue of alpha-melanocyte-stimulating hormone (α-MSH) and one of the most widely used reference compounds in melanocortin receptor research, with activity documented across MC1R through MC5R subtypes. All findings described here derive from preclinical research; Melanotan II is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Noxptide Melanotan II is synthesised to ≥99% purity, independently verified by HPLC and mass spectrometry, and shipped with a batch-specific Certificate of Analysis.',
-      'Light-protected, lyophilised and dispatched tracked from our UK facility.',
+      'Light-protected, lyophilised and dispatched tracked from our UK facility. When UK laboratories order Melanotan 2 for research, batch documentation matters more than price — the peptides UK Melanotan 2 listings that circulate on unverified marketplaces rarely carry one. Ours does: 10 mg Melanotan 2 and 20 mg vials, each with its batch-specific COA, supplied for research use only.',
     ],
     applications: [
       'Melanocortin receptor (MC1R–MC5R) research',
@@ -623,7 +627,11 @@ export const products: Product[] = [
       },
       {
         q: 'How should it be stored?',
-        a: 'Lyophilised at -20°C, protected from light. After reconstitution, refrigerate at 2–8°C.',
+        a: 'Correct Melanotan 2 storage is lyophilised at -20°C, protected from light. After reconstitution, refrigerate at 2–8°C.',
+      },
+      {
+        q: 'Why not simply search "Melanotan 2 Amazon" and buy there?',
+        a: 'Marketplace listings rarely provide batch-specific analytical verification. Laboratory research requires a documented chain of quality — independent HPLC peptide testing, MS identity confirmation and a batch Certificate of Analysis — which is what we supply with every vial.',
       },
       {
         q: 'Is a Certificate of Analysis included?',
@@ -653,7 +661,7 @@ export const products: Product[] = [
     short:
       'Bremelanotide — the MC4R-preferring melanocortin for CNS and sexual-function receptor research. ≥99% purity with full COA documentation.',
     description: [
-      'PT-141 (Bremelanotide) is a metabolite-derived melanocortin peptide closely related to Melanotan II but with a free C-terminal carboxyl group, shifting its research profile toward MC4R-mediated central nervous system pathways. It is one of the most clinically documented melanocortin peptides in existence.',
+      'PT-141 (Bremelanotide) is a metabolite-derived melanocortin peptide closely related to Melanotan II but with a free C-terminal carboxyl group, shifting its research profile toward MC4R-mediated central nervous system pathways. It is one of the most clinically documented melanocortin peptides in existence. All findings described here derive from preclinical and clinical literature; the material supplied here is strictly for laboratory research use.',
       'Our PT-141 is synthesised to ≥99% purity, independently verified by HPLC and MS, and supplied with a batch-specific Certificate of Analysis.',
       'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery. PT-141 price reflects its cyclic, synthesis-intensive structure; UK laboratories that order PT-141 for research can choose PT-141 10 mg or 20 mg vials, each with a batch-specific COA, supplied for research use only.',
     ],

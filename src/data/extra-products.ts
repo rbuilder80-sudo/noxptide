@@ -40,7 +40,7 @@ export const extraProducts: Product[] = [
       },
       {
         q: 'How does Sermorelin compare to CJC-1295 (No DAC)?',
-        a: 'Both target the GHRH receptor. CJC-1295 (No DAC) carries four substitutions that resist DPP-IV degradation; Sermorelin is the native sequence fragment, useful as the reference standard.',
+        a: 'Both target the GHRH receptor. CJC-1295 (No DAC) carries four substitutions that resist DPP-IV degradation; Sermorelin is the native sequence fragment, useful as the reference standard. In CJC-1295/Ipamorelin vs Sermorelin designs, the literature generally positions the secretagogue pairing as the synergistic option and Sermorelin as the native-sequence comparator.',
       },
       {
         q: 'What purity is supplied?',
@@ -74,7 +74,7 @@ export const extraProducts: Product[] = [
     short:
       'The mitochondrial-encoded peptide at the centre of metabolic and exercise-mimetic research. ≥99% purity, batch-verified, COA included.',
     description: [
-      'MOTS-c is a 16-amino-acid peptide encoded within the mitochondrial 12S rRNA gene — part of a recently discovered class of mitochondrial-derived peptides that has reshaped how researchers think about mitochondrial–nuclear signalling. The literature concentrates on metabolic regulation, insulin sensitivity pathways and exercise-mimetic models.',
+      'MOTS-c is a 16-amino-acid peptide encoded within the mitochondrial 12S rRNA gene — part of a recently discovered class of mitochondrial-derived peptides that has reshaped how researchers think about mitochondrial–nuclear signalling. The literature concentrates on metabolic regulation, insulin sensitivity pathways and exercise-mimetic models. All findings described here derive from preclinical research; MOTS-c is supplied strictly for laboratory use.',
       'Because MOTS-c sits at the frontier of metabolic research, batch quality matters doubly: our material is independently verified to ≥99% purity by HPLC with MS identity confirmation, and every order ships with a batch-specific COA.',
       'Lyophilised, sterile-vialed and dispatched tracked from the UK with same-day dispatch before 4pm. MOTS-c for sale here is research-grade material in MOTS-c 10 mg and 20 mg vials, each with a batch-specific COA — supplied strictly for laboratory research use.',
     ],
@@ -125,9 +125,9 @@ export const extraProducts: Product[] = [
     short:
       'The lipidated amylin analogue driving the next wave of appetite-regulation research. ≥99% purity with full batch COA documentation.',
     description: [
-      'Cagrilintide is a long-acting amylin analogue engineered with a fatty-acid side chain for extended receptor exposure. Amylin-pathway research has expanded rapidly as laboratories investigate complementary appetite-regulation mechanisms beyond the incretin axis, and cagrilintide is the field\'s reference compound.',
+      'Cagrilintide is a long-acting amylin analogue engineered with a fatty-acid side chain for extended receptor exposure. Amylin-pathway research has expanded rapidly as laboratories investigate complementary appetite-regulation mechanisms beyond the incretin axis, and cagrilintide is the field\'s reference compound, frequently examined alongside semaglutide-class incretin compounds in comparative appetite-regulation research. All findings described here derive from preclinical and clinical literature; the material supplied here is strictly for laboratory research use.',
       'As a large, lipidated peptide, cagrilintide demands exacting synthesis and purification. Our material is independently verified to ≥99% purity by HPLC with mass spectrometry identity confirmation, and ships with a batch-specific Certificate of Analysis.',
-      'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility.',
+      'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility. As a UK peptide supplier and peptide shop focused on research peptides, UK metabolic-research laboratories receive batch-verified cagrilintide in 5 mg and 10 mg vials, for research use only.',
     ],
     applications: [
       'Amylin receptor pharmacology research',
@@ -234,7 +234,7 @@ export const extraProducts: Product[] = [
     description: [
       'Reduced L-Glutathione is the cell\'s primary endogenous antioxidant — the glutathione peptide is a tripeptide (γ-Glu-Cys-Gly) central to redox homeostasis, detoxification pathways and oxidative-stress research across cell biology. This glutathione tripeptide is supplied strictly for laboratory research; all findings described here derive from preclinical research.',
       'Glutathione oxidises readily, so purity and handling determine whether your assay measures the reduced form or its disulphide. Our material is independently verified to ≥99% purity by HPLC and ships with a batch-specific COA.',
-      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
+      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery. As a UK peptide supplier and peptide shop for research peptides, UK cell-biology laboratories receive batch-verified material in 600 mg and 1200 mg vials, for research use only.',
     ],
     applications: [
       'Oxidative-stress and redox-biology research',
@@ -283,7 +283,7 @@ export const extraProducts: Product[] = [
     short:
       'The minimal anti-inflammatory fragment of α-MSH for immune-modulation research. ≥99% purity, batch COA with every order.',
     description: [
-      'KPV (Lys-Pro-Val) is the C-terminal tripeptide of alpha-melanocyte-stimulating hormone — the smallest fragment retaining the parent hormone\'s anti-inflammatory activity in research models, without its melanocortin pigmentation effects. That separation makes KPV a clean tool for immune-modulation research.',
+      'KPV (Lys-Pro-Val) is the C-terminal tripeptide of alpha-melanocyte-stimulating hormone — the smallest fragment retaining the parent hormone\'s anti-inflammatory activity in research models, without its melanocortin pigmentation effects. That separation makes KPV a clean tool for immune-modulation research. The BPC–KPV pairing is also well established in the literature, with many gut-integrity research programmes studying BPC-157 and KPV in complementary models. All findings described here derive from preclinical research; KPV is supplied strictly for laboratory use.',
       'Published work examines KPV in intestinal inflammation models, NF-κB pathway regulation and epithelial barrier research. Our KPV is independently verified to ≥99% purity by HPLC and MS, and ships with a batch-specific Certificate of Analysis.',
       'Supplied lyophilised, sterile-vialed and dispatched tracked from the UK. For laboratories looking to buy the KPV peptide, UK research institutions can choose 10 mg and 20 mg vials, each with a batch-specific COA — supplied strictly for laboratory research use.',
     ],
@@ -336,7 +336,7 @@ export const extraProducts: Product[] = [
     description: [
       'DSIP (Delta Sleep-Inducing Peptide) is a nonapeptide first isolated in 1977 during research into sleep-regulating factors. Its literature spans sleep-architecture models, HPA-axis (stress) regulation and neuroendocrine signalling, making the DSIP peptide one of the longest-studied neuropeptides in the catalogue. All findings described here derive from preclinical research; DSIP is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Noxptide DSIP is synthesised to ≥99% purity, independently verified by HPLC and mass spectrometry, and supplied with a batch-specific Certificate of Analysis.',
-      'Lyophilised, sterile-vialed and dispatched tracked from our UK facility.',
+      'Lyophilised, sterile-vialed and dispatched tracked from our UK facility. As a UK peptide supplier of research peptides, UK neuroscience laboratories can choose DSIP 5 mg and 10 mg vials, each with a batch-specific COA, for research use only.',
     ],
     applications: [
       'Sleep-regulation and circadian research models',
@@ -386,7 +386,7 @@ export const extraProducts: Product[] = [
     description: [
       'Hexarelin (Examorelin) is a synthetic hexapeptide growth hormone secretagogue — among the most potent of the GHRP class at the ghrelin receptor (GHS-R1a) in published research, with an additional literature strand examining CD36-mediated cardiac pathways. All findings described here derive from preclinical research; Hexarelin is supplied strictly for laboratory use.',
       'Our Hexarelin is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry. Every order ships with a batch-specific Certificate of Analysis.',
-      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
+      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery. As a UK peptide supplier and peptide shop specialising in research peptides, UK endocrine laboratories receive batch-verified Hexarelin in 2 mg and 5 mg vials, for research use only.',
     ],
     applications: [
       'GHS-R1a receptor pharmacology research',
@@ -404,8 +404,12 @@ export const extraProducts: Product[] = [
         a: 'Examorelin is the INN (generic name) for Hexarelin; the two terms refer to the same hexapeptide.',
       },
       {
+        q: 'How should Hexarelin be stored and reconstituted?',
+        a: 'Standard peptide storage and peptide reconstitution practice applies: lyophilised at -20°C, reconstitute with bacteriostatic water under sterile conditions, then refrigerate at 2–8°C and use within 21 days.',
+      },
+      {
         q: 'What purity is supplied?',
-        a: '≥99% by independent HPLC with MS identity confirmation, documented on the batch COA included with every order.',
+        a: '≥99% peptide purity by independent HPLC peptide testing with MS identity confirmation, documented on the batch COA included with every order.',
       },
     ],
     references: [
@@ -488,7 +492,7 @@ export const extraProducts: Product[] = [
     description: [
       'Testagen (KEDG) is a synthetic tetrapeptide of the Khavinson bioregulator family, examined in the research literature as a testis-directed short-peptide probe for studying tissue-specific gene-expression regulation in reproductive-tissue experimental systems.',
       'Within the Khavinson framework, short peptides of this class are proposed to act at the chromatin/transcriptional level; Testagen is used as a tool compound for peptide-driven regulation studies and as a comparator in tissue-specificity panels across the bioregulator family.',
-      'Our Testagen is independently verified to ≥99% purity by HPLC and MS, and ships with a batch-specific Certificate of Analysis.',
+      'Our Testagen is independently verified to ≥99% purity by HPLC and MS, and ships with a batch-specific Certificate of Analysis. All findings described here derive from preclinical research; Testagen is supplied strictly for laboratory use. As a UK peptide supplier and peptide shop stocking research peptides, UK laboratories receive Testagen in 20 mg and 40 mg vials, for research use only.',
     ],
     applications: [
       'Gene-expression regulation research (Khavinson framework)',

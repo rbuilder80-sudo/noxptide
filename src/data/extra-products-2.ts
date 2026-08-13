@@ -22,7 +22,7 @@ export const extraProducts2: Product[] = [
     description: [
       'GHRP-6 is the pioneering synthetic hexapeptide of the growth-hormone-releasing peptide class. Its discovery opened the entire research field around the ghrelin receptor (GHS-R1a), and it remains the standard reference compound for comparative secretagogue pharmacology, including studies of its documented orexigenic (appetite-pathway) activity. All findings described here derive from preclinical research; GHRP-6 is supplied strictly for laboratory use.',
       'Noxptide GHRP-6 is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry. Every order ships with a batch-specific Certificate of Analysis.',
-      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
+      'Researchers looking to buy GHRP-6 in the UK can choose GHRP-6 5 mg or GHRP-6 10 mg vials, supplied lyophilised in sterile, tamper-evident packaging with tracked UK delivery — for research use only.',
     ],
     applications: [
       'GHS-R1a (ghrelin receptor) reference research',
@@ -70,7 +70,7 @@ export const extraProducts2: Product[] = [
     description: [
       'GHRP-2 (Pralmorelin) is a second-generation synthetic hexapeptide secretagogue, documented in the literature as among the most potent of the GHRP class at the ghrelin receptor. It is widely used as a benchmark compound in comparative studies of secretagogue potency, pharmacokinetics and pituitary signalling. All findings described here derive from preclinical research; GHRP-2 is supplied strictly for laboratory use.',
       'Our GHRP-2 is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry against its theoretical 817.98 g/mol. Every batch ships with its Certificate of Analysis.',
-      'Supplied lyophilised in sterile, tamper-evident vials, dispatched tracked from our UK facility.',
+      'GHRP-2 storage is lyophilised at -20°C, and GHRP-2 reconstitution follows standard practice with bacteriostatic water under sterile conditions, then refrigeration at 2–8°C. Researchers looking to buy GHRP-2 in the UK can choose GHRP-2 5 mg or GHRP-2 10 mg vials, supplied lyophilised in sterile, tamper-evident packaging and dispatched tracked from our UK facility — for research use only.',
     ],
     applications: [
       'Ghrelin receptor (GHS-R1a) pharmacology research',
@@ -184,6 +184,10 @@ export const extraProducts2: Product[] = [
         a: 'It depends on protocol design: No-DAC (Modified GRF 1-29) preserves pulsatile signalling; the DAC form suits sustained-exposure models. We stock both, each with batch-specific COAs.',
       },
       {
+        q: 'CJC-1295 vs Ipamorelin — how do they relate?',
+        a: 'CJC-1295 acts at the GHRH receptor while Ipamorelin acts at GHS-R1a, so the Ipamorelin vs CJC-1295 comparison reflects complementary mechanisms; most CJC-1295–Ipamorelin research designs run the two together.',
+      },
+      {
         q: 'How is it stored?',
         a: 'Lyophilised at -20°C; after reconstitution refrigerate at 2–8°C and use within 14 days.',
       },
@@ -214,7 +218,7 @@ export const extraProducts2: Product[] = [
     description: [
       'IGF-1 LR3 is an engineered analogue of insulin-like growth factor-1: an Arg3 substitution reduces binding-protein affinity and a 13-amino-acid N-terminal extension extends activity, making it the standard tool for sustained IGF signalling research in cell and tissue models. All findings described here derive from preclinical research; IGF-1 LR3 is supplied strictly for laboratory use.',
       'At 83 amino acids, IGF-1 LR3 is a recombinant-class protein rather than a simple synthetic peptide — and one of the most counterfeited compounds in the research market. Our material is independently verified to ≥99% purity with MS identity confirmation, and every vial ships with its batch-specific COA.',
-      'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility with cold-pack options available.',
+      'IGF-1 LR3 price reflects its recombinant-class production and verification cost. The IGF-1 LR3 for sale here is independently verified and supplied lyophilised in sterile 1 mg and 2 mg vials — UK laboratories can buy IGF-1 LR3 online with tracked delivery and cold-pack options available, for research use only. Dispatched tracked from our UK facility.',
     ],
     applications: [
       'IGF-1 receptor signalling research',
@@ -266,7 +270,7 @@ export const extraProducts2: Product[] = [
     description: [
       'PEG-MGF is the polyethylene-glycol-conjugated form of Mechano Growth Factor, the IGF-1Ec splice variant examined in the literature for its role in muscle repair and satellite-cell activation following mechanical damage. PEGylation protects the peptide from rapid degradation, extending its experimental window. All findings described here derive from preclinical research; PEG-MGF is supplied strictly for laboratory use.',
       'Our PEG-MGF is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry. Every order ships with a batch-specific Certificate of Analysis.',
-      'Supplied lyophilised in sterile, tamper-evident vials with tracked UK delivery.',
+      'PEG-MGF reconstitution follows standard laboratory practice: bacteriostatic water under sterile conditions, then refrigeration at 2–8°C. Researchers looking to buy PEG-MGF in the UK will find the PEG-MGF for sale here in PEG-MGF 2 mg and 5 mg vials, supplied lyophilised in sterile, tamper-evident packaging with tracked UK delivery — for research use only.',
     ],
     applications: [
       'Muscle repair and satellite-cell activation research',
@@ -409,7 +413,7 @@ export const extraProducts2: Product[] = [
     description: [
       'Kisspeptin-10 is the shortest fully active fragment of the kisspeptin family — the peptide system the literature places at the top of the reproductive endocrine cascade, signalling through the KISS1R (GPR54) receptor. It is a standard tool in hypothalamic–pituitary–gonadal axis research. All findings described here derive from preclinical research; the Kisspeptin-10 peptide is supplied strictly for laboratory use.',
       'Our Kisspeptin-10 is synthesised to ≥99% purity and independently verified by HPLC and mass spectrometry. Every order ships with a batch-specific Certificate of Analysis.',
-      'Supplied lyophilised in sterile vials, dispatched tracked from our UK facility.',
+      'Kisspeptin-10 for sale here is research-grade material: UK laboratories can buy Kisspeptin-10 in 5 mg and 10 mg vials, supplied lyophilised in sterile packaging and dispatched tracked from our UK facility — for research use only.',
     ],
     applications: [
       'KISS1R (GPR54) receptor signalling research',

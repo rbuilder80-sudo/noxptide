@@ -1,4 +1,4 @@
-import { products, categories, type Category, type Product } from './products'
+import { products, type Product } from './products'
 import { guides, type Guide } from './guides'
 import { allFaqs } from './faqs'
 
@@ -58,7 +58,6 @@ export function websiteLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    '@id': `${SITE_URL}/#website`,
     name: SITE_NAME,
     url: `${SITE_URL}/`,
     publisher: { '@id': ORG_ID },
@@ -252,38 +251,6 @@ export function guideSeo(guide: Guide): RouteSeo {
         { name: 'Home', path: '/' },
         { name: 'Guides', path: '/guides' },
         { name: guide.title },
-      ]),
-    ],
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/* Category hub routes (audit §8)                                      */
-/* ------------------------------------------------------------------ */
-
-export function categorySeo(category: Category): RouteSeo {
-  const path = `/category/${category.slug}`
-  const description = category.description
-  return {
-    title: `${category.name} | UK Research Peptides — Noxptide`,
-    description,
-    robots: INDEX_ROBOTS,
-    canonical: `${SITE_URL}${path}`,
-    ogType: 'website',
-    ogImage: DEFAULT_OG_IMAGE,
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'CollectionPage',
-        name: category.name,
-        description,
-        url: `${SITE_URL}${path}`,
-        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/` },
-      },
-      breadcrumbLd([
-        { name: 'Home', path: '/' },
-        { name: 'Shop', path: '/shop' },
-        { name: category.name },
       ]),
     ],
   }
@@ -515,7 +482,7 @@ export function seoForPath(path: string): RouteSeo {
   return { ...notFoundSeo, canonical: `${SITE_URL}${clean}` }
 }
 
-/** Indexable routes advertised in the XML sitemap (audit: 51 URLs + 4 category hubs). */
+/** Indexable routes advertised in the XML sitemap (audit: 51 URLs). */
 export const INDEXABLE_PATHS: string[] = [
   '/',
   '/shop',
@@ -526,7 +493,6 @@ export const INDEXABLE_PATHS: string[] = [
   '/shipping',
   '/legal',
   '/contact',
-  ...categories.map((c) => `/category/${c.slug}`),
   ...products.map((p) => `/product/${p.slug}`),
   ...guides.map((g) => `/guides/${g.slug}`),
 ]

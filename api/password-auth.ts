@@ -81,8 +81,8 @@ export function createPasswordLoginHandler() {
     });
     return c.json({ ok: true, name: user.name, role: user.role });
    } catch (err) {
-    const e = err as { message?: string; cause?: { message?: string } };
-    return c.json({ error: "debug", detail: String(e?.message).slice(0, 300), cause: String(e?.cause?.message ?? "").slice(0, 300) }, 500);
+    console.error("[auth] password login failed:", err);
+    return c.json({ error: "Sign in is temporarily unavailable — please try again." }, 500);
    }
   };
 }
