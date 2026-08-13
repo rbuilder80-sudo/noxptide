@@ -5,7 +5,7 @@ import { useSeo } from '../hooks/useSeo'
 import { coreSeo } from '../data/seo'
 import { products } from '../data/products'
 import ProductCard from '../components/ProductCard'
-import { isProductHidden, livePrice, useProductOverrides } from '../hooks/useProductOverrides'
+import { isProductHidden, liveName, livePrice, useProductOverrides } from '../hooks/useProductOverrides'
 
 export default function Shop() {
   useSeo({ pageKey: 'shop', ...coreSeo['/shop'] })
@@ -30,7 +30,10 @@ export default function Shop() {
     }
     if (sort === 'price-asc') list = [...list].sort((a, b) => fromPrice(a) - fromPrice(b))
     if (sort === 'price-desc') list = [...list].sort((a, b) => fromPrice(b) - fromPrice(a))
-    if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name))
+    if (sort === 'name')
+      list = [...list].sort((a, b) =>
+        liveName(overrides, a.slug, a.name).localeCompare(liveName(overrides, b.slug, b.name)),
+      )
     return list
   }, [q, sort, overrides])
 
