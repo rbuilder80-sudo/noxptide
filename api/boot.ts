@@ -136,5 +136,13 @@ if (env.isProduction) {
     } catch (err) {
       console.warn("[db] schema sync skipped:", (err as Error).message);
     }
+    // Idempotent guard independent of the drizzle journal (prod DB was
+    // partially managed via db:push, so the migrator can stop early).
+    try {
+      const { ensureSalesBackendSchema } = await import("./lib/ensure-schema");
+      await ensureSalesBackendSchema();
+    } catch (err) {
+      console.warn("[db] ensure-schema skipped:", (err as Error).message);
+    }
   })();
 }
