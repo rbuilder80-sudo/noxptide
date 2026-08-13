@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { ArrowRight, ShieldCheck, FlaskConical, Truck, FileCheck, Star, Quote } from 'lucide-react'
+import { ArrowRight, ShieldCheck, FlaskConical, Truck, FileCheck, Star, Quote, BadgePercent } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
 import { coreSeo } from '../data/seo'
 import { products } from '../data/products'
@@ -50,18 +50,22 @@ const testimonials = [
 export default function Home() {
   useSeo({ pageKey: 'home', ...coreSeo['/'] })
 
-  const featured = products.filter((p) => ['bpc-157', 'tb-500', 'ipamorelin', 'ghk-cu'].includes(p.slug))
+  // Best sellers shown below the full-range grid — deliberately disjoint from
+  // the first eight products so the two sections never repeat the same cards.
+  const featured = products.filter((p) =>
+    ['melanotan-2', 'aod-9604', 'mots-c', 'kpv'].includes(p.slug),
+  )
 
   return (
     <div>
-      {/* Hero — MotionSites style: light, typography-led, floating stat cards */}
+      {/* Hero — one message, one visual, one action: verifiable purity */}
       <section className="relative overflow-hidden bg-background">
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(27,19,60,0.07),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(249,115,22,0.06),transparent_50%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(27,19,60,0.06),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(249,115,22,0.05),transparent_50%)]"
           aria-hidden="true"
         />
-        <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 pb-16 pt-32 sm:pb-24">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
+        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-28 sm:pt-32 lg:pb-24">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
             <div>
               <p className="inline-flex items-center gap-2 rounded-full border border-[#1B133C]/10 bg-white/70 px-4 py-1.5 text-xs font-semibold text-foreground backdrop-blur-sm">
                 <ShieldCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
@@ -75,7 +79,7 @@ export default function Home() {
                 The UK's quality-first research peptide supplier — synthesis-grade compounds,
                 batch-specific Certificates of Analysis, and same-day dispatch from UK stock.
               </p>
-              <div className="mt-8 flex flex-wrap gap-4">
+              <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Link
                   to="/shop"
                   className="inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-4 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 transition hover:opacity-90"
@@ -86,85 +90,71 @@ export default function Home() {
                   to="/quality"
                   className="inline-flex items-center gap-2 rounded-xl border-2 border-[#1B133C]/10 bg-white/70 px-7 py-4 text-base font-bold text-foreground backdrop-blur-sm transition hover:border-[#1B133C]/30"
                 >
-                  Our Quality Standard
+                  Verify Our Quality
                 </Link>
               </div>
+
+              {/* Trust row — the four facts that close a peptide buyer */}
+              <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-[#1B133C]/10 pt-6 sm:grid-cols-4">
+                {[
+                  { icon: ShieldCheck, text: '≥99% purity — HPLC-verified, every batch' },
+                  { icon: FileCheck, text: 'Batch COA with every order' },
+                  { icon: Truck, text: 'Same-day dispatch before 4pm' },
+                  { icon: BadgePercent, text: 'Volume pricing — up to 30% off' },
+                ].map((t) => (
+                  <li key={t.text} className="flex items-start gap-2.5">
+                    <t.icon className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+                    <span className="text-xs font-semibold leading-snug text-foreground/80">
+                      {t.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Floating stat cards over hero visual */}
-            <div className="relative hidden flex-col items-end gap-4 lg:flex">
+            {/* Single product visual with two proof badges — no card clutter */}
+            <div className="relative hidden lg:block">
               <Enter>
-              <div className="glass-card mb-2 w-full max-w-md overflow-hidden p-2 shadow-xl shadow-[#1B133C]/10">
-                {/* CSS background: not downloaded on mobile where this column is hidden */}
-                <div
-                  role="img"
-                  aria-label="Noxptide research peptide vials with batch Certificates of Analysis"
-                  className="h-44 w-full rounded-lg bg-cover bg-center"
-                  style={{ backgroundImage: "url(/images/hero-vials.webp)" }}
-                />
-              </div>
-              </Enter>
-              <Enter>
-              <div className="glass-card w-72 p-5 shadow-xl shadow-[#1B133C]/10">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Batch Purity
-                </p>
-                <p className="mt-1 font-display text-6xl text-foreground">
-                  ≥99<span className="text-3xl text-accent">%</span>
-                </p>
-                <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                  </span>
-                  HPLC verified — current batch
-                </p>
-              </div>
-              </Enter>
-              <Enter>
-              <div className="glass-card w-64 p-5 shadow-xl shadow-[#1B133C]/10 lg:mr-16">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-foreground">Your Insights</p>
-                  <span className="rounded-full bg-accent/10 px-2.5 py-1 text-xs font-bold text-accent">
-                    32 peptides
-                  </span>
+                <div className="overflow-hidden rounded-3xl border border-[#1B133C]/10 shadow-2xl shadow-[#1B133C]/15">
+                  {/* CSS background: not downloaded on mobile where this column is hidden */}
+                  <div
+                    role="img"
+                    aria-label="Noxptide research peptide vials with batch Certificates of Analysis"
+                    className="h-[26rem] w-full bg-cover bg-center"
+                    style={{ backgroundImage: "url(/images/hero-vials.webp)" }}
+                  />
                 </div>
-                <p className="mt-1.5 text-xs text-muted-foreground">
-                  In stock, dispatching today before 4pm
-                </p>
-              </div>
               </Enter>
-              <Enter>
-              <div className="glass-card flex w-72 items-center justify-between p-5 shadow-xl shadow-[#1B133C]/10">
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Batch COA</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Certificate of Analysis with every vial
+              <Enter delay={0.15} className="absolute left-5 top-8">
+                <div className="glass-card p-4 shadow-xl shadow-[#1B133C]/10">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Current batch purity
+                  </p>
+                  <p className="mt-0.5 font-display text-3xl text-foreground">
+                    ≥99<span className="text-lg text-accent">%</span>
+                  </p>
+                  <p className="mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                    </span>
+                    HPLC + MS verified
                   </p>
                 </div>
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </span>
-              </div>
+              </Enter>
+              <Enter delay={0.3} className="absolute -right-4 bottom-10">
+                <div className="glass-card flex items-center gap-3 p-4 shadow-xl shadow-[#1B133C]/10">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <FileCheck className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Batch COA</p>
+                    <p className="text-[11px] text-muted-foreground">Certificate with every vial</p>
+                  </div>
+                </div>
               </Enter>
             </div>
           </div>
-
-          {/* Stats strip */}
-          <dl className="mt-14 grid grid-cols-3 gap-4 border-t border-[#1B133C]/10 pt-8">
-            <div>
-              <dt className="font-display text-2xl text-foreground sm:text-3xl">≥99%</dt>
-              <dd className="mt-1 text-xs text-muted-foreground sm:text-sm">HPLC purity, every batch</dd>
-            </div>
-            <div>
-              <dt className="font-display text-2xl text-foreground sm:text-3xl">100%</dt>
-              <dd className="mt-1 text-xs text-muted-foreground sm:text-sm">Orders with batch COA</dd>
-            </div>
-            <div>
-              <dt className="font-display text-2xl text-foreground sm:text-3xl">4pm</dt>
-              <dd className="mt-1 text-xs text-muted-foreground sm:text-sm">Same-day dispatch cut-off</dd>
-            </div>
-          </dl>
         </div>
       </section>
 
