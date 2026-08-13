@@ -4,6 +4,20 @@ import { useSeo } from '../hooks/useSeo'
 import { coreSeo } from '../data/seo'
 import { guides } from '../data/guides'
 
+/** Natural topic labels for guide cards (replaces raw keyword kickers). */
+const topicLabels: Record<string, string> = {
+  'bpc-157-research-guide': 'Compound Guide',
+  'tb-500-research-guide': 'Compound Guide',
+  'bpc-157-vs-tb-500': 'Comparison',
+  'ipamorelin-vs-cjc-1295': 'Comparison',
+  'semax-research-guide': 'Compound Guide',
+  'ghk-cu-research-guide': 'Compound Guide',
+  'peptide-reconstitution-storage-guide': 'Handling & Storage',
+  'how-to-read-peptide-coa': 'Quality & COAs',
+  'melanotan-2-vs-pt-141': 'Comparison',
+  'epitalon-research-guide': 'Compound Guide',
+}
+
 export default function Guides() {
   useSeo({ pageKey: 'guides', ...coreSeo['/guides'] })
 
@@ -52,6 +66,46 @@ export default function Guides() {
           </Link>
         ))}
       </div>
+
+      {/* Editorial standards */}
+      <section className="mt-16 grid gap-10 border-t border-border pt-12 lg:grid-cols-2" aria-labelledby="editorial-heading">
+        <div>
+          <h2 id="editorial-heading" className="text-2xl font-extrabold tracking-tight">
+            How These Guides Are Written
+          </h2>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            Each guide starts from the published scientific literature, not from marketing copy.
+            Drafts are checked against the sources they cite before publication, reviewed for
+            accuracy and clarity, and revisited when the literature or our product range changes —
+            every guide shows its last-updated date. Where we describe handling procedures, they
+            reflect standard laboratory practice for lyophilised research peptides.
+          </p>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            We do not publish dosing, human-use or therapeutic content. Guides describe mechanisms
+            as reported in preclinical research and are written for qualified researchers working
+            in-vitro.
+          </p>
+        </div>
+        <div>
+          <h2 className="text-2xl font-extrabold tracking-tight">Citation Policy</h2>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            Every guide links directly to its sources — primarily PubMed-indexed literature — so you
+            can read the underlying evidence yourself rather than take our word for it. We cite
+            primary research and review articles; we do not cite supplier websites, forums or
+            anecdotal reports.
+          </p>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            Ready to put the reading into practice? Browse our{' '}
+            <Link to="/shop" className="font-semibold text-primary hover:underline">
+              research peptide catalogue
+            </Link>{' '}
+            — as a UK research peptide supplier, every compound we list ships with batch-matched
+            documentation for laboratory research use only. See also our{' '}
+            <Link to="/quality" className="font-semibold text-primary hover:underline">quality standards</Link>{' '}
+            and <Link to="/faq" className="font-semibold text-primary hover:underline">FAQ</Link>.
+          </p>
+        </div>
+      </section>
     </div>
   )
 }

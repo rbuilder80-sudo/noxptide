@@ -135,7 +135,7 @@ export const products: Product[] = [
     short:
       'Synthetic Thymosin Beta-4 for cell-migration, angiogenesis and tissue-regeneration research. Independently tested, COA supplied with every batch.',
     description: [
-      'TB-500 is a synthetic version of Thymosin Beta-4, a naturally occurring 43-amino-acid peptide that plays a central role in actin regulation, cell migration and tissue repair. It is one of the cornerstones of regenerative research and is frequently studied alongside BPC-157 in complementary repair models.',
+      'TB-500 is a synthetic version of Thymosin Beta-4, a naturally occurring 43-amino-acid peptide that plays a central role in actin regulation, cell migration and tissue repair. It is one of the cornerstones of regenerative research and is frequently studied alongside BPC-157 in complementary repair models. All findings described here derive from preclinical research; TB-500 is supplied strictly for laboratory use and is not for human or veterinary use.',
       'Our TB-500 is produced by solid-phase synthesis, purified via preparative HPLC, and confirmed to ≥99% purity with full mass spectrometry characterisation. Batch-specific Certificates of Analysis ship with every order.',
       'Lyophilised for maximum stability and dispatched from the UK with tracked, discreet delivery and cold-chain options available on request.',
     ],
@@ -237,7 +237,7 @@ export const products: Product[] = [
     short:
       'The most selective growth-hormone-releasing peptide in research use, prized for its clean receptor profile. ≥99% purity, COA with every vial.',
     description: [
-      'Ipamorelin is a pentapeptide growth hormone secretagogue renowned in the research literature for its selectivity: it stimulates growth hormone release via the ghrelin receptor (GHS-R1a) without the significant cortisol or prolactin activity observed with earlier GHRPs, making it a clean tool for endocrine research.',
+      'Ipamorelin is a pentapeptide growth hormone secretagogue renowned in the research literature for its selectivity: it stimulates growth hormone release via the ghrelin receptor (GHS-R1a) without the significant cortisol or prolactin activity observed with earlier GHRPs, making it a clean tool for endocrine research. The CJC-1295–Ipamorelin pairing is one of the most studied combinations in the field, with the GHRH analogue and the selective GHRP acting on complementary receptors. All findings described here derive from preclinical research; Ipamorelin is supplied strictly for laboratory use.',
       'Our Ipamorelin is synthesised by SPPS, purified by preparative HPLC to ≥99%, and every batch is confirmed by mass spectrometry. The batch Certificate of Analysis is available before purchase on request.',
       'Dispatched from our UK facility in discreet, tracked packaging with same-day dispatch before 4pm.',
     ],
@@ -310,6 +310,10 @@ export const products: Product[] = [
       {
         q: 'Is this the same as Modified GRF 1-29?',
         a: 'Yes — CJC-1295 (No DAC) and Modified GRF 1-29 refer to the same tetrasubstituted 29-amino-acid GHRH analogue.',
+      },
+      {
+        q: 'CJC-1295 vs Ipamorelin — how do they compare?',
+        a: 'CJC-1295 acts at the GHRH receptor while Ipamorelin acts at GHS-R1a, so the Ipamorelin vs CJC-1295 comparison is really one of complementary mechanisms; most protocols in the literature run the two together rather than choosing between them.',
       },
       {
         q: 'How is purity verified?',

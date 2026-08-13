@@ -50,6 +50,7 @@ function rateLimited(ip: string): boolean {
 
 export function createPasswordLoginHandler() {
   return async (c: Context) => {
+   try {
     const ip = c.req.header("cf-connecting-ip") ?? c.req.header("x-forwarded-for") ?? "unknown";
     if (rateLimited(ip)) {
       return c.json({ error: "Too many attempts — try again in a few minutes." }, 429);
@@ -79,5 +80,9 @@ export function createPasswordLoginHandler() {
       maxAge: Session.maxAgeMs / 1000,
     });
     return c.json({ ok: true, name: user.name, role: user.role });
+   } catch (err) {
+    const e = err as { message?: string; cause?: { message?: string } };
+    return c.json({ error: "debug", detail: String(e?.message).slice(0, 300), cause: String(e?.cause?.message ?? "").slice(0, 300) }, 500);
+   }
   };
 }

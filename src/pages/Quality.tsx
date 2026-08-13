@@ -46,6 +46,13 @@ export default function Quality() {
             if a batch cannot be independently verified, it does not ship.
           </strong>
         </p>
+        <p className="mt-4 leading-relaxed text-muted-foreground">
+          This page explains exactly how we test: the methodology behind every peptide certificate
+          of analysis we issue, what those tests can and cannot tell you, how to match your vial to
+          its batch paperwork, and the release workflow a batch must pass before it reaches our
+          shelf. As a peptide supplier UK researchers can audit, we would rather show you the
+          process than ask you to trust it.
+        </p>
       </div>
 
       <div className="mt-12 grid gap-6 md:grid-cols-2">

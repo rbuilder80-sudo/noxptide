@@ -87,6 +87,56 @@ export default function Shop() {
         ))}
       </div>
 
+      {/* Catalogue guidance */}
+      <section className="mt-16 border-t border-border pt-12" aria-labelledby="guidance-heading">
+        <div className="max-w-3xl space-y-5 leading-relaxed text-muted-foreground">
+          <h2 id="guidance-heading" className="text-2xl font-extrabold tracking-tight text-foreground">
+            Buying Research Peptides in the UK: What to Check
+          </h2>
+          <p>
+            Not every peptide shop UK researchers find online works to the same standard. Before
+            you buy peptides in the UK for laboratory use, three things matter more than price:
+            documented purity, batch traceability, and verifiable testing. Every compound in this
+            catalogue is a lyophilised research peptide supplied strictly for in-vitro laboratory
+            research — synthesised by solid-phase methods and purified by preparative
+            chromatography to ≥99%.
+          </p>
+          <p>
+            Purity claims are only as good as the evidence behind them. Our peptide purity figures
+            come from independent HPLC peptide testing, with molecular identity confirmed by mass
+            spectrometry — and every vial is tied to a numbered batch with its own{' '}
+            <Link to="/quality" className="font-semibold text-primary hover:underline">
+              Certificate of Analysis
+            </Link>
+            . You can request the current batch COA for any product above before you order, and
+            learn to read it in our{' '}
+            <Link to="/guides/how-to-read-peptide-coa" className="font-semibold text-primary hover:underline">
+              guide to peptide COAs
+            </Link>
+            . If a supplier cannot show you batch-matched documentation, that is the answer to your
+            quality question.
+          </p>
+          <p>
+            Handling matters as much as synthesis. Lyophilised peptides are stable in transit, but
+            correct peptide storage and careful peptide reconstitution determine how long a
+            compound remains reliable in the lab. Our{' '}
+            <Link to="/guides/peptide-reconstitution-storage-guide" className="font-semibold text-primary hover:underline">
+              reconstitution and storage guide
+            </Link>{' '}
+            covers solvent selection, aliquoting and freezer practice, and each product page
+            carries compound-specific guidance.
+          </p>
+          <p>
+            Orders dispatch same day before 4pm from UK stock, with tracked delivery free over £25
+            — see <Link to="/shipping" className="font-semibold text-primary hover:underline">shipping &amp; delivery</Link>{' '}
+            for timings, and our <Link to="/faq" className="font-semibold text-primary hover:underline">FAQ</Link>{' '}
+            for volume pricing and guarantees. Questions about a compound or batch?{' '}
+            <Link to="/contact" className="font-semibold text-primary hover:underline">Contact us</Link> —
+            we answer as fellow researchers, not salespeople.
+          </p>
+        </div>
+      </section>
+
       {filtered.length === 0 && (
         <div className="mt-10 rounded-2xl border border-dashed border-border p-12 text-center">
           <p className="text-lg font-semibold">No peptides match "{q}"</p>

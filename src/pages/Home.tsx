@@ -196,9 +196,11 @@ export default function Home() {
             <h2 id="peptides-heading" className="text-3xl font-extrabold tracking-tight">
               Peptides
             </h2>
-            <p className="mt-2 text-muted-foreground">
+            <p className="mt-2 max-w-2xl text-muted-foreground">
               The complete research peptide range — every batch independently verified, every vial
-              shipped with its Certificate of Analysis.
+              shipped with its Certificate of Analysis. If you are looking to buy peptides in the
+              UK for laboratory research, this is a peptide shop UK laboratories can verify before
+              they spend a penny: documented peptide purity, not promises.
             </p>
           </div>
           <Link to="/shop" className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex">
@@ -351,6 +353,58 @@ export default function Home() {
                 </div>
               </figure>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Resources & company */}
+      <section className="border-t border-border bg-white py-16 sm:py-20" aria-labelledby="resources-heading">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="grid gap-10 lg:grid-cols-2">
+            <div>
+              <h2 id="resources-heading" className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                A UK Research Peptide Supplier You Can Check
+              </h2>
+              <p className="mt-4 leading-relaxed text-muted-foreground">
+                Noxptide is a UK-based supplier of research-use-only peptides. We hold stock in the
+                UK, dispatch from the UK, and back every claim we make with batch documentation you
+                can request before ordering. All compounds are supplied strictly for in-vitro
+                laboratory research — never for human or veterinary use.
+              </p>
+              <p className="mt-4 leading-relaxed text-muted-foreground">
+                Beyond the catalogue, we publish practical laboratory resources: how to approach{' '}
+                <Link to="/guides/peptide-reconstitution-storage-guide" className="font-semibold text-primary hover:underline">
+                  peptide reconstitution and peptide storage
+                </Link>{' '}
+                correctly, and{' '}
+                <Link to="/guides/how-to-read-peptide-coa" className="font-semibold text-primary hover:underline">
+                  how to read a Certificate of Analysis
+                </Link>{' '}
+                so you can verify any supplier's claims — ours included.
+              </p>
+            </div>
+            <nav className="grid gap-3 sm:grid-cols-2" aria-label="Key pages">
+              {[
+                { to: '/shop', label: 'Shop peptides UK', desc: 'Browse the full batch-verified catalogue.' },
+                { to: '/quality', label: 'Quality & COAs', desc: 'Our testing standards and release workflow.' },
+                { to: '/guides', label: 'Research Guides', desc: 'Handling, storage and COA reading guides.' },
+                { to: '/shipping', label: 'Shipping & Delivery', desc: 'Dispatch times and tracked UK delivery.' },
+                { to: '/about', label: 'About Noxptide', desc: 'Who we are and how we work.' },
+                { to: '/contact', label: 'Contact', desc: 'COA requests and order support.' },
+              ].map((l) => (
+                <Link
+                  key={l.to}
+                  to={l.to}
+                  className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+                >
+                  <p className="flex items-center justify-between font-bold text-foreground group-hover:text-primary">
+                    {l.label}
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" aria-hidden="true" />
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">{l.desc}</p>
+                </Link>
+              ))}
+            </nav>
           </div>
         </div>
       </section>
