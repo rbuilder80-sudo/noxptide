@@ -2,6 +2,14 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { ArrowLeft } from 'lucide-react'
 import { trpc } from '../../providers/trpc'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
 
 const STATUSES = ['pending', 'paid', 'processing', 'dispatched', 'completed', 'cancelled'] as const
 
@@ -25,6 +33,38 @@ export default function AdminOrderDetail() {
       utils.orders.list.invalidate()
     },
   })
+  const { data: refunds } = trpc.orders.listRefunds.useQuery(
+    { orderId },
+    { enabled: Number.isFinite(orderId) },
+  )
+  const [courier, setCourier] = useState('')
+  const [trackingNumber, setTrackingNumber] = useState('')
+  const [refundOpen, setRefundOpen] = useState(false)
+  const [refundAmount, setRefundAmount] = useState('')
+  const [refundReason, setRefundReason] = useState('')
+  useEffect(() => {
+    if (order) {
+      setCourier(order.courier ?? '')
+      setTrackingNumber(order.trackingNumber ?? '')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?.id])
+  const updateTracking = trpc.orders.updateTracking.useMutation({
+    onSuccess: () => {
+      utils.orders.get.invalidate({ id: orderId })
+      utils.orders.list.invalidate()
+    },
+  })
+  const addRefund = trpc.orders.addRefund.useMutation({
+    onSuccess: () => {
+      utils.orders.get.invalidate({ id: orderId })
+      utils.orders.list.invalidate()
+      utils.orders.listRefunds.invalidate({ orderId })
+      setRefundOpen(false)
+      setRefundAmount('')
+      setRefundReason('')
+    },
+  })
   const syncHubSpot = trpc.orders.syncHubSpot.useMutation({
     onSuccess: (result) => {
       utils.orders.get.invalidate({ id: orderId })
@@ -42,6 +82,8 @@ export default function AdminOrderDetail() {
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>
   if (!order) return <p className="text-sm text-muted-foreground">Order not found.</p>
+
+  const refundedPence = order.refundedPence
 
   return (
     <div className="max-w-5xl">
@@ -141,6 +183,172 @@ export default function AdminOrderDetail() {
           </dl>
         </section>
       </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <h2 className="font-bold">Fulfilment & tracking</h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="text-sm font-semibold">Courier</span>
+              <input
+                value={courier}
+                onChange={(e) => setCourier(e.target.value)}
+                placeholder="Royal Mail"
+                className="mt-1.5 w-full rounded-lg border border-input px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-semibold">Tracking number</span>
+              <input
+                value={trackingNumber}
+                onChange={(e) => setTrackingNumber(e.target.value)}
+                placeholder="AB123456789GB"
+                className="mt-1.5 w-full rounded-lg border border-input px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+          </div>
+          <button
+            onClick={() =>
+              updateTracking.mutate({
+                orderId: order.id,
+                courier: courier || undefined,
+                trackingNumber: trackingNumber || undefined,
+              })
+            }
+            disabled={updateTracking.isPending}
+            className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+          >
+            {updateTracking.isPending ? 'Saving…' : 'Save tracking'}
+          </button>
+          {updateTracking.isSuccess && !updateTracking.isPending && (
+            <p className="mt-2 text-xs font-semibold text-emerald-700">Tracking saved.</p>
+          )}
+          {updateTracking.error && (
+            <p className="mt-2 text-xs font-semibold text-red-700">{updateTracking.error.message}</p>
+          )}
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-bold">Refunds</h2>
+            <button
+              onClick={() => setRefundOpen(true)}
+              disabled={refundedPence >= order.totalPence}
+              className="rounded-lg border border-primary bg-card px-3.5 py-2 text-xs font-bold text-primary hover:bg-secondary disabled:opacity-50"
+            >
+              Add refund
+            </button>
+          </div>
+          <dl className="mt-4 space-y-2 text-sm">
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">Order total</dt>
+              <dd>{gbp(order.totalPence)}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">Total refunded</dt>
+              <dd className={refundedPence > 0 ? 'font-bold text-red-700' : ''}>
+                {gbp(refundedPence)}
+              </dd>
+            </div>
+            {refundedPence >= order.totalPence && (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">Status</dt>
+                <dd className="font-bold text-red-700">Fully refunded</dd>
+              </div>
+            )}
+          </dl>
+          <ul className="mt-4 space-y-2.5 text-sm">
+            {(refunds ?? []).map((r) => (
+              <li
+                key={r.id}
+                className="flex justify-between gap-4 border-b border-border/50 pb-2.5 last:border-0"
+              >
+                <span>
+                  <span className="font-semibold">{gbp(r.amountPence)}</span>
+                  {r.reason && <span className="text-muted-foreground"> — {r.reason}</span>}
+                  <span className="block text-xs text-muted-foreground">
+                    {new Date(r.createdAt).toLocaleString('en-GB')}
+                    {r.createdBy ? ` · ${r.createdBy}` : ''}
+                  </span>
+                </span>
+              </li>
+            ))}
+            {(refunds ?? []).length === 0 && (
+              <li className="text-muted-foreground">No refunds recorded.</li>
+            )}
+          </ul>
+        </section>
+      </div>
+
+      <Dialog open={refundOpen} onOpenChange={setRefundOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add refund — {order.orderNumber}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <p className="text-sm text-muted-foreground">
+              Up to {gbp(order.totalPence - refundedPence)} remaining of the {gbp(order.totalPence)}{' '}
+              order total. Record refunds here after refunding the payment externally.
+            </p>
+            <div>
+              <Label htmlFor="refund-amount">Amount (£)</Label>
+              <div className="mt-1.5 flex items-center gap-1">
+                <span className="text-sm text-muted-foreground">£</span>
+                <input
+                  id="refund-amount"
+                  value={refundAmount}
+                  onChange={(e) => setRefundAmount(e.target.value)}
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  className="w-full rounded-lg border border-input px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="refund-reason">Reason</Label>
+              <textarea
+                id="refund-reason"
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                rows={2}
+                className="mt-1.5 w-full rounded-lg border border-input px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </div>
+            {addRefund.error && (
+              <p className="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+                {addRefund.error.message}
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <button
+              onClick={() => setRefundOpen(false)}
+              className="rounded-lg border border-border px-4 py-2 text-sm font-bold text-muted-foreground hover:bg-secondary"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                const amount = Math.round(parseFloat(refundAmount) * 100)
+                if (!Number.isFinite(amount) || amount <= 0) return
+                addRefund.mutate({
+                  orderId: order.id,
+                  amountPence: amount,
+                  reason: refundReason || undefined,
+                })
+              }}
+              disabled={
+                addRefund.isPending ||
+                !Number.isFinite(parseFloat(refundAmount)) ||
+                parseFloat(refundAmount) <= 0
+              }
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+            >
+              {addRefund.isPending ? 'Recording…' : 'Record refund'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-sm">
         <h2 className="font-bold">HubSpot sync</h2>

@@ -33,6 +33,10 @@ const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminCms = lazy(() => import("./pages/admin/AdminCms"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
+const AdminOrderDetail = lazy(() => import("./pages/admin/AdminOrderDetail"));
+const AdminCustomers = lazy(() => import("./pages/admin/AdminCustomers"));
+const AdminDiscounts = lazy(() => import("./pages/admin/AdminDiscounts"));
 
 const adminFallback = (
   <div className="p-10 text-center text-muted-foreground">Loading…</div>
@@ -77,6 +81,10 @@ export default function App() {
                 >
                   <Route index element={<AdminDashboard />} />
                   <Route path="products" element={<AdminProducts />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="orders/:id" element={<AdminOrderDetail />} />
+                  <Route path="customers" element={<AdminCustomers />} />
+                  <Route path="discounts" element={<AdminDiscounts />} />
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="cms" element={<AdminCms />} />
                 </Route>

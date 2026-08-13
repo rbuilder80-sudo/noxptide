@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
+import { Search } from 'lucide-react'
 import { trpc } from '../../providers/trpc'
 
 const STATUSES = ['pending', 'paid', 'processing', 'dispatched', 'completed', 'cancelled'] as const
@@ -17,11 +18,31 @@ function gbp(pence: number) {
   return `£${(pence / 100).toFixed(2)}`
 }
 
+const PAGE_SIZE = 50
+
 export default function AdminOrders() {
   const [filter, setFilter] = useState<string>('open')
+  const [q, setQ] = useState('')
+  const [debouncedQ, setDebouncedQ] = useState('')
+  const [offset, setOffset] = useState(0)
   const [syncMessage, setSyncMessage] = useState<string | null>(null)
   const utils = trpc.useUtils()
-  const { data: orders, isLoading } = trpc.orders.list.useQuery()
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedQ(q.trim())
+      setOffset(0)
+    }, 300)
+    return () => clearTimeout(t)
+  }, [q])
+  const serverStatus = STATUSES.includes(filter as (typeof STATUSES)[number])
+    ? (filter as (typeof STATUSES)[number])
+    : undefined
+  const { data: orders, isLoading } = trpc.orders.list.useQuery({
+    status: serverStatus,
+    q: debouncedQ || undefined,
+    limit: PAGE_SIZE,
+    offset,
+  })
   const update = trpc.orders.updateStatus.useMutation({
     onSuccess: () => utils.orders.list.invalidate(),
   })
@@ -36,12 +57,9 @@ export default function AdminOrders() {
   })
 
   const all = orders ?? []
+  // Specific statuses are filtered server-side; "open" hides completed/cancelled client-side.
   const shown =
-    filter === 'open'
-      ? all.filter((o) => !['completed', 'cancelled'].includes(o.status))
-      : filter === 'all'
-        ? all
-        : all.filter((o) => o.status === filter)
+    filter === 'open' ? all.filter((o) => !['completed', 'cancelled'].includes(o.status)) : all
 
   return (
     <div>
@@ -62,7 +80,10 @@ export default function AdminOrders() {
             {['open', 'all', ...STATUSES].map((s) => (
               <button
                 key={s}
-                onClick={() => setFilter(s)}
+                onClick={() => {
+                  setFilter(s)
+                  setOffset(0)
+                }}
                 className={`rounded-lg px-3 py-1.5 capitalize transition ${
                   filter === s ? 'bg-primary text-primary-foreground' : 'text-foreground/70 hover:bg-slate-100'
                 }`}
@@ -72,6 +93,19 @@ export default function AdminOrders() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="relative mt-4 w-full max-w-sm">
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search order number, email or name…"
+          className="w-full rounded-lg border border-input bg-card py-2.5 pl-9 pr-4 text-sm outline-none focus:border-primary"
+        />
       </div>
 
       {syncMessage && (
@@ -161,6 +195,27 @@ export default function AdminOrders() {
               )}
             </tbody>
           </table>
+          <div className="flex items-center justify-between border-t border-border px-5 py-3 text-sm">
+            <p className="text-muted-foreground">
+              Showing {offset + 1}–{offset + all.length}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
+                disabled={offset === 0}
+                className="rounded-lg border border-border bg-card px-3.5 py-1.5 text-xs font-bold text-foreground/70 hover:bg-secondary disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setOffset(offset + PAGE_SIZE)}
+                disabled={all.length < PAGE_SIZE}
+                className="rounded-lg border border-border bg-card px-3.5 py-1.5 text-xs font-bold text-foreground/70 hover:bg-secondary disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

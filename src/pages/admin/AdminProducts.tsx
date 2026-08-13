@@ -1,6 +1,14 @@
 import { useMemo, useState } from 'react'
 import { trpc } from '../../providers/trpc'
-import { products, formatGBP, type Product } from '../../data/products'
+import { products, categories, formatGBP, type Product } from '../../data/products'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
 
 type RowState = { price: string; stock: string }
 const rowKey = (slug: string, sizeLabel: string) => `${slug}::${sizeLabel}`
@@ -120,11 +128,163 @@ function SizeRow({
   )
 }
 
+type ListingOverrideRow = {
+  productSlug: string
+  name: string | null
+  tagline: string | null
+  description: string | null
+  categorySlug: string | null
+  imageUrl: string | null
+}
+
+/** Dialog to edit storefront listing copy (name/tagline/description/category/image) for one product. */
+function ListingDialog({
+  product,
+  override,
+  onClose,
+  onChanged,
+}: {
+  product: Product
+  override?: ListingOverrideRow
+  onClose: () => void
+  onChanged: () => void
+}) {
+  const [name, setName] = useState(override?.name ?? product.name)
+  const [tagline, setTagline] = useState(override?.tagline ?? product.subtitle ?? '')
+  const [description, setDescription] = useState(
+    override?.description ?? product.description.join('\n\n'),
+  )
+  const [categorySlug, setCategorySlug] = useState(override?.categorySlug ?? product.category)
+  const [imageUrl, setImageUrl] = useState(override?.imageUrl ?? '')
+
+  const upsert = trpc.products.upsertListing.useMutation({
+    onSuccess: () => {
+      onChanged()
+      onClose()
+    },
+  })
+  const remove = trpc.products.removeListing.useMutation({
+    onSuccess: () => {
+      onChanged()
+      onClose()
+    },
+  })
+
+  const inputCls =
+    'mt-1.5 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus:border-primary'
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Edit listing — {product.name}</DialogTitle>
+        </DialogHeader>
+        <div className="grid max-h-[60vh] gap-4 overflow-y-auto pr-1">
+          <div>
+            <Label htmlFor="li-name">Name</Label>
+            <input id="li-name" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <Label htmlFor="li-tagline">Tagline</Label>
+            <input
+              id="li-tagline"
+              value={tagline}
+              onChange={(e) => setTagline(e.target.value)}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <Label htmlFor="li-description">Description</Label>
+            <textarea
+              id="li-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={6}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <Label htmlFor="li-category">Category</Label>
+            <select
+              id="li-category"
+              value={categorySlug}
+              onChange={(e) => setCategorySlug(e.target.value)}
+              className={inputCls}
+            >
+              {categories.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label htmlFor="li-image">Image URL (optional)</Label>
+            <input
+              id="li-image"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="/images/products/example.webp"
+              className={inputCls}
+            />
+          </div>
+          {(upsert.error || remove.error) && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+              {(upsert.error ?? remove.error)?.message}
+            </p>
+          )}
+        </div>
+        <DialogFooter className="flex-wrap gap-2">
+          {override && (
+            <button
+              onClick={() => remove.mutate({ productSlug: product.slug })}
+              disabled={remove.isPending || upsert.isPending}
+              className="mr-auto rounded-lg border border-border px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
+            >
+              {remove.isPending ? 'Reverting…' : 'Revert to catalogue'}
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="rounded-lg border border-border px-4 py-2 text-sm font-bold text-muted-foreground hover:bg-secondary"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() =>
+              upsert.mutate({
+                productSlug: product.slug,
+                name: name.trim() || undefined,
+                tagline: tagline.trim() || null,
+                description: description.trim() || null,
+                categorySlug: categorySlug || null,
+                imageUrl: imageUrl.trim() || null,
+              })
+            }
+            disabled={!name.trim() || upsert.isPending || remove.isPending}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          >
+            {upsert.isPending ? 'Saving…' : 'Save listing'}
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function AdminProducts() {
   const [q, setQ] = useState('')
   const utils = trpc.useUtils()
   const { data: variantRows, isLoading } = trpc.products.variants.useQuery()
   const { data: overrides } = trpc.products.overrides.useQuery()
+  const { data: listingRows } = trpc.products.listingOverrides.useQuery()
+  const [editingListing, setEditingListing] = useState<string | null>(null)
+
+  const listingMap = useMemo(() => {
+    const m = new Map<string, ListingOverrideRow>()
+    for (const r of listingRows ?? []) m.set(r.productSlug, r)
+    return m
+  }, [listingRows])
   const setStatus = trpc.products.setStatus.useMutation({
     onSuccess: () => utils.products.overrides.invalidate(),
   })
@@ -157,6 +317,7 @@ export default function AdminProducts() {
   const onChanged = () => {
     utils.products.variants.invalidate()
     utils.products.overrides.invalidate()
+    utils.products.listingOverrides.invalidate()
   }
 
   const shown = products.filter((p) =>
@@ -198,8 +359,19 @@ export default function AdminProducts() {
                       Hidden from shop
                     </span>
                   )}
+                  {listingMap.has(p.slug) && (
+                    <span className="ml-2 rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-bold uppercase text-sky-700">
+                      Listing edited
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setEditingListing(p.slug)}
+                    className="rounded-lg border border-border px-3.5 py-1.5 text-xs font-bold text-muted-foreground hover:bg-secondary"
+                  >
+                    Edit listing
+                  </button>
                   <button
                     onClick={() =>
                       setStatus.mutate({
@@ -248,6 +420,19 @@ export default function AdminProducts() {
           )
         })}
       </div>
+      {editingListing &&
+        (() => {
+          const p = products.find((x) => x.slug === editingListing)
+          if (!p) return null
+          return (
+            <ListingDialog
+              product={p}
+              override={listingMap.get(p.slug)}
+              onClose={() => setEditingListing(null)}
+              onChanged={onChanged}
+            />
+          )
+        })()}
       <p className="mt-4 text-xs text-muted-foreground">
         Tip: per-product SEO (meta title & description) lives under{' '}
         <a href="/admin/cms" className="font-semibold text-primary hover:underline">

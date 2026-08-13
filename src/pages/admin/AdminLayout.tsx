@@ -1,5 +1,5 @@
 import { NavLink, Navigate, Outlet } from 'react-router'
-import { LayoutDashboard, Boxes, Users, FileEdit, FlaskConical, LogOut } from 'lucide-react'
+import { LayoutDashboard, Boxes, ShoppingCart, UserRound, TicketPercent, Users, FileEdit, FlaskConical, LogOut } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 
 export default function AdminLayout() {
@@ -28,7 +28,10 @@ export default function AdminLayout() {
 
   const links = [
     { to: '/admin', end: true, icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'manager', 'support'] },
-    { to: '/admin/products', end: false, icon: Boxes, label: 'Stock & Pricing', roles: ['admin', 'manager'] },
+    { to: '/admin/products', end: false, icon: Boxes, label: 'Products', roles: ['admin', 'manager'] },
+    { to: '/admin/orders', end: false, icon: ShoppingCart, label: 'Orders', roles: ['admin', 'manager', 'support'] },
+    { to: '/admin/customers', end: false, icon: UserRound, label: 'Customers', roles: ['admin', 'manager', 'support'] },
+    { to: '/admin/discounts', end: false, icon: TicketPercent, label: 'Discounts', roles: ['admin'] },
     { to: '/admin/cms', end: false, icon: FileEdit, label: 'SEO & Pages', roles: ['admin', 'manager'] },
     { to: '/admin/users', end: false, icon: Users, label: 'Team & Access', roles: ['admin'] },
   ].filter((l) => l.roles.includes(user.role))

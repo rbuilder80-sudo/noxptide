@@ -1,7 +1,22 @@
 import { Link } from 'react-router'
 import { AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { trpc } from '../../providers/trpc'
 import { products } from '../../data/products'
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '@/components/ui/chart'
+
+function gbp(pence: number) {
+  return `£${(pence / 100).toFixed(2)}`
+}
+
+const revenueChartConfig = {
+  revenue: { label: 'Revenue', color: 'var(--primary)' },
+} satisfies ChartConfig
 
 const hubspotRequiredScopes = [
   'crm.objects.contacts.read',
@@ -34,6 +49,9 @@ export default function AdminDashboard() {
   const testHubSpotSync = trpc.integrations.testHubSpotSync.useMutation({
     onSuccess: () => utils.integrations.status.invalidate(),
   })
+  const { data: analytics } = trpc.analytics.overview.useQuery()
+  const { data: revenueByDay } = trpc.analytics.revenueByDay.useQuery({ days: 30 })
+  const { data: topProducts } = trpc.analytics.topProducts.useQuery({ days: 30, limit: 8 })
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>
 
@@ -59,8 +77,137 @@ export default function AdminDashboard() {
     <div>
       <h1 className="text-2xl font-extrabold tracking-tight">Dashboard</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-        Catalogue at a glance — stock, pricing and SEO. Orders and sales are handled in HubSpot.
+        Sales, stock and catalogue at a glance.
       </p>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          { label: 'Revenue (30d)', value: analytics ? gbp(analytics.revenue30dPence) : '—', to: '/admin/orders' },
+          { label: 'Orders (30d)', value: analytics ? String(analytics.orders30d) : '—', to: '/admin/orders' },
+          { label: 'Avg order value (30d)', value: analytics ? gbp(analytics.aov30dPence) : '—', to: '/admin/orders' },
+          { label: 'Pending orders', value: analytics ? String(analytics.pendingOrders) : '—', to: '/admin/orders' },
+        ].map((s) => (
+          <Link
+            key={s.label}
+            to={s.to}
+            className="rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {s.label}
+            </p>
+            <p className="mt-2 text-3xl font-extrabold">{s.value}</p>
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-5">
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm xl:col-span-3">
+          <h2 className="text-lg font-bold">Revenue — last 30 days</h2>
+          {revenueByDay && revenueByDay.length > 0 ? (
+            <ChartContainer config={revenueChartConfig} className="mt-4 h-64 w-full">
+              <AreaChart
+                data={revenueByDay.map((d) => ({
+                  day: d.day.slice(5),
+                  revenue: d.revenuePence / 100,
+                  orders: d.orders,
+                }))}
+                margin={{ top: 4, right: 8, bottom: 0, left: 8 }}
+              >
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} fontSize={11} />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  fontSize={11}
+                  tickFormatter={(v: number) => `£${v}`}
+                />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value) => [`£${Number(value).toFixed(2)}`, ' Revenue']}
+                    />
+                  }
+                />
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="var(--color-revenue)"
+                  fill="var(--color-revenue)"
+                  fillOpacity={0.15}
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ChartContainer>
+          ) : (
+            <p className="mt-4 text-sm text-muted-foreground">No revenue data for the last 30 days.</p>
+          )}
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm xl:col-span-2">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-bold">Low stock alerts</h2>
+            <Link to="/admin/products" className="text-xs font-bold text-primary hover:underline">
+              Manage stock
+            </Link>
+          </div>
+          <ul className="mt-4 space-y-2 text-sm">
+            {(analytics?.lowStock ?? []).slice(0, 8).map((v) => (
+              <li
+                key={`${v.productSlug}::${v.sizeLabel}`}
+                className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2"
+              >
+                <span className="font-semibold">
+                  {v.productSlug} <span className="text-muted-foreground">{v.sizeLabel}</span>
+                </span>
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                    v.stock === 0 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                  }`}
+                >
+                  {v.stock === 0 ? 'Out of stock' : `${v.stock} left`}
+                </span>
+              </li>
+            ))}
+            {(analytics?.lowStock ?? []).length === 0 && (
+              <li className="text-muted-foreground">All variants have healthy stock levels.</li>
+            )}
+          </ul>
+        </section>
+      </div>
+
+      <h2 className="mt-8 text-lg font-bold">Top products — last 30 days</h2>
+      <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
+        <table className="w-full min-w-[480px] text-left text-sm">
+          <thead>
+            <tr className="border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
+              <th className="px-5 py-3">Product</th>
+              <th className="px-5 py-3">Qty sold</th>
+              <th className="px-5 py-3">Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(topProducts ?? []).map((p) => (
+              <tr key={p.productSlug} className="border-b border-border/60 last:border-0 hover:bg-secondary">
+                <td className="px-5 py-3 font-semibold">
+                  <Link to={`/product/${p.productSlug}`} className="text-primary hover:underline">
+                    {p.productName}
+                  </Link>
+                </td>
+                <td className="px-5 py-3">{p.qty}</td>
+                <td className="px-5 py-3 font-semibold">{gbp(p.revenuePence)}</td>
+              </tr>
+            ))}
+            {(topProducts ?? []).length === 0 && (
+              <tr>
+                <td colSpan={3} className="px-5 py-10 text-center text-muted-foreground">
+                  No sales in the last 30 days.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {stats.map((s) => (
