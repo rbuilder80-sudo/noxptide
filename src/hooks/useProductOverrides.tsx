@@ -7,20 +7,32 @@ export interface VariantOverride {
   stock: number
 }
 
+export interface ListingOverride {
+  productSlug: string
+  name: string | null
+  tagline: string | null
+  description: string | null
+  categorySlug: string | null
+  imageUrl: string | null
+  detailsJson: string | null
+}
+
 interface OverridesMap {
   /** Keyed by `${productSlug}::${sizeLabel}`. */
   variants: Record<string, VariantOverride>
   /** Products hidden from the storefront by the admin. */
   hidden: Record<string, true>
+  /** Listing-level overrides (name/description/category/image), keyed by product slug. */
+  listings: Record<string, ListingOverride>
 }
 
-const EMPTY: OverridesMap = { variants: {}, hidden: {} }
+const EMPTY: OverridesMap = { variants: {}, hidden: {}, listings: {} }
 const OverridesContext = createContext<OverridesMap>(EMPTY)
 
 const key = (slug: string, sizeLabel: string) => `${slug}::${sizeLabel}`
 
 /**
- * Fetches live price/stock overrides once for the storefront.
+ * Fetches live price/stock and listing overrides once for the storefront.
  * Uses a plain fetch (not the tRPC client) so the heavy @trpc/react-query
  * stack stays out of the storefront's critical-path JavaScript — same
  * pattern as the CMS provider. On any failure the static catalogue
@@ -30,23 +42,29 @@ export function ProductOverridesProvider({ children }: { children: ReactNode }) 
   const [map, setMap] = useState<OverridesMap>(EMPTY)
   useEffect(() => {
     let active = true
-    fetch('/api/trpc/products.overrides')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (!active || !d) return
-        const data = d?.result?.data?.json
-        if (!data) return
+    const fetchJson = (proc: string) =>
+      fetch(`/api/trpc/${proc}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => d?.result?.data?.json ?? null)
+        .catch(() => null)
+    Promise.all([fetchJson('products.overrides'), fetchJson('products.listingOverrides')]).then(
+      ([overrides, listings]) => {
+        if (!active) return
         const variants: OverridesMap['variants'] = {}
-        for (const v of data.variants ?? []) {
+        for (const v of overrides?.variants ?? []) {
           variants[key(v.productSlug, v.sizeLabel)] = v
         }
         const hidden: OverridesMap['hidden'] = {}
-        for (const s of data.statuses ?? []) {
+        for (const s of overrides?.statuses ?? []) {
           if (s.status === 'hidden') hidden[s.productSlug] = true
         }
-        setMap({ variants, hidden })
-      })
-      .catch(() => {})
+        const listingMap: OverridesMap['listings'] = {}
+        for (const row of listings ?? []) {
+          if (row?.productSlug) listingMap[row.productSlug] = row
+        }
+        setMap({ variants, hidden, listings: listingMap })
+      },
+    )
     return () => {
       active = false
     }
@@ -73,4 +91,29 @@ export function liveStock(map: OverridesMap, slug: string, sizeLabel: string): n
 /** True when the admin has hidden the product from the storefront. */
 export function isProductHidden(map: OverridesMap, slug: string): boolean {
   return !!map.hidden[slug]
+}
+
+/** Listing-level override row for a product, or undefined when unmanaged. */
+export function listingOverride(map: OverridesMap, slug: string): ListingOverride | undefined {
+  return map.listings[slug]
+}
+
+/** Live listing name, falling back to the static catalogue value. */
+export function liveName(map: OverridesMap, slug: string, fallback: string): string {
+  return map.listings[slug]?.name ?? fallback
+}
+
+/** Live listing description, falling back to the static catalogue value. */
+export function liveDescription(map: OverridesMap, slug: string, fallback: string): string {
+  return map.listings[slug]?.description ?? fallback
+}
+
+/** Live listing image URL, or null when unmanaged (use static catalogue image). */
+export function liveImage(map: OverridesMap, slug: string): string | null {
+  return map.listings[slug]?.imageUrl ?? null
+}
+
+/** Live category slug, falling back to the static catalogue value. */
+export function liveCategory(map: OverridesMap, slug: string, fallback: string): string {
+  return map.listings[slug]?.categorySlug ?? fallback
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router'
-import { CheckCircle2, Landmark, LoaderCircle, Lock, ShieldCheck, Truck } from 'lucide-react'
+import { CheckCircle2, Landmark, LoaderCircle, Lock, ShieldCheck, TicketPercent, Truck, X } from 'lucide-react'
 import { useSeo } from '../hooks/useSeo'
 import { coreSeo } from '../data/seo'
 import { useCart } from '../context/CartContext'
@@ -16,6 +16,11 @@ export default function Checkout() {
   const [searchParams] = useSearchParams()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'next-day'>('standard')
+  const [promoInput, setPromoInput] = useState('')
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; discountPence: number } | null>(null)
+  const [promoError, setPromoError] = useState<string | null>(null)
+  const [promoChecking, setPromoChecking] = useState(false)
+  const utils = trpc.useUtils()
   const checkoutReadiness = trpc.orders.checkoutReadiness.useQuery()
   const createOrder = trpc.orders.create.useMutation()
   const confirmPayment = trpc.orders.confirmPayment.useMutation()
@@ -33,6 +38,41 @@ export default function Checkout() {
   const confirmationStarted = useRef(false)
   const cartCleared = useRef(false)
   const shipping = shippingMethod === 'next-day' ? 8.99 : subtotal >= 25 ? 0 : 4.99
+  const promoDiscount = appliedPromo ? appliedPromo.discountPence / 100 : 0
+  const total = discountedSubtotal - promoDiscount + shipping
+
+  async function applyPromo() {
+    const code = promoInput.trim()
+    if (!code || promoChecking) return
+    setPromoError(null)
+    setPromoChecking(true)
+    try {
+      // Mirror server-side stacking: validate against the volume-discounted subtotal.
+      const res = await utils.discounts.validate.fetch({
+        code,
+        subtotalPence: Math.round(discountedSubtotal * 100),
+      })
+      if (res.valid) {
+        setAppliedPromo({ code: code.toUpperCase(), discountPence: res.discountPence })
+        setPromoInput('')
+      } else {
+        setAppliedPromo(null)
+        setPromoError(
+          res.reason === 'expired'
+            ? 'This code has expired'
+            : res.reason === 'exhausted'
+              ? 'This code has been fully used'
+              : res.reason === 'minimum not met'
+                ? "This order doesn't meet the code's minimum spend"
+                : "That code isn't valid",
+        )
+      }
+    } catch {
+      setPromoError("Couldn't check that code — try again")
+    } finally {
+      setPromoChecking(false)
+    }
+  }
   const payByBankReady = checkoutReadiness.data?.payByBankReady ?? false
   const checkoutDisabled = createOrder.isPending || checkoutReadiness.isLoading || !payByBankReady
 
@@ -71,6 +111,7 @@ export default function Checkout() {
         postcode: String(fd.get('postcode') || ''),
         country: 'United Kingdom',
         shippingMethod,
+        promoCode: appliedPromo?.code,
         items: items.map((it) => ({
           productSlug: it.slug,
           sizeLabel: it.sizeLabel,
@@ -283,6 +324,42 @@ export default function Checkout() {
               )
             })}
           </ul>
+          <div className="mt-4 border-t border-border pt-4">
+            <label htmlFor="promo-code" className="text-sm font-semibold">
+              Promo code
+            </label>
+            <div className="mt-1.5 flex gap-2">
+              <input
+                id="promo-code"
+                type="text"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    void applyPromo()
+                  }
+                }}
+                placeholder="Enter code"
+                autoComplete="off"
+                className="w-full rounded-lg border border-input px-3 py-2 text-sm uppercase outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+              <button
+                type="button"
+                onClick={() => void applyPromo()}
+                disabled={promoChecking || !promoInput.trim()}
+                className="flex items-center gap-1.5 rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground hover:opacity-90 disabled:opacity-60"
+              >
+                {promoChecking ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <TicketPercent className="h-4 w-4" aria-hidden="true" />
+                )}
+                Apply
+              </button>
+            </div>
+            {promoError && <p className="mt-2 text-sm font-medium text-red-700">{promoError}</p>}
+          </div>
           <dl className="mt-4 space-y-2.5 border-t border-border pt-4 text-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Subtotal</dt>
@@ -294,13 +371,32 @@ export default function Checkout() {
                 <dd>−{formatGBP(discountAmount)}</dd>
               </div>
             )}
+            {appliedPromo && (
+              <div className="flex items-center justify-between font-semibold text-emerald-600">
+                <dt className="flex items-center gap-1.5">
+                  Code {appliedPromo.code} applied
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedPromo(null)
+                      setPromoError(null)
+                    }}
+                    aria-label={`Remove promo code ${appliedPromo.code}`}
+                    className="rounded-full p-0.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  >
+                    <X className="h-3.5 w-3.5" aria-hidden="true" />
+                  </button>
+                </dt>
+                <dd>−{formatGBP(promoDiscount)}</dd>
+              </div>
+            )}
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Delivery</dt>
               <dd className="font-semibold">{shipping === 0 ? 'Free' : formatGBP(shipping)}</dd>
             </div>
             <div className="flex justify-between border-t border-border pt-3 text-base font-extrabold">
               <dt>Total</dt>
-              <dd>{formatGBP(discountedSubtotal + shipping)}</dd>
+              <dd>{formatGBP(total)}</dd>
             </div>
           </dl>
           <button
@@ -314,7 +410,7 @@ export default function Checkout() {
               : checkoutReadiness.isLoading
                 ? 'Checking secure payment…'
                 : payByBankReady
-                  ? `Pay by Bank — ${formatGBP(discountedSubtotal + shipping)}`
+                  ? `Pay by Bank — ${formatGBP(total)}`
                   : 'Pay by Bank being connected'}
           </button>
           {!checkoutReadiness.isLoading && !payByBankReady && !submitError && (

@@ -6,7 +6,7 @@ import {
 import { useSeo } from '../hooks/useSeo'
 import { notFoundSeo, productSeo } from '../data/seo'
 import { useCart } from '../context/CartContext'
-import { isProductHidden, livePrice, liveStock, useProductOverrides } from '../hooks/useProductOverrides'
+import { isProductHidden, liveCategory, liveDescription, liveImage, liveName, livePrice, liveStock, useProductOverrides } from '../hooks/useProductOverrides'
 import { formatGBP, getProduct, productsByCategory } from '../data/products'
 import ProductCard, { ProductImage } from '../components/ProductCard'
 import ProductDetailsAccordion, { TrustStrips } from '../components/ProductDetailsAccordion'
@@ -34,10 +34,12 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function Product() {
   const { slug = '' } = useParams()
   const product = getProduct(slug)
-  const related = product ? productsByCategory(product.category).filter((p) => p.slug !== slug) : []
-  const productGuides = guidesForProduct(slug).filter((g) => !g.slug.endsWith('storage-guide'))
   const { addItem } = useCart()
   const overrides = useProductOverrides()
+  const related = product
+    ? productsByCategory(liveCategory(overrides, product.slug, product.category)).filter((p) => p.slug !== slug)
+    : []
+  const productGuides = guidesForProduct(slug).filter((g) => !g.slug.endsWith('storage-guide'))
   const [sizeIdx, setSizeIdx] = useState(0)
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
@@ -48,6 +50,11 @@ export default function Product() {
   })
 
   if (!product || isProductHidden(overrides, slug)) return <Navigate to="/shop" replace />
+
+  /** Live listing overrides (DB) fall back to static catalogue values. */
+  const displayName = liveName(overrides, product.slug, product.name)
+  const displayDescription = liveDescription(overrides, product.slug, product.short)
+  const displayImage = liveImage(overrides, product.slug)
 
   const size = product.sizes[sizeIdx]
   /** Admin-controlled live values (DB) fall back to catalogue defaults. */
@@ -69,7 +76,7 @@ export default function Product() {
       <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
         <Link to="/" className="hover:text-primary">Home</Link> /{' '}
         <Link to="/shop" className="hover:text-primary">Peptides</Link> /{' '}
-        <span className="text-foreground">{product.name}</span>
+        <span className="text-foreground">{displayName}</span>
       </nav>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-2">
@@ -79,6 +86,8 @@ export default function Product() {
             product={product}
             sizeLabel={size.label}
             eager
+            name={displayName}
+            imageUrl={displayImage}
             className="aspect-square w-full rounded-2xl border border-border shadow-sm"
           />
           {product.badge && (
@@ -97,7 +106,7 @@ export default function Product() {
             Peptides
           </Link>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            {product.name} Research Peptide
+            {displayName} Research Peptide
           </h1>
           <p className="mt-1 text-muted-foreground">{product.subtitle}</p>
           <div className="mt-3">
@@ -116,7 +125,7 @@ export default function Product() {
             </span>
           </div>
 
-          <p className="mt-5 leading-relaxed text-muted-foreground">{product.short}</p>
+          <p className="mt-5 leading-relaxed text-muted-foreground">{displayDescription}</p>
 
           <div className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-sm">
             <fieldset>
@@ -340,7 +349,7 @@ export default function Product() {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/85 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur lg:hidden">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-bold leading-tight">{product.name} · {size.label}</p>
+            <p className="text-sm font-bold leading-tight">{displayName} · {size.label}</p>
             <p className="text-lg font-extrabold text-primary">{formatGBP(unitNow * qty)}</p>
           </div>
           <button
