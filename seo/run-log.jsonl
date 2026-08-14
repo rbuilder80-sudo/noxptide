@@ -2,3 +2,5 @@
 {"ts":"2026-08-14T19:06:11.616Z","action":"queue-run","status":"skipped","detail":"no editor credentials for /guides/bpc-157-research-guide"}
 {"ts":"2026-08-14T19:06:11.616Z","action":"queue-run","status":"skipped","detail":"no editor credentials for /guides/tb-500-research-guide"}
 {"ts":"2026-08-14T19:06:11.616Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
+{"ts":"2026-08-14T23:08:59.827Z","action":"health","status":"ok","detail":"/=200, /sitemap.xml=200, /robots.txt=200"}
+{"ts":"2026-08-14T23:08:59.828Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
