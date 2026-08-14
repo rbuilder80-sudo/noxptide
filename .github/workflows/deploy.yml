@@ -1,0 +1,55 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build & deploy
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Railway
+        if: secrets.RAILWAY_TOKEN != ''
+        run: railway up --service "${{ vars.RAILWAY_SERVICE_ID }}" --detach
+        env:
+          # Project token — Railway dashboard → project → Settings → Tokens.
+          # If you hit the CLI 5.3.x project-token regression in GitHub
+          # Actions, pin the container (e.g. ghcr.io/railwayapp/cli:3.19.0)
+          # or use an account-scoped token as RAILWAY_API_TOKEN instead.
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Deploy skipped (token not configured yet)
+        if: secrets.RAILWAY_TOKEN == ''
+        run: echo "RAILWAY_TOKEN is not set — deploy skipped. Add the secret in repo Settings → Secrets and variables → Actions to activate deploys."
+      - name: Smoke check
+        if: secrets.RAILWAY_TOKEN != ''
+        run: 'curl -sf -o /dev/null -w "live: %{http_code}\n" https://www.noxptide.co.uk'
+
+  ping-indexnow:
+    name: Ping search engines (IndexNow)
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: secrets.INDEXNOW_KEY != ''
+    steps:
+      - name: Ping IndexNow (Bing · Yandex · Seznam · Naver)
+        run: |
+          curl -sS "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fwww.noxptide.co.uk%2F&key=${{ secrets.INDEXNOW_KEY }}"
+          curl -sS "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fwww.noxptide.co.uk%2Fsitemap.xml&key=${{ secrets.INDEXNOW_KEY }}"
+
+  notify-seo-master:
+    name: Notify SEO Master
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: secrets.SEO_MASTER_WEBHOOK != ''
+    steps:
+      - name: Post deploy event
+        run: |
+          curl -sS -X POST "${{ secrets.SEO_MASTER_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{"event":"deploy.complete","ref":"${{ github.sha }}","site":"https://www.noxptide.co.uk"}'

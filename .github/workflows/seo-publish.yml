@@ -1,0 +1,52 @@
+name: SEO Master — Publish page content
+
+# GitHub-connected content publishing for the SEO Master program.
+# The SEO Master (or an operator) triggers this workflow with the page key
+# and the SEO fields to change; it applies the change through the site's own
+# CMS API (tRPC cms.upsert → page_contents) and pings IndexNow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pageKey:
+        description: Page key (e.g. /product/bpc-157 or /guides/...)
+        required: true
+      metaTitle:
+        description: Meta title (optional)
+        required: false
+        default: ""
+      metaDescription:
+        description: Meta description (optional)
+        required: false
+        default: ""
+      content:
+        description: Content override (Markdown/HTML, optional)
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Apply content via CMS API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Publish via site CMS API
+        run: node scripts/seo-apply.mjs
+        env:
+          SITE_ORIGIN: https://www.noxptide.co.uk
+          SEO_EDITOR_EMAIL: ${{ secrets.SEO_EDITOR_EMAIL }}
+          SEO_EDITOR_PASSWORD: ${{ secrets.SEO_EDITOR_PASSWORD }}
+          PAGE_KEY: ${{ inputs.pageKey }}
+          META_TITLE: ${{ inputs.metaTitle }}
+          META_DESCRIPTION: ${{ inputs.metaDescription }}
+          CONTENT: ${{ inputs.content }}
+      - name: Ping IndexNow for the page
+        if: secrets.INDEXNOW_KEY != ''
+        run: |
+          curl -sS "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fwww.noxptide.co.uk${{ inputs.pageKey }}&key=${{ secrets.INDEXNOW_KEY }}"
