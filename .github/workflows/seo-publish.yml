@@ -1,9 +1,9 @@
-name: SEO Master — Publish page content
+name: SEO Master - Publish page content
 
 # GitHub-connected content publishing for the SEO Master program.
 # The SEO Master (or an operator) triggers this workflow with the page key
 # and the SEO fields to change; it applies the change through the site's own
-# CMS API (tRPC cms.upsert → page_contents) and pings IndexNow.
+# CMS API (tRPC cms.upsert -> page_contents) and pings IndexNow.
 
 on:
   workflow_dispatch:
@@ -31,6 +31,8 @@ jobs:
   publish:
     name: Apply content via CMS API
     runs-on: ubuntu-latest
+    env:
+      INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,6 +49,6 @@ jobs:
           META_DESCRIPTION: ${{ inputs.metaDescription }}
           CONTENT: ${{ inputs.content }}
       - name: Ping IndexNow for the page
-        if: secrets.INDEXNOW_KEY != ''
+        if: env.INDEXNOW_KEY != ''
         run: |
-          curl -sS "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fwww.noxptide.co.uk${{ inputs.pageKey }}&key=${{ secrets.INDEXNOW_KEY }}"
+          curl -sS "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fwww.noxptide.co.uk${{ inputs.pageKey }}&key=${INDEXNOW_KEY}"

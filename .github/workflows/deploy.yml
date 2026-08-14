@@ -13,10 +13,12 @@ jobs:
     name: Build & deploy
     runs-on: ubuntu-latest
     container: ghcr.io/railwayapp/cli
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - name: Deploy to Railway
-        if: secrets.RAILWAY_TOKEN != ''
+        if: env.RAILWAY_TOKEN != ''
         run: railway up --service "${{ vars.RAILWAY_SERVICE_ID }}" --detach
         env:
           # Project token — Railway dashboard → project → Settings → Tokens.
@@ -25,31 +27,35 @@ jobs:
           # or use an account-scoped token as RAILWAY_API_TOKEN instead.
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       - name: Deploy skipped (token not configured yet)
-        if: secrets.RAILWAY_TOKEN == ''
-        run: echo "RAILWAY_TOKEN is not set — deploy skipped. Add the secret in repo Settings → Secrets and variables → Actions to activate deploys."
+        if: env.RAILWAY_TOKEN == ''
+        run: echo "RAILWAY_TOKEN is not set - deploy skipped. Add the secret in repo Settings > Secrets and variables > Actions to activate deploys."
       - name: Smoke check
-        if: secrets.RAILWAY_TOKEN != ''
+        if: env.RAILWAY_TOKEN != ''
         run: 'curl -sf -o /dev/null -w "live: %{http_code}\n" https://www.noxptide.co.uk'
 
   ping-indexnow:
     name: Ping search engines (IndexNow)
     needs: deploy
     runs-on: ubuntu-latest
-    if: secrets.INDEXNOW_KEY != ''
+    env:
+      INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
     steps:
-      - name: Ping IndexNow (Bing · Yandex · Seznam · Naver)
+      - name: Ping IndexNow (Bing - Yandex - Seznam - Naver)
+        if: env.INDEXNOW_KEY != ''
         run: |
-          curl -sS "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fwww.noxptide.co.uk%2F&key=${{ secrets.INDEXNOW_KEY }}"
-          curl -sS "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fwww.noxptide.co.uk%2Fsitemap.xml&key=${{ secrets.INDEXNOW_KEY }}"
+          curl -sS "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fwww.noxptide.co.uk%2F&key=${INDEXNOW_KEY}"
+          curl -sS "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fwww.noxptide.co.uk%2Fsitemap.xml&key=${INDEXNOW_KEY}"
 
   notify-seo-master:
     name: Notify SEO Master
     needs: deploy
     runs-on: ubuntu-latest
-    if: secrets.SEO_MASTER_WEBHOOK != ''
+    env:
+      SEO_MASTER_WEBHOOK: ${{ secrets.SEO_MASTER_WEBHOOK }}
     steps:
       - name: Post deploy event
+        if: env.SEO_MASTER_WEBHOOK != ''
         run: |
-          curl -sS -X POST "${{ secrets.SEO_MASTER_WEBHOOK }}" \
+          curl -sS -X POST "${SEO_MASTER_WEBHOOK}" \
             -H "Content-Type: application/json" \
             -d '{"event":"deploy.complete","ref":"${{ github.sha }}","site":"https://www.noxptide.co.uk"}'
