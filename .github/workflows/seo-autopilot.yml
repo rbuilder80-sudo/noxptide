@@ -1,0 +1,50 @@
+name: SEO Master Autopilot
+
+# Autonomous SEO task cycle for noxptide.co.uk:
+#   health check -> content queue -> IndexNow -> status page regeneration.
+# Runs every 6 hours on GitHub-hosted runners (survives restarts, no server
+# to keep alive) and can be triggered manually. Every run is appended to
+# seo/run-log.jsonl and committed back, so results are always traceable.
+# Failures fail the workflow -> GitHub emails the repo owner automatically.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # 00:00 / 06:00 / 12:00 / 18:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seo-autopilot
+  cancel-in-progress: false
+
+jobs:
+  autopilot:
+    name: Run SEO task cycle
+    runs-on: ubuntu-latest
+    env:
+      SITE_ORIGIN: https://www.noxptide.co.uk
+      SEO_EDITOR_EMAIL: ${{ secrets.SEO_EDITOR_EMAIL }}
+      SEO_EDITOR_PASSWORD: ${{ secrets.SEO_EDITOR_PASSWORD }}
+      INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run autopilot cycle
+        run: node scripts/seo-runner.mjs all
+      - name: Commit run records
+        if: always()
+        run: |
+          git config user.name "Noxptide SEO Bot"
+          git config user.email "seo@noxptide.co.uk"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git add seo seo-status.md
+          if ! git diff --cached --quiet; then
+            git commit -m "seo: autopilot run records [skip ci]"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
