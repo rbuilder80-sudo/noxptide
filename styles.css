@@ -1,0 +1,149 @@
+/* Noxptide SEO Master — Information Architects style.
+   Content-first, system fonts, zero decoration, classic blue links. */
+
+:root {
+  --ink: #111111;
+  --dim: #555555;
+  --rule: #d9d9d9;
+  --link: #0000ee;
+  --link-visited: #551a8b;
+  --ok: #0a6b2d;
+  --skip: #6b6b6b;
+  --bg: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  font-size: 17px;
+}
+
+main {
+  max-width: 46rem;               /* ~66ch reading measure */
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+a { color: var(--link); }
+a:visited { color: var(--link-visited); }
+a:hover, a:focus { text-decoration-thickness: 2px; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: #f2f2f2;
+  padding: 0.08em 0.3em;
+  border-radius: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: #fff;
+  padding: 0.5rem 1rem;
+  z-index: 10;
+}
+.skip-link:focus { left: 0; }
+
+.site-header {
+  border-bottom: 1px solid var(--rule);
+}
+.site-header nav {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1.5rem;
+  font-size: 0.95rem;
+}
+.brand { font-weight: 700; letter-spacing: 0.02em; }
+.brand-dim { font-weight: 400; color: var(--dim); }
+.site-header ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.hero h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); line-height: 1.15; margin: 1.2rem 0 0.8rem; }
+.lede { font-size: 1.08rem; color: #222; }
+.cta { font-weight: 700; }
+
+h2 {
+  font-size: 1.45rem;
+  margin: 2.6rem 0 0.6rem;
+  padding-top: 0.4rem;
+  border-top: 3px solid var(--ink);
+}
+h3 { font-size: 1.08rem; margin: 1.6rem 0 0.4rem; }
+
+.meta { color: var(--dim); font-size: 0.88rem; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0 1.5rem;
+}
+.stats div {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.7rem 0.9rem;
+}
+.stats dt { font-size: 0.8rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.04em; }
+.stats dd { margin: 0.25rem 0 0; font-weight: 700; font-size: 1.05rem; }
+
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+  margin: 0.5rem 0 1rem;
+}
+th, td {
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+th { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dim); }
+table.plain td:last-child { white-space: nowrap; }
+
+.status-ok { color: var(--ok); font-weight: 600; }
+.status-skipped, .status-pending { color: var(--skip); }
+
+.steps li, section ol li, section ul li { margin-bottom: 0.5rem; }
+
+footer {
+  border-top: 1px solid var(--rule);
+  color: var(--dim);
+  font-size: 0.85rem;
+}
+footer p { max-width: 46rem; margin: 0 auto; padding: 1rem 1.25rem 2rem; }
+
+.linklike {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.linklike:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.linklike.copied { color: var(--ok); }
+
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

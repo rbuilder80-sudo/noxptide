@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noxptide SEO Master — the autonomous SEO worker for noxptide.co.uk</title>
+<meta name="description" content="An autonomous SEO operation layer for noxptide.co.uk: scheduled health checks, content publishing, IndexNow pings and full run traceability. Every run recorded, no rank promises.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+
+<header class="site-header">
+  <nav aria-label="Primary">
+    <span class="brand">NOXPTIDE <span class="brand-dim">SEO MASTER</span></span>
+    <ul>
+      <li><a href="#status">Live status</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#scope">Scope</a></li>
+      <li><a href="#honesty">Honesty</a></li>
+      <li><a href="#operators">For operators</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="content">
+
+  <section class="hero">
+    <h1>An autonomous SEO worker for noxptide.co.uk.</h1>
+    <p class="lede">The SEO Master runs a full SEO task cycle on a schedule —
+    health checks, content publishing, search-engine pings — and records every
+    run. It does the work and shows the receipts. It makes no promises about
+    rankings, because nobody honest can.</p>
+    <p><a class="cta" href="#status">See the live status</a> ·
+    <a href="https://github.com/rbuilder80-sudo/noxptide" rel="noopener">Source on GitHub</a></p>
+  </section>
+
+  <section id="status" aria-labelledby="status-h">
+    <h2 id="status-h">Live status</h2>
+    <p class="meta">Snapshot: 2026-08-14 19:06 UTC · generated from
+    <code>seo/run-log.jsonl</code> on <code>main</code> · site checked:
+    <a href="https://www.noxptide.co.uk" rel="noopener">https://www.noxptide.co.uk</a></p>
+
+    <dl class="stats" aria-label="Run statistics">
+      <div><dt>Site (HTTPS)</dt><dd id="stat-site">200 · TLS verified</dd></div>
+      <div><dt>Runs recorded</dt><dd id="stat-runs">4</dd></div>
+      <div><dt>Failures</dt><dd id="stat-failures">0</dd></div>
+      <div><dt>Success rate</dt><dd id="stat-rate">100%</dd></div>
+      <div><dt>Cycle</dt><dd id="stat-cycle">Every 6 h (00/06/12/18 UTC)</dd></div>
+    </dl>
+
+    <h3>Recent runs</h3>
+    <div class="table-wrap">
+    <table id="run-table" aria-label="Recent autopilot runs">
+      <thead><tr><th scope="col">Time (UTC)</th><th scope="col">Action</th><th scope="col">Status</th><th scope="col">Detail</th></tr></thead>
+      <tbody><!-- rendered from embedded data --></tbody>
+    </table>
+    </div>
+
+    <h3>Content queue</h3>
+    <div class="table-wrap">
+    <table id="queue-table" aria-label="Pending content tasks">
+      <thead><tr><th scope="col">Page key</th><th scope="col">Task</th><th scope="col">Status</th></tr></thead>
+      <tbody><!-- rendered from embedded data --></tbody>
+    </table>
+    </div>
+    <p class="meta">Machine-readable: <code>seo/status.json</code> · status page:
+    <a href="https://github.com/rbuilder80-sudo/noxptide/blob/main/seo-status.md" rel="noopener">seo-status.md</a></p>
+  </section>
+
+  <section id="how" aria-labelledby="how-h">
+    <h2 id="how-h">How it works</h2>
+    <p>Every cycle is one pass through four steps. Each step appends a dated
+    record to the run log; nothing happens silently.</p>
+    <ol class="steps">
+      <li><strong>Health</strong> — GET <code>/</code>, <code>/sitemap.xml</code>,
+      <code>/robots.txt</code>. Any non-200 fails the run and alerts the owner.</li>
+      <li><strong>Queue</strong> — every <em>pending</em> item in the content queue
+      is published through the site's own CMS API (title, description, content).
+      No credentials configured? Items are marked <em>skipped</em> — never lost.</li>
+      <li><strong>IndexNow</strong> — pings Bing, Yandex, Seznam and Naver for the
+      homepage and sitemap when a key is configured.</li>
+      <li><strong>Status</strong> — regenerates the status page and JSON snapshot
+      from the run log.</li>
+    </ol>
+    <h3>Why it can be left alone</h3>
+    <ul>
+      <li>Runs on <strong>GitHub-hosted runners</strong> — no server, no machine
+      to keep alive, survives restarts by design.</li>
+      <li>The bot <strong>commits its own records</strong> back to the repository
+      (message contains <code>[skip ci]</code>, so it never re-triggers deploys).</li>
+      <li>Failures <strong>fail the workflow</strong> — GitHub emails the repo
+      owner; a daily supervision check adds a second alerting layer.</li>
+    </ul>
+  </section>
+
+  <section id="scope" aria-labelledby="scope-h">
+    <h2 id="scope-h">What it covers</h2>
+    <table class="plain">
+      <thead><tr><th scope="col">Area</th><th scope="col">What the bot does</th><th scope="col">Status</th></tr></thead>
+      <tbody>
+        <tr><td>Technical health</td><td>Scheduled checks of the site, sitemap and robots.txt</td><td>Live</td></tr>
+        <tr><td>Content publishing</td><td>Meta title/description/content updates via the site CMS API</td><td>Ready — waits for editor credentials</td></tr>
+        <tr><td>On-page SEO</td><td>Queued meta refreshes for real pages (2 guides seeded)</td><td>Ready — waits for credentials</td></tr>
+        <tr><td>Off-page / authority</td><td>IndexNow pings to Bing, Yandex, Seznam, Naver</td><td>Ready — waits for key</td></tr>
+        <tr><td>Deployment</td><td>Push-to-main deploys to Railway behind Cloudflare</td><td>Ready — waits for token</td></tr>
+        <tr><td>Monitoring &amp; alerts</td><td>Workflow-failure email + daily supervision check</td><td>Live</td></tr>
+        <tr><td>Traceability</td><td>Append-only run log, generated status page, JSON snapshot</td><td>Live</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="honesty" aria-labelledby="honesty-h">
+    <h2 id="honesty-h">What it does not do</h2>
+    <ul>
+      <li><strong>No ranking guarantees.</strong> No tool can promise top-3 on
+      Google.co.uk. The bot does the work; search engines decide.</li>
+      <li><strong>No rule-breaking.</strong> It acts only on sites it is
+      authorised for, within their terms of service, without bypassing
+      authentication or rate limits.</li>
+      <li><strong>No third-party scanning.</strong> It operates on
+      noxptide.co.uk and the accounts the owner provides — nothing else.</li>
+      <li><strong>No exposed secrets.</strong> Credentials live only in GitHub
+      Actions secrets and are never written to logs, files or this page.</li>
+    </ul>
+  </section>
+
+  <section id="operators" aria-labelledby="operators-h">
+    <h2 id="operators-h">For operators</h2>
+    <p>Everything needed to run, pause, configure and recover the system is in
+    the runbook. The five items below are the only operator actions — the
+    assistant cannot set secrets.</p>
+    <ol>
+      <li>Add secrets <code>RAILWAY_TOKEN</code> + <code>RAILWAY_SERVICE_ID</code>
+      → deploys activate on every push to main.</li>
+      <li>Add <code>SEO_EDITOR_EMAIL</code> + <code>SEO_EDITOR_PASSWORD</code>
+      → queued content publishes live.</li>
+      <li>Add <code>INDEXNOW_KEY</code> and host <code>&lt;key&gt;.txt</code>
+      on the site → search-engine pings fire each cycle.</li>
+      <li>Configure the Railway MySQL backup and test one restore.</li>
+      <li>Trigger a cycle any time: repo → Actions → <em>SEO Master Autopilot</em>
+      → Run workflow.</li>
+    </ol>
+    <p class="meta">Runbook: <a href="https://github.com/rbuilder80-sudo/noxptide/blob/main/SEO-MASTER-RUNBOOK.md" rel="noopener">SEO-MASTER-RUNBOOK.md</a>
+    · Tracker: <a href="https://github.com/rbuilder80-sudo/noxptide/blob/main/seo-master-tracker.md" rel="noopener">seo-master-tracker.md</a>
+    · Repo: <button type="button" id="copy-repo" class="linklike">copy repo URL</button></p>
+  </section>
+
+</main>
+
+<footer>
+  <p>Noxptide SEO Master · version 1.0 · 2026-08-14 ·
+  <a href="https://www.noxptide.co.uk" rel="noopener">noxptide.co.uk</a> ·
+  <a href="https://github.com/rbuilder80-sudo/noxptide" rel="noopener">GitHub</a></p>
+</footer>
+
+<script type="application/json" id="seo-data">
+{
+  "generatedAt": "2026-08-14T19:06:11.617Z",
+  "site": "https://www.noxptide.co.uk",
+  "stats": { "runs": 4, "failures": 0, "successRate": 100 },
+  "runs": [
+    { "ts": "2026-08-14T19:06:11.615Z", "action": "health", "status": "ok", "detail": "/=200, /sitemap.xml=200, /robots.txt=200" },
+    { "ts": "2026-08-14T19:06:11.616Z", "action": "queue-run", "status": "skipped", "detail": "no editor credentials for /guides/bpc-157-research-guide" },
+    { "ts": "2026-08-14T19:06:11.616Z", "action": "queue-run", "status": "skipped", "detail": "no editor credentials for /guides/tb-500-research-guide" },
+    { "ts": "2026-08-14T19:06:11.616Z", "action": "indexnow", "status": "skipped", "detail": "no INDEXNOW_KEY configured" }
+  ],
+  "queue": [
+    { "key": "/guides/bpc-157-research-guide", "task": "Meta refresh (title + description)", "status": "pending" },
+    { "key": "/guides/tb-500-research-guide", "task": "Meta refresh (title + description)", "status": "pending" }
+  ]
+}
+</script>
+<script src="app.js"></script>
+</body>
+</html>
