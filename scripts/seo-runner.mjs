@@ -28,7 +28,7 @@ const SEO_DIR = path.join(ROOT, "seo");
 const QUEUE = path.join(SEO_DIR, "content-queue.json");
 const RUNLOG = path.join(SEO_DIR, "run-log.jsonl");
 const STATUS_JSON = path.join(SEO_DIR, "status.json");
-const STATUS_MD = path.join(ROOT, "SEO-STATUS.md");
+const STATUS_MD = path.join(ROOT, "seo-status.md");
 
 const SITE = process.env.SITE_ORIGIN || "https://www.noxptide.co.uk";
 const action = process.argv[2] || "all";
