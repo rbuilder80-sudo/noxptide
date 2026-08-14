@@ -16,6 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Deploy to Railway
+        if: secrets.RAILWAY_TOKEN != ''
         run: railway up --service "${{ vars.RAILWAY_SERVICE_ID }}" --detach
         env:
           # Project token — Railway dashboard → project → Settings → Tokens.
@@ -23,7 +24,11 @@ jobs:
           # Actions, pin the container (e.g. ghcr.io/railwayapp/cli:3.19.0)
           # or use an account-scoped token as RAILWAY_API_TOKEN instead.
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Deploy skipped (token not configured yet)
+        if: secrets.RAILWAY_TOKEN == ''
+        run: echo "RAILWAY_TOKEN is not set — deploy skipped. Add the secret in repo Settings → Secrets and variables → Actions to activate deploys."
       - name: Smoke check
+        if: secrets.RAILWAY_TOKEN != ''
         run: 'curl -sf -o /dev/null -w "live: %{http_code}\n" https://www.noxptide.co.uk'
 
   ping-indexnow:
