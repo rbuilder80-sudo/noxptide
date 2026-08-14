@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "key": "/guides/bpc-157-research-guide",
+      "metaTitle": "BPC-157 Research Guide: Evidence, Handling & Storage | Noxptide",
+      "metaDescription": "BPC-157 research guide: mechanism of action, laboratory handling, reconstitution, dosing and storage evidence for UK peptide researchers.",
+      "content": null,
+      "status": "pending",
+      "createdAt": "2026-08-14T20:05:00.000Z",
+      "note": "Meta refresh for existing guide (title/description only; applied via site CMS API when editor credentials are configured)"
+    },
+    {
+      "key": "/guides/tb-500-research-guide",
+      "metaTitle": "TB-500 Research Guide: Thymosin Beta-4 in the Laboratory | Noxptide",
+      "metaDescription": "TB-500 (thymosin beta-4) research guide: laboratory use, reconstitution, dosing protocols and stability evidence for UK researchers.",
+      "content": null,
+      "status": "pending",
+      "createdAt": "2026-08-14T20:05:00.000Z",
+      "note": "Meta refresh for existing guide (title/description only; applied via site CMS API when editor credentials are configured)"
+    }
+  ]
+}
