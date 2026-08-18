@@ -10,7 +10,6 @@ import { isProductHidden, liveCategory, liveDescription, liveImage, liveName, li
 import { formatGBP, getProduct, productsByCategory } from '../data/products'
 import ProductCard, { ProductImage } from '../components/ProductCard'
 import ProductDetailsAccordion, { TrustStrips } from '../components/ProductDetailsAccordion'
-import Rating from '../components/Rating'
 import { guidesForProduct } from '../data/guides'
 import { BookOpen, ArrowRight } from 'lucide-react'
 
@@ -109,9 +108,6 @@ export default function Product() {
             {displayName} Research Peptide
           </h1>
           <p className="mt-1 text-muted-foreground">{product.subtitle}</p>
-          <div className="mt-3">
-            <Rating rating={product.rating} reviews={product.reviews} size="lg" />
-          </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
@@ -316,23 +312,24 @@ export default function Product() {
         </div>
       </section>
 
-      {/* Social proof */}
+      {/* Verification proof — factual claims only (no ratings/testimonials until
+          genuine, attributable reviews exist — Google policy + UK consumer law) */}
       <section className="mt-12 rounded-2xl border border-border bg-card p-7" aria-labelledby="product-proof">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 id="product-proof" className="text-xl font-extrabold tracking-tight">
-              Trusted by UK Research Teams
-            </h2>
-            <div className="mt-2">
-              <Rating rating={product.rating} reviews={product.reviews} size="lg" />
-            </div>
-          </div>
-          <blockquote className="max-w-xl rounded-xl bg-secondary p-5 text-sm leading-relaxed text-foreground">
-            "Consistent purity across every batch we've tested, with documentation that matches
-            independent retesting. Exactly what a research lab needs."
-            <footer className="mt-2 text-xs text-muted-foreground">— Laboratory Manager, Cambridge Biotech</footer>
-          </blockquote>
-        </div>
+        <h2 id="product-proof" className="text-xl font-extrabold tracking-tight">
+          Verified Quality on Every Batch
+        </h2>
+        <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+          {[
+            { icon: ShieldCheck, text: '≥99% purity confirmed by HPLC on every production batch' },
+            { icon: FileCheck, text: 'Batch-specific Certificate of Analysis supplied with every order' },
+            { icon: FlaskConical, text: 'Identity confirmed by mass spectrometry before release' },
+          ].map((f) => (
+            <li key={f.text} className="flex items-start gap-2.5 rounded-xl bg-secondary p-4">
+              <f.icon className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+              <span className="text-sm font-medium leading-snug text-foreground/90">{f.text}</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Related */}

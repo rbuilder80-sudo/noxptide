@@ -138,16 +138,17 @@ fs.writeFileSync(path.join(dist, "checkout-shell.html"), makeShell("Secure Check
 console.log("prerender: admin-shell.html + checkout-shell.html written");
 
 // Sitemap: only canonical, indexable www URLs (audit P0-2, launch checklist).
-const lastmod = new Date().toISOString().slice(0, 10);
+// No lastmod: a single build-time date on every URL is fabricated data — Google
+// only trusts lastmod when it reflects a real page change, and ignores it otherwise.
 const priority = (p) =>
   p === "/" ? "1.0" : p.startsWith("/product/") ? "0.9" : p.startsWith("/guides/") ? "0.8" : "0.7";
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${INDEXABLE_PATHS.map(
   (p) =>
-    `  <url><loc>https://www.noxptide.co.uk${p === "/" ? "/" : p}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>${priority(p)}</priority></url>`,
+    `  <url><loc>https://www.noxptide.co.uk${p === "/" ? "/" : p}</loc><changefreq>weekly</changefreq><priority>${priority(p)}</priority></url>`,
 ).join("\n")}
 </urlset>
 `;
 fs.writeFileSync(path.join(dist, "sitemap.xml"), sitemap);
-console.log(`prerender: sitemap.xml written (${INDEXABLE_PATHS.length} URLs, lastmod ${lastmod})`);
+console.log(`prerender: sitemap.xml written (${INDEXABLE_PATHS.length} URLs)`);

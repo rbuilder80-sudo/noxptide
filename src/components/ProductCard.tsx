@@ -2,7 +2,6 @@ import { Link } from 'react-router'
 import { FlaskConical } from 'lucide-react'
 import type { Product } from '../data/products'
 import { formatGBP } from '../data/products'
-import Rating from './Rating'
 import { liveImage, liveName, livePrice, liveStock, useProductOverrides } from '../hooks/useProductOverrides'
 
 /** Noxptide-branded vial photography: /images/products/<slug>-<size>.webp per vial size.
@@ -102,9 +101,6 @@ export default function ProductCard({ product, eager = false }: { product: Produ
           </Link>
         </h3>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.short}</p>
-        <div className="mt-2">
-          <Rating rating={product.rating} reviews={product.reviews} />
-        </div>
         <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
           <div>
             <span className="text-xs text-muted-foreground">from</span>

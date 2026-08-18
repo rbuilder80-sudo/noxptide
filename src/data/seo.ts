@@ -196,13 +196,9 @@ export function productSeo(product: Product): RouteSeo {
         image: productImageUrl(product),
         brand: { '@type': 'Brand', name: SITE_NAME },
         sku: product.slug.toUpperCase(),
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: product.rating.toFixed(1),
-          reviewCount: product.reviews,
-          bestRating: '5',
-          worstRating: '1',
-        },
+        // No aggregateRating: ratings must only be emitted for genuine, visible,
+        // attributable reviews (Google structured-data policy — fabricated ratings
+        // risk a manual action). Reinstated once real review data exists.
         offers: product.sizes.map((s) => ({
           '@type': 'Offer',
           url: `${SITE_URL}${path}`,

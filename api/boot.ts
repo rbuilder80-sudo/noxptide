@@ -86,6 +86,18 @@ if (env.isProduction) {
     await next();
   });
 
+  // Trailing-slash canonicalisation: /shop/ serves a byte-identical duplicate of
+  // /shop today, splitting link equity. 301 -> slashless path (query preserved);
+  // API routes are excluded — tRPC paths legitimately end in various shapes.
+  app.use("*", async (c, next) => {
+    const p = c.req.path;
+    if (p.length > 1 && p.endsWith("/") && !p.startsWith("/api/")) {
+      const url = new URL(c.req.url);
+      return c.redirect(`${url.origin}${p.slice(0, -1)}${url.search}`, 301);
+    }
+    await next();
+  });
+
   serveStaticFiles(app);
 
   const port = parseInt(process.env.PORT || "3000");  serve({ fetch: app.fetch, port, hostname: "0.0.0.0" }, () => {

@@ -89,7 +89,10 @@
   <body>
     <div id="root"></div>
     <noscript>
-      <h1>UK Research Peptides with Verifiable ≥99% Purity</h1>
+      <!-- No heading here: every prerendered page already ships its own
+           route-specific H1 inside #root. A second (homepage) H1 in the raw
+           HTML would duplicate it sitewide. -->
+      <p><strong>UK Research Peptides with Verifiable ≥99% Purity</strong></p>
       <p>UK research peptides with ≥99% HPLC purity, independent verification and batch-specific Certificates of Analysis. Tracked UK delivery. For laboratory research use only.</p>
       <nav>
         <a href="/shop">Shop all research peptides</a> |
