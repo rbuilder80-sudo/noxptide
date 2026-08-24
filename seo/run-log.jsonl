@@ -80,3 +80,5 @@
 {"ts":"2026-08-24T01:18:15.088Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
 {"ts":"2026-08-24T06:59:03.744Z","action":"health","status":"ok","detail":"/=200, /sitemap.xml=200, /robots.txt=200"}
 {"ts":"2026-08-24T06:59:03.745Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
+{"ts":"2026-08-24T12:51:00.317Z","action":"health","status":"ok","detail":"/=200, /sitemap.xml=200, /robots.txt=200"}
+{"ts":"2026-08-24T12:51:00.318Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
