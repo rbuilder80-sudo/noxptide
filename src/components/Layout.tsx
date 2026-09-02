@@ -137,9 +137,7 @@ export default function Layout() {
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <FlaskConical className="h-5 w-5" aria-hidden="true" />
               </span>
-              <span className="text-lg font-bold">
-                Nox<span className="text-primary">ptide</span>
-              </span>
+              <span className="text-lg font-bold text-primary">Noxptide</span>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               The UK's quality-first research peptide supplier. Independently verified ≥99% purity,
