@@ -1,58 +1,7 @@
-# Noxptide — robots.txt
-# Public indexable content is open to search and AI crawlers.
-# Private/system areas are controlled by noindex directives in the pages
-# themselves (not disallowed here, so crawlers can see the noindex).
-
+# Noxptide - robots.txt
+# Public pages are crawlable and indexability is controlled at page level with
+# canonical links, meta robots, and X-Robots-Tag headers for private shells.
 User-agent: *
 Allow: /
 
-# --- AI search & retrieval crawlers ---
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Perplexity-User
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Claude-SearchBot
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Applebot
-Allow: /
-
-User-agent: Meta-ExternalAgent
-Allow: /
-
-# --- AI training crawlers ---
-User-agent: GPTBot
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: Amzn-SearchBot
-Allow: /
-
-# Exactly one Sitemap directive, on the canonical www host.
-# llms.txt is a separate optional resource — not advertised as a sitemap.
 Sitemap: https://www.noxptide.co.uk/sitemap.xml
