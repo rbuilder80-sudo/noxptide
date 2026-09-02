@@ -31,11 +31,11 @@ export function serveStaticFiles(app: App) {
   // never the SPA homepage with a 200 (audit: required HTTP contract).
   app.notFound((c) => {
     const accept = c.req.header("accept") ?? "";
+    c.header("X-Robots-Tag", "noindex, follow");
     if (!accept.includes("text/html")) {
       return c.json({ error: "Not Found" }, 404);
     }
     const notFoundPath = path.resolve(distPath, "404.html");
-    c.header("X-Robots-Tag", "noindex, follow");
     if (fs.existsSync(notFoundPath)) {
       return c.html(fs.readFileSync(notFoundPath, "utf-8"), 404);
     }

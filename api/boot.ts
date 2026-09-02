@@ -93,7 +93,11 @@ if (env.isProduction) {
     const p = c.req.path;
     if (p.length > 1 && p.endsWith("/") && !p.startsWith("/api/")) {
       const url = new URL(c.req.url);
-      return c.redirect(`${url.origin}${p.slice(0, -1)}${url.search}`, 301);
+      c.header("Cache-Control", "public, max-age=86400");
+      return c.redirect(
+        `https://www.noxptide.co.uk${p.replace(/\/+$/, "")}${url.search}`,
+        301
+      );
     }
     await next();
   });
