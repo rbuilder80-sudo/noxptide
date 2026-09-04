@@ -133,12 +133,12 @@ export default function Layout() {
       <footer className="border-t border-border bg-secondary">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-5">
           <div>
-            <div className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2" aria-label="Noxptide home">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <FlaskConical className="h-5 w-5" aria-hidden="true" />
               </span>
               <span className="text-lg font-bold text-primary">Noxptide</span>
-            </div>
+            </Link>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               The UK's quality-first research peptide supplier. Independently verified ≥99% purity,
               batch-specific Certificates of Analysis, and tracked delivery on every order.

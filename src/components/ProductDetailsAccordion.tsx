@@ -1,7 +1,70 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { Truck, Package, BadgePercent, RotateCcw, Plus } from 'lucide-react'
 import type { Product } from '../data/products'
+
+const INTERNAL_LINKS: Record<string, Record<string, string>> = {
+  'bpc-157': {
+    'TB-500': '/product/tb-500',
+    'BPC-157 and TB-500': '/guides/bpc-157-vs-tb-500',
+    'preparative HPLC': '/quality',
+  },
+  'tb-500': {
+    'BPC-157': '/product/bpc-157',
+    'buy TB500 (TB-500)': '/shop',
+  },
+  ipamorelin: {
+    'CJC-1295': '/product/cjc-1295-no-dac',
+    'preparative HPLC': '/quality',
+    'CJC-1295–Ipamorelin prices': '/shop',
+  },
+  'hgh-fragment-176-191': {
+    'AOD-9604': '/product/aod-9604',
+    'HGH Fragment 5 mg': '/shop',
+  },
+}
+
+function LinkedDescription({ product, text }: { product: Product; text: string }) {
+  const links = INTERNAL_LINKS[product.slug]
+  if (!links) return <>{text}</>
+
+  const phrases = Object.keys(links).sort((a, b) => b.length - a.length)
+  const parts: ReactNode[] = []
+  let remaining = text
+  let key = 0
+
+  while (remaining) {
+    let firstIndex = -1
+    let firstPhrase = ''
+
+    for (const phrase of phrases) {
+      const idx = remaining.indexOf(phrase)
+      if (idx !== -1 && (firstIndex === -1 || idx < firstIndex)) {
+        firstIndex = idx
+        firstPhrase = phrase
+      }
+    }
+
+    if (firstIndex === -1) {
+      parts.push(remaining)
+      break
+    }
+
+    if (firstIndex > 0) parts.push(remaining.slice(0, firstIndex))
+    parts.push(
+      <Link
+        key={`${firstPhrase}-${key++}`}
+        to={links[firstPhrase]}
+        className="font-semibold text-primary hover:underline"
+      >
+        {firstPhrase}
+      </Link>,
+    )
+    remaining = remaining.slice(firstIndex + firstPhrase.length)
+  }
+
+  return <>{parts}</>
+}
 
 const strips = [
   { icon: Truck, color: 'text-emerald-600', text: 'Free UK Delivery on orders over £25' },
@@ -70,7 +133,7 @@ export default function ProductDetailsAccordion({ product }: { product: Product 
         <AccordionSection title="Description" defaultOpen>
           {product.description.map((p, i) => (
             <p key={i} className={i > 0 ? 'mt-3' : ''}>
-              {p}
+              <LinkedDescription product={product} text={p} />
             </p>
           ))}
         </AccordionSection>

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router'
 import { useSeo } from '../hooks/useSeo'
 import { categorySeo, notFoundSeo } from '../data/seo'
@@ -5,6 +6,36 @@ import { categories, productsByCategory } from '../data/products'
 import ProductCard from '../components/ProductCard'
 import { isProductHidden, useProductOverrides } from '../hooks/useProductOverrides'
 import NotFound from './NotFound'
+
+function CategoryDescription({ text, slug }: { text: string; slug: string }) {
+  if (slug !== 'recovery-repair') return <>{text}</>
+
+  const links: Record<string, string> = {
+    'BPC-157': '/product/bpc-157',
+    'TB-500': '/product/tb-500',
+  }
+  const parts: ReactNode[] = []
+  const pattern = /(BPC-157|TB-500)/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = pattern.exec(text))) {
+    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index))
+    parts.push(
+      <Link
+        key={`${match[0]}-${match.index}`}
+        to={links[match[0]]}
+        className="font-medium text-teal-700 hover:underline"
+      >
+        {match[0]}
+      </Link>,
+    )
+    lastIndex = pattern.lastIndex
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex))
+
+  return <>{parts}</>
+}
 
 /**
  * Crawlable category hub (audit §8). Each category is an indexable landing
@@ -51,7 +82,9 @@ export default function Category() {
         {category.tagline ? (
           <p className="mt-2 text-lg text-slate-600">{category.tagline}</p>
         ) : null}
-        <p className="mt-4 leading-relaxed text-slate-600">{category.description}</p>
+        <p className="mt-4 leading-relaxed text-slate-600">
+          <CategoryDescription text={category.description} slug={category.slug} />
+        </p>
         <p className="mt-4 leading-relaxed text-slate-600">
           Every batch in this range is independently verified by HPLC and mass spectrometry and
           ships with a batch-specific Certificate of Analysis — see{' '}

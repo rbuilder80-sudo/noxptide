@@ -50,8 +50,11 @@ export default function Quality() {
           This page explains exactly how we test: the methodology behind every peptide certificate
           of analysis we issue, what those tests can and cannot tell you, how to match your vial to
           its batch paperwork, and the release workflow a batch must pass before it reaches our
-          shelf. As a peptide supplier UK researchers can audit, we would rather show you the
-          process than ask you to trust it.
+          shelf. As a{' '}
+          <Link to="/" className="font-semibold text-primary hover:underline">
+            peptide supplier UK
+          </Link>{' '}
+          researchers can audit, we would rather show you the process than ask you to trust it.
         </p>
       </div>
 
@@ -123,11 +126,17 @@ export default function Quality() {
           <h2 className="text-2xl font-extrabold tracking-tight">What These Tests Cannot Tell You</h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
             Honest testing means honest limitations. HPLC purity measures the sample tested, at the
-            time it was tested — it cannot guarantee stability after poor peptide storage or
-            incorrect peptide reconstitution in your own laboratory, which is why we publish
+            time it was tested — it cannot guarantee stability after poor{' '}
+            <Link
+              to="/guides/peptide-reconstitution-storage-guide"
+              className="font-semibold text-primary hover:underline"
+            >
+              peptide storage
+            </Link>{' '}
+            or incorrect peptide reconstitution in your own laboratory, which is why we publish
             handling guidance alongside every product. MS confirms molecular weight, not full
-            amino-acid sequence. And a COA is only meaningful when its batch number matches the
-            vial in your hand: a generic, undated certificate proves nothing.
+            amino-acid sequence. And a COA is only meaningful when its batch number matches the vial
+            in your hand: a generic, undated certificate proves nothing.
           </p>
           <p className="mt-4 leading-relaxed text-muted-foreground">
             Counter and residual content (for example water or counter-ions in the lyophilised

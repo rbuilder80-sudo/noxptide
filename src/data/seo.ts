@@ -35,15 +35,25 @@ export interface RouteSeo {
 export function organizationLd() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'OnlineStore',
+    '@type': ['Organization', 'OnlineStore'],
     '@id': ORG_ID,
-    name: SITE_NAME,
+    name: 'Noxptide Ltd',
+    alternateName: SITE_NAME,
     url: `${SITE_URL}/`,
     logo: `${SITE_URL}/favicon.svg`,
     image: DEFAULT_OG_IMAGE,
     description:
       'UK supplier of ≥99% purity research peptides with batch-specific Certificates of Analysis. For laboratory research use only.',
     email: 'support@noxptide.co.uk',
+    areaServed: { '@type': 'Country', name: 'United Kingdom' },
+    foundingLocation: { '@type': 'Country', name: 'United Kingdom' },
+    knowsAbout: [
+      'Research peptides',
+      'HPLC peptide testing',
+      'Mass spectrometry peptide identity verification',
+      'Certificates of Analysis',
+      'Laboratory research materials',
+    ],
     contactPoint: {
       '@type': 'ContactPoint',
       email: 'support@noxptide.co.uk',
@@ -168,6 +178,19 @@ const PRODUCT_TITLE_OVERRIDES: Record<string, string> = {
   'thymosin-alpha-1': 'Thymosin Alpha-1 Peptide UK | ≥99% Purity | Noxptide',
 }
 
+const PRODUCT_DESCRIPTION_OVERRIDES: Record<string, string> = {
+  'bpc-157':
+    'Get detailed product information on BPC-157 Research Peptide UK, including batch documentation, specifications and reliable UK delivery for research purposes.',
+  'tb-500':
+    'Get detailed information about TB-500 Research Peptide UK, including product specifications, batch documentation and reliable UK delivery for research purposes.',
+  ipamorelin:
+    'Review detailed information about Ipamorelin Research Peptide UK, including product specifications, testing documentation and reliable UK delivery for research use.',
+  'cjc-1295-no-dac':
+    'Compare CJC-1295 No DAC vs With DAC, including key differences, product specifications, purity details and research information for laboratory applications.',
+  tesamorelin:
+    'Explore Tesamorelin 10mg and 5mg research peptides in the UK, with detailed product information, specifications and reliable delivery for laboratory research.',
+}
+
 export function productImageUrl(product: Product, sizeLabel?: string) {
   const label = (sizeLabel ?? product.sizes[0].label).replace(/ /g, '').toLowerCase()
   return `${SITE_URL}/images/products/${product.slug}-${label}.webp`
@@ -178,7 +201,9 @@ export function productSeo(product: Product): RouteSeo {
   const title =
     PRODUCT_TITLE_OVERRIDES[product.slug] ??
     `${product.name} Research Peptide UK | ≥99% Purity | Noxptide`
-  const description = `Order ${product.name} research peptide in the UK with ≥99% purity, batch-specific COA and tracked delivery. For laboratory research use only.`
+  const description =
+    PRODUCT_DESCRIPTION_OVERRIDES[product.slug] ??
+    `Order ${product.name} research peptide in the UK with ≥99% purity, batch-specific COA and tracked delivery. For laboratory research use only.`
   return {
     title,
     description,
@@ -394,14 +419,14 @@ const noindex = (path: string, title: string, description: string): RouteSeo =>
 export const coreSeo: Record<string, RouteSeo> = {
   '/': base(
     '/',
-    'UK Research Peptides | ≥99% Purity & Batch COAs',
-    'UK research peptides with ≥99% HPLC purity, independent verification and batch-specific COAs. Tracked delivery. For laboratory research use only.',
+    'Buy Peptides UK | peptide manufacturers | Noxptide Ltd',
+    'Looking to buy peptides in the UK? Explore high-quality research peptides from Noxptide Ltd, with batch testing, verified quality and secure UK delivery.',
     { jsonLd: [organizationLd(), websiteLd()] },
   ),
   '/shop': base(
     '/shop',
-    'Research Peptides UK | Shop the Noxptide Catalogue',
-    'Browse Noxptide research peptides with ≥99% HPLC purity, batch-specific COAs and tracked UK delivery. Supplied strictly for laboratory research.',
+    'Buy Peptides UK for Laboratory Research | Noxptide Ltd',
+    'Buy peptides for laboratory research in UK with Noxptide Ltd. Explore our range of research peptides with product details and convenient UK delivery.',
     {
       jsonLd: [
         {
@@ -452,8 +477,8 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/quality': base(
     '/quality',
-    'Peptide Quality Testing & Certificates of Analysis',
-    'See how Noxptide verifies identity and ≥99% purity using HPLC, mass spectrometry and batch-specific Certificates of Analysis for research peptides.',
+    'HPLC Peptide & Purity Testing Solutions | Noxptide',
+    'Noxptide provides detailed information on HPLC peptide testing and peptide purity testing, helping verify the quality and purity of research peptides.',
     {
       jsonLd: [
         webPageLd(
