@@ -177,6 +177,7 @@ const PRODUCT_TITLE_OVERRIDES: Record<string, string> = {
   'cjc-1295-dac': 'CJC-1295 With DAC Peptide UK | ≥99% Purity | Noxptide',
   'thymosin-alpha-1': 'Thymosin Alpha-1 Peptide UK | ≥99% Purity | Noxptide',
   'igf-1-lr3': 'IGF-1 LR3 UK | COA-Verified Research Peptide | Noxptide',
+  'ghrp-2': 'GHRP-2 UK | Pralmorelin Research Peptide | Noxptide',
 }
 
 const PRODUCT_DESCRIPTION_OVERRIDES: Record<string, string> = {
@@ -192,6 +193,8 @@ const PRODUCT_DESCRIPTION_OVERRIDES: Record<string, string> = {
     'Explore Tesamorelin 10mg and 5mg research peptides in the UK, with detailed product information, specifications and reliable delivery for laboratory research.',
   'igf-1-lr3':
     'Review IGF-1 LR3 for UK lab research: 1 mg and 2 mg vials, ≥99% purity, MS identity confirmation, batch COA and tracked delivery.',
+  'ghrp-2':
+    'Review GHRP-2, also known as Pralmorelin, for UK lab research: 5 mg and 10 mg vials, ≥99% purity, batch COA and tracked delivery.',
 }
 
 export function productImageUrl(product: Product, sizeLabel?: string) {
