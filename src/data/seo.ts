@@ -176,6 +176,7 @@ const PRODUCT_TITLE_OVERRIDES: Record<string, string> = {
   'hgh-fragment-176-191': 'HGH Fragment 176-191 Peptide UK | ≥99% Purity | Noxptide',
   'cjc-1295-dac': 'CJC-1295 With DAC Peptide UK | ≥99% Purity | Noxptide',
   'thymosin-alpha-1': 'Thymosin Alpha-1 Peptide UK | ≥99% Purity | Noxptide',
+  'igf-1-lr3': 'IGF-1 LR3 UK | COA-Verified Research Peptide | Noxptide',
 }
 
 const PRODUCT_DESCRIPTION_OVERRIDES: Record<string, string> = {
@@ -189,6 +190,8 @@ const PRODUCT_DESCRIPTION_OVERRIDES: Record<string, string> = {
     'Compare CJC-1295 No DAC vs With DAC, including key differences, product specifications, purity details and research information for laboratory applications.',
   tesamorelin:
     'Explore Tesamorelin 10mg and 5mg research peptides in the UK, with detailed product information, specifications and reliable delivery for laboratory research.',
+  'igf-1-lr3':
+    'Review IGF-1 LR3 for UK lab research: 1 mg and 2 mg vials, ≥99% purity, MS identity confirmation, batch COA and tracked delivery.',
 }
 
 export function productImageUrl(product: Product, sizeLabel?: string) {
@@ -419,8 +422,8 @@ const noindex = (path: string, title: string, description: string): RouteSeo =>
 export const coreSeo: Record<string, RouteSeo> = {
   '/': base(
     '/',
-    'Buy Peptides UK | peptide manufacturers | Noxptide Ltd',
-    'Looking to buy peptides in the UK? Explore high-quality research peptides from Noxptide Ltd, with batch testing, verified quality and secure UK delivery.',
+    'Buy Research Peptides UK | ≥99% Purity & COAs | Noxptide',
+    'Buy research peptides in the UK from Noxptide: ≥99% HPLC purity, batch COAs, secure checkout and tracked UK delivery. Laboratory research use only.',
     { jsonLd: [organizationLd(), websiteLd()] },
   ),
   '/shop': base(

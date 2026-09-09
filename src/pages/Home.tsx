@@ -72,12 +72,12 @@ export default function Home() {
                 Every batch independently verified to ≥99% purity
               </p>
               <h1 className="mt-6 font-display text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-                UK research peptides with{' '}
+                Buy research peptides in the UK with{' '}
                 <em className="italic text-accent">verifiable ≥99% purity</em>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                The UK's quality-first research peptide supplier — synthesis-grade compounds,
-                batch-specific Certificates of Analysis, and same-day dispatch from UK stock.
+                Noxptide supplies laboratory research peptides with batch-specific Certificates
+                of Analysis, secure checkout, and same-day dispatch from UK stock.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Link
