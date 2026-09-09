@@ -173,9 +173,9 @@ function faqPageLd(faqs: { q: string; a: string }[]) {
 /** Title-tag overrides where the product name is long (audit table). */
 const PRODUCT_TITLE_OVERRIDES: Record<string, string> = {
   'cjc-1295-no-dac': 'CJC-1295 (No DAC) Peptide UK | ≥99% Purity | Noxptide',
-  'hgh-fragment-176-191': 'HGH Fragment 176-191 Peptide UK | ≥99% Purity | Noxptide',
+  'hgh-fragment-176-191': 'HGH Fragment 176-191 UK | COA-Verified | Noxptide',
   'cjc-1295-dac': 'CJC-1295 With DAC Peptide UK | ≥99% Purity | Noxptide',
-  'thymosin-alpha-1': 'Thymosin Alpha-1 Peptide UK | ≥99% Purity | Noxptide',
+  'thymosin-alpha-1': 'Thymosin Alpha-1 UK | TA1 Research Peptide | Noxptide',
   'igf-1-lr3': 'IGF-1 LR3 UK | COA-Verified Research Peptide | Noxptide',
   'ghrp-2': 'GHRP-2 UK | Pralmorelin Research Peptide | Noxptide',
 }
@@ -191,10 +191,14 @@ const PRODUCT_DESCRIPTION_OVERRIDES: Record<string, string> = {
     'Compare CJC-1295 No DAC vs With DAC, including key differences, product specifications, purity details and research information for laboratory applications.',
   tesamorelin:
     'Explore Tesamorelin 10mg and 5mg research peptides in the UK, with detailed product information, specifications and reliable delivery for laboratory research.',
+  'hgh-fragment-176-191':
+    'Review HGH Fragment 176-191 for UK lab research: 5 mg vials, ≥99% purity, batch COA, storage guidance and tracked delivery.',
   'igf-1-lr3':
     'Review IGF-1 LR3 for UK lab research: 1 mg and 2 mg vials, ≥99% purity, MS identity confirmation, batch COA and tracked delivery.',
   'ghrp-2':
     'Review GHRP-2, also known as Pralmorelin, for UK lab research: 5 mg and 10 mg vials, ≥99% purity, batch COA and tracked delivery.',
+  'thymosin-alpha-1':
+    'Review Thymosin Alpha-1, also called TA1, for UK lab research: 5 mg vials, ≥99% purity, batch COA and tracked delivery.',
 }
 
 export function productImageUrl(product: Product, sizeLabel?: string) {
@@ -261,7 +265,7 @@ const GUIDE_TITLE_OVERRIDES: Record<string, string> = {
   'ipamorelin-vs-cjc-1295': 'Ipamorelin vs CJC-1295: Secretagogue Research Compared',
   'semax-research-guide': 'Semax Research Guide: The ACTH(4-10) Analogue in CNS Studies',
   'ghk-cu-research-guide': 'GHK-Cu Research Guide: The Copper Peptide in Matrix Research',
-  'peptide-reconstitution-storage-guide': 'How to Reconstitute & Store Research Peptides | Noxptide',
+  'peptide-reconstitution-storage-guide': 'Peptide Reconstitution & Storage Guide | Noxptide',
   'how-to-read-peptide-coa': 'How to Read a Peptide Certificate of Analysis | Noxptide',
   'melanotan-2-vs-pt-141': 'Melanotan II vs PT-141: Melanocortin Research Compared',
   'epitalon-research-guide': 'Epitalon Research Guide: The Telomerase-Pathway Tetrapeptide',
@@ -282,7 +286,7 @@ const GUIDE_DESCRIPTION_OVERRIDES: Record<string, string> = {
   'ghk-cu-research-guide':
     'A laboratory guide to GHK-Cu (Copper Tripeptide-1): four decades of skin and matrix research, what the blue colour tells you about quality, and correct storage.',
   'peptide-reconstitution-storage-guide':
-    'Step-by-step laboratory guidance on reconstituting lyophilised peptides with bacteriostatic water, storage temperatures, shelf life and freeze-thaw limits.',
+    'Step-by-step lab guide to peptide reconstitution, bacteriostatic water, storage temperatures, shelf life and freeze-thaw limits.',
   'how-to-read-peptide-coa':
     'What every section of a peptide COA actually means: HPLC purity traces, mass spectrometry identity, batch numbers, appearance testing, and red flags.',
   'melanotan-2-vs-pt-141':
@@ -458,8 +462,8 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/guides': base(
     '/guides',
-    'Research Peptide Guides, Handling & COA Resources',
-    'Evidence-led guides to research peptide handling, storage, COAs and compound comparisons. Written for laboratory research; not medical advice.',
+    'Research Peptide Guides UK | Storage, COAs & Handling',
+    'Browse Noxptide research peptide guides for storage, reconstitution, COA checks and compound comparisons. Laboratory research use only.',
     {
       jsonLd: [
         {
@@ -483,8 +487,8 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/quality': base(
     '/quality',
-    'HPLC Peptide & Purity Testing Solutions | Noxptide',
-    'Noxptide provides detailed information on HPLC peptide testing and peptide purity testing, helping verify the quality and purity of research peptides.',
+    'Peptide Purity Testing & COAs | HPLC + MS | Noxptide',
+    'See how Noxptide verifies research peptide purity with HPLC, mass spectrometry identity checks and batch-specific Certificates of Analysis.',
     {
       jsonLd: [
         webPageLd(
