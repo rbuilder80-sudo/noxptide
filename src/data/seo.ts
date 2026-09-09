@@ -530,14 +530,14 @@ export const coreSeo: Record<string, RouteSeo> = {
   ),
   '/shipping': base(
     '/shipping',
-    'Research Peptide Shipping & UK Delivery | Noxptide',
-    'Noxptide shipping information: dispatch cut-offs, tracked UK delivery, packaging, costs and European options for laboratory research peptide orders.',
+    'Research Peptide Order Delivery UK | Noxptide Shipping',
+    'Delivery details for Noxptide research peptide orders: same-day dispatch cut-off, tracked UK options, packaging and European delivery notes.',
     {
       jsonLd: [
         webPageLd(
           'Research Peptide Shipping & Delivery',
           '/shipping',
-          'Dispatch cut-offs, tracked UK delivery, packaging, costs and European options for laboratory research peptide orders.',
+          'Delivery details for Noxptide research peptide orders, including dispatch cut-offs, tracked UK options, packaging and European delivery notes.',
         ),
         breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Shipping & Delivery' }]),
       ],
