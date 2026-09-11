@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-09-11T15:59:32.460Z",
-  "totalRuns": 216,
-  "failures": 4,
+  "generatedAt": "2026-09-11T20:34:40.025Z",
+  "totalRuns": 218,
+  "failures": 5,
   "successRate": 98,
   "byAction": {
     "health": {
-      "total": 107,
+      "total": 108,
       "ok": 103,
-      "fail": 4,
+      "fail": 5,
       "skip": 0
     },
     "queue-run": {
@@ -17,10 +17,10 @@
       "skip": 2
     },
     "indexnow": {
-      "total": 107,
+      "total": 108,
       "ok": 0,
       "fail": 0,
-      "skip": 107
+      "skip": 108
     }
   }
 }
