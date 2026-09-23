@@ -1,5 +1,5 @@
 import * as jose from "jose";
-import { env } from "../lib/env";
+import { env, requireEnv } from "../lib/env";
 import type { SessionPayload } from "./types";
 
 const JWT_ALG = "HS256";
@@ -7,6 +7,7 @@ const JWT_ALG = "HS256";
 export async function signSessionToken(
   payload: SessionPayload,
 ): Promise<string> {
+  requireEnv("APP_SECRET");
   const secret = new TextEncoder().encode(env.appSecret);
   return new jose.SignJWT(payload)
     .setProtectedHeader({ alg: JWT_ALG })
@@ -23,6 +24,7 @@ export async function verifySessionToken(
     return null;
   }
   try {
+    requireEnv("APP_SECRET");
     const secret = new TextEncoder().encode(env.appSecret);
     const { payload } = await jose.jwtVerify(token, secret, {
       algorithms: [JWT_ALG],

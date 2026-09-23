@@ -1,4 +1,4 @@
-import { env } from "../lib/env";
+import { env, requireEnv } from "../lib/env";
 import type { UserProfile } from "./types";
 
 async function kimiRequest<T>(
@@ -6,6 +6,7 @@ async function kimiRequest<T>(
   token: string,
   init?: RequestInit,
 ): Promise<T | null> {
+  requireEnv("KIMI_OPEN_URL");
   const resp = await fetch(`${env.kimiOpenUrl}${path}`, {
     ...init,
     headers: {

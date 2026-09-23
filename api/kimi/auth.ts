@@ -2,7 +2,7 @@ import type { Context } from "hono";
 import { setCookie } from "hono/cookie";
 import * as jose from "jose";
 import * as cookie from "cookie";
-import { env } from "../lib/env";
+import { env, requireEnvGroup } from "../lib/env";
 import { getSessionCookieOptions } from "../lib/cookies";
 import { Paths, Session } from "@contracts/constants";
 import { Errors } from "@contracts/errors";
@@ -37,9 +37,19 @@ async function exchangeAuthCode(
   return resp.json() as Promise<TokenResponse>;
 }
 
-const jwks = jose.createRemoteJWKSet(
-  new URL(`${env.kimiAuthUrl}/api/.well-known/jwks.json`),
-);
+let jwks: ReturnType<typeof jose.createRemoteJWKSet> | null = null;
+
+function requireKimiOAuthEnv() {
+  requireEnvGroup(["APP_ID", "APP_SECRET", "KIMI_AUTH_URL", "KIMI_OPEN_URL"]);
+}
+
+function getJwks() {
+  requireKimiOAuthEnv();
+  jwks ??= jose.createRemoteJWKSet(
+    new URL(`${env.kimiAuthUrl}/api/.well-known/jwks.json`),
+  );
+  return jwks;
+}
 
 function getPublicOrigin(c: Context) {
   const requestUrl = new URL(c.req.url);
@@ -68,6 +78,18 @@ function decodeRedirectState(state: string) {
 
 export function createOAuthLoginHandler() {
   return (c: Context) => {
+    try {
+      requireKimiOAuthEnv();
+    } catch (error) {
+      return c.json(
+        {
+          error: "OAuth is not configured",
+          detail: error instanceof Error ? error.message : String(error),
+        },
+        503,
+      );
+    }
+
     const redirectUri = getOAuthRedirectUri(c);
     const state = Buffer.from(redirectUri, "utf8").toString("base64");
     const url = new URL(`${env.kimiAuthUrl}/api/oauth/authorize`);
@@ -85,7 +107,7 @@ export function createOAuthLoginHandler() {
 async function verifyAccessToken(
   accessToken: string,
 ): Promise<{ userId: string; clientId: string }> {
-  const { payload } = await jose.jwtVerify(accessToken, jwks);
+  const { payload } = await jose.jwtVerify(accessToken, getJwks());
   const userId = payload.user_id as string;
   const clientId = payload.client_id as string;
   if (!userId) {
