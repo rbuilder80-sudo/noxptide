@@ -390,3 +390,5 @@
 {"ts":"2026-10-04T20:56:22.929Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
 {"ts":"2026-10-05T04:28:09.865Z","action":"health","status":"ok","detail":"/=200, /sitemap.xml=200, /robots.txt=200"}
 {"ts":"2026-10-05T04:28:09.866Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
+{"ts":"2026-10-05T13:48:54.079Z","action":"health","status":"ok","detail":"/=200, /sitemap.xml=200, /robots.txt=200"}
+{"ts":"2026-10-05T13:48:54.080Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
