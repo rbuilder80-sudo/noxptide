@@ -500,3 +500,5 @@
 {"ts":"2026-10-21T11:18:20.712Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
 {"ts":"2026-10-21T16:44:20.113Z","action":"health","status":"ok","detail":"/=200, /sitemap.xml=200, /robots.txt=200"}
 {"ts":"2026-10-21T16:44:20.114Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
+{"ts":"2026-10-21T21:19:46.340Z","action":"health","status":"ok","detail":"/=200, /sitemap.xml=200, /robots.txt=200"}
+{"ts":"2026-10-21T21:19:46.341Z","action":"indexnow","status":"skipped","detail":"no INDEXNOW_KEY configured"}
