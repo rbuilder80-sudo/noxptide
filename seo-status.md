@@ -1,10 +1,10 @@
 # SEO Master — Live Status
 
-_Generated 2026-11-22T05:28:21.050Z · site https://www.noxptide.co.uk · every run recorded in `seo/run-log.jsonl`_
+_Generated 2026-11-22T14:10:54.005Z · site https://www.noxptide.co.uk · every run recorded in `seo/run-log.jsonl`_
 
 ## Summary
 
-- Runs recorded: **692**
+- Runs recorded: **694**
 - Failures: **48**
 - Success rate: **93%**
 
@@ -12,14 +12,16 @@ _Generated 2026-11-22T05:28:21.050Z · site https://www.noxptide.co.uk · every 
 
 | Action | Total | OK | Fail | Skipped |
 |---|---|---|---|---|
-| health | 345 | 297 | 48 | 0 |
+| health | 346 | 298 | 48 | 0 |
 | queue-run | 2 | 0 | 0 | 2 |
-| indexnow | 345 | 0 | 0 | 345 |
+| indexnow | 346 | 0 | 0 | 346 |
 
 ## Recent runs
 
 | Time (UTC) | Action | Status | Detail |
 |---|---|---|---|
+| 2026-11-22T14:10:54.004Z | indexnow | skipped | no INDEXNOW_KEY configured |
+| 2026-11-22T14:10:54.003Z | health | ok | /=200, /sitemap.xml=200, /robots.txt=200 |
 | 2026-11-22T05:28:21.049Z | indexnow | skipped | no INDEXNOW_KEY configured |
 | 2026-11-22T05:28:21.048Z | health | ok | /=200, /sitemap.xml=200, /robots.txt=200 |
 | 2026-11-21T22:50:24.065Z | indexnow | skipped | no INDEXNOW_KEY configured |
@@ -28,8 +30,6 @@ _Generated 2026-11-22T05:28:21.050Z · site https://www.noxptide.co.uk · every 
 | 2026-11-21T14:19:40.944Z | health | ok | /=200, /sitemap.xml=200, /robots.txt=200 |
 | 2026-11-21T05:54:35.445Z | indexnow | skipped | no INDEXNOW_KEY configured |
 | 2026-11-21T05:54:35.444Z | health | ok | /=200, /sitemap.xml=200, /robots.txt=200 |
-| 2026-11-20T23:44:01.745Z | indexnow | skipped | no INDEXNOW_KEY configured |
-| 2026-11-20T23:44:01.744Z | health | ok | /=200, /sitemap.xml=200, /robots.txt=200 |
 
 ## Content queue
 
